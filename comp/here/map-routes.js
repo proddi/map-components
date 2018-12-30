@@ -27,31 +27,49 @@ function addToColor(delta) {
     return (color) => adoptColor(color, delta);
 }
 
-const _ROUTE_STYLES = {
-    "selected": {
-        default:    [{ strokeColor: "black",  lineWidth: 7 }, { strokeColor: "white",  lineWidth: 5, x:1 }],
-//            "walk":     [{ strokeColor: "black",  lineWidth: 3, lineDash: [3, 6] }, {}],
-//            "bus":      [{ strokeColor: "purple", lineWidth: 3 }, {}],
-//            "bus":      [{ strokeColor: "white"  }, { strokeColor: "purple" }],   // sbahn
-//            "metro":    [{ strokeColor: "#222266" }, { strokeColor: "#8888FF" }],   // sbahn
-//            "subway":   [{ strokeColor: "brown",  lineWidth: 6 }, {}],   // ubahn
-//            "train":    [{ strokeColor: "red",    lineWidth: 8 }, {}],   // train
+
+function mergeWithColor(color, weight) {
+    return function(prev) {
+        if (!prev) return color;
+        return mergeColor(prev, color, weight);
+    }
+}
+
+
+const _ROUTE_STYLES_OUTLINE = {
+    name:           "outline",
+    selected: {
+        default:    { strokeColor: "#777777", lineWidth: 8 },
     },
-    "passive": {
-        default:    [{ strokeColor: "#888888", lineWidth: 7 }, { strokeColor: "#cccccc", lineWidth: 5 }],
-        "walk":     [{ strokeColor: "#888888",  lineWidth: 7, lineDash: [3, 10] }, { strokeColor: "#cccccc",  lineWidth: 5, lineDash: [3, 10] }],
-        "bus":      [{ strokeColor: "#804080", lineWidth: 7 }, { strokeColor: "#a36aa3",   lineWidth: 5 }],
+    passive: {
+        default:    { strokeColor: "#888888", lineWidth: 7 },
+        walk:       { strokeColor: "#888888", lineWidth: 7, lineDash: [3, 10] },
+        bus:        { strokeColor: "#804080", lineWidth: 7 },
     },
-    "highlighed": {
-        default:    [{ strokeColor: addToColor(-16), lineWidth: 8 }, { strokeColor: addToColor(16), l_ineWidth: 4 }],
+    highlighed: {
+        default:    { strokeColor: "#666666", lineWidth: 8 },
+//        default:    mergeColor("strokeColor", "#222222", .5, { lineWidth: 8 }),
+//        default:    addToColor("strokeColor", -16, { strokeColor: addToColor(-16), lineWidth: 8 },
     },
 }
 
-const _ROUTE_ZINDICES = {
-    "passive": 0,
-    "selected": 10,
-    "highlighed": 5,
+const _ROUTE_STYLES = {
+    name:           "line",
+    selected: {
+        default:    { strokeColor: "#dddddd", lineWidth: 5, x:1 },
+//        default:    foo({ strokeColor: "#dddddd", lineWidth: 5, x:1 }),
+//        metro:      { strokeColor: "red",    lineWidth: 5, x:1 },
+    },
+    passive: {
+        default:    { strokeColor: "#cccccc", lineWidth: 5 },
+//        walk:       { strokeColor: "#cccccc", lineWidth: 5, lineDash: [3, 10] },
+//        bus:        { strokeColor: "#a36aa3", lineWidth: 5 },
+    },
+    highlighed: {
+        default:    { strokeColor: "#dddddd", l_ineWidth: 4 },
+    },
 }
+
 
 class HereMapRoutes extends HTMLElement {
     constructor() {
@@ -62,6 +80,7 @@ class HereMapRoutes extends HTMLElement {
     connectedCallback() {
         let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("here-map"));
         let router = document.querySelector(this.getAttribute("router"));
+        let styler = document.querySelector(this.getAttribute("styler"));
 
         mapComp.whenReady.then(({map}) => {
             router.addEventListener("request", (ev) => {
@@ -70,13 +89,14 @@ class HereMapRoutes extends HTMLElement {
             router.addEventListener("routes", (ev) => {
                 this.addRoutes(map, ev.detail.routes);
             });
-            router.addEventListener("styles", (ev) => {
-                let styles = ev.detail;
-                for (let id in styles) {
-                    this._applyRouteStyleUi(this._routeUi[id], styles[id]);
-                }
-            });
-
+            if (styler) {
+                styler.addEventListener("styles", (ev) => {
+                    let styles = ev.detail;
+                    for (let id in styles) {
+                        this._applyRouteStyleUi(this._routeUi[id], styles[id]);
+                    }
+                });
+            }
             router.currentRoutes && this.addRoutes(map, router.currentRoutes);
         });
         this._router = router;
@@ -91,11 +111,11 @@ class HereMapRoutes extends HTMLElement {
 
     addRoutes(map, routes, style=undefined) {
         for (let route of routes) {
-            this.showRoute(map, route, style);
+            this.showRoute(map, route);
         }
     }
 
-    showRoute(map, route, styles=undefined) {
+    showRoute(map, route, styles=[]) {
         let ui = new H.map.Group();
         for (let leg of route.legs) {
             this._addLegUI(ui, leg);
@@ -122,35 +142,65 @@ class HereMapRoutes extends HTMLElement {
     }
 
     _applyRouteStyleUi(uiRoot, styleNames) {
-        styleNames = ["passive"].concat(styleNames || []);
-        let zIndex = styleNames.map(name => _ROUTE_ZINDICES[name]).reduce((prev, val) => Math.max(prev, val), 0);
-        uiRoot.setZIndex(zIndex);
+        let state = styleNames.length > 0 ? styleNames[styleNames.length-1] : "passive";
+        uiRoot.setZIndex(ROUTE_ZINDICES[state] || 0);
         uiRoot.getObjects().forEach((ui, index) => {
-            index = index % 2;
+            let cycle = ["outline", "inline"][index%2];
             let leg = ui.getData();
-            let type = leg.transport.type;
-            let style = this._combineStyles(
-                styleNames.map(
-                    setName => _ROUTE_STYLES[setName][type] || _ROUTE_STYLES[setName].default
-                ).map(pair => pair[index])
+            let transport = leg.transport;
+            let style = combineStyles(
+                { color: transport.color || "#888888", outline: transport.color || "#888888",  },   // color layer
+                TRANSPORT_STYLES[transport.type] || TRANSPORT_STYLES.default,
+                STATE_STYLES[state] || STATE_STYLES.default,
             );
-            if (style.x && leg.transport.color) style.strokeColor = leg.transport.color;
-            ui.setStyle(style);
+            ui.setStyle(CYCLE_FINISHER[index%2](style));
         });
     }
-
-    _combineStyles(styles) {
-        let result = {};
-        for (let style of styles) {
-            for (let key in style) {
-                let value = style[key];
-                result[key] = value.call ? style[key](result[key]) : value;
-            }
-        }
-        return result;
-    }
-
 }
+
+
+const ROUTE_ZINDICES = {
+    "passive": 0,
+    "selected": 5,
+    "highlighted": 10,
+}
+
+
+function combineStyles(...styles) {
+    return styles.reduce((style, add) => {
+        let computed = {};
+        for (let key in add) {
+            let val = add[key];
+            computed[key] = val.call ? val(style[key]) : val;
+        }
+        return Object.assign({}, style, computed);
+    }, {});
+}
+
+const TRANSPORT_STYLES = {
+    default:    {},
+    walk:       { dash: [3, 10], },
+}
+
+const STATE_STYLES = {
+    default:    { width: 5, border: 2, },
+    passive:    { color: mergeWithColor("#cccccc", .9), outline: mergeWithColor("#888888", .4), width: 5, border: 2, },
+    selected:   { color: mergeWithColor("#cccccc", .2), outline: mergeWithColor("#444444", .4), width: 5, border: 3, },
+    highlighted:{ color: mergeWithColor("#cccccc", .6), outline: mergeWithColor("#666666", .4), width: 5, border: 3, },
+}
+
+const CYCLE_FINISHER = [
+    function(style) {  // outline
+        style.lineWidth = (style.width || 0) + (style.border || 0);
+        style.strokeColor = style.outline;
+        return style;
+    },
+    function(style) {  // inline
+        style.lineWidth = style.width;
+        style.strokeColor = style.color;
+        return style;
+    },
+];
 
 
 customElements.define("here-map-routes", HereMapRoutes);

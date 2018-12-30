@@ -77,16 +77,17 @@ class HereTransitRouter extends BaseRouter {
 function buildTransport(transport) {
     let t = Object.assign({}, transport.At || {}, transport);
     return new Transport({
-            mode: ROUTER_MODES[t.mode] || t.mode,
+            type: ROUTER_MODES[t.mode] || t.mode,
             name: t.name || "walk",
             color: t.color});
 }
 
 
 const ROUTER_MODES = {
-    "20": "walk",
-    "4": "metro",
-    "7": "subway",
+    4:  "metro",
+    5:  "bus",
+    7:  "subway",
+    20: "walk",
 }
 
 

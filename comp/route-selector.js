@@ -134,7 +134,7 @@ class RouteSelector extends HTMLElement {
     }
 
     highlightRoute(route) {
-        this._emitRouteStyle(route, this._selectedRoute == route && "selected", "highlighed");
+        this._emitRouteStyle(route, this._selectedRoute == route && "selected", "highlighted");
     }
 
     unhighlightRoute(route) {
