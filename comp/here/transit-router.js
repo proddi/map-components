@@ -62,7 +62,7 @@ class HereTransitRouter extends BaseRouter {
                         let departure = buildLocation(sec.Dep);
                         let arrival = buildLocation(sec.Arr);
                         let transport = buildTransport(sec.Dep.Transport);
-                        let geometry = sec.Graph ? sec.Graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [];
+                        let geometry = sec.graph ? sec.graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [];
                         return new Leg(departure, arrival, transport, geometry);
                     });
                     return new Route(`route-${conn.id}`, this, departure, arrival, legs);

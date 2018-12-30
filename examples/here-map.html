@@ -5,7 +5,7 @@
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../comp/here/platform.js"></script>
     <script type="module" src="../comp/here/map.js"></script>
-    <script type="module" src="../comp/here/transit-router.js"></script>
+    <script type="module" src="../comp/here/router.js"></script>
     <script type="module" src="../comp/here/map-route-picker.js"></script>
     <script type="module" src="../comp/here/map-routes.js"></script>
     <script type="module" src="../comp/route-selector.js"></script>
@@ -20,13 +20,12 @@
 <body>
     <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-    <here-transit-router id="here-router"
-        app-id="${HERE_APP_ID}"
-        app-code="${HERE_APP_CODE}"
+    <here-router id="here-router"
+        platform="#here-platform"
         start="13.40,52.53"
         dest="13.56,52.41"
         time="2018-12-22T19:17:07">
-    </here-transit-router>
+    </here-router>
 
     <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
         <!-- picker is the input tool -->

@@ -2,12 +2,11 @@ import {BaseRouter, Request, Response, Route, Leg, Transport, Address} from '../
 
 
 class GoogleRequest {
-    constructor(start, dest, time, url, router) {
+    constructor(start, dest, time, router) {
         this.start = start;
         this.dest = dest;
         this.time = time;
 //        super(start, dest, time);
-        this.url = url;
         this.router = router;
     }
 }
@@ -36,11 +35,7 @@ class GoogleDirectionsRouter extends BaseRouter {
     buildRequest(start, dest, time=undefined) {
         start = new Address(start);
         dest = new Address(dest);
-        let url = `https://maps.googleapis.com/maps/api/directions/json?origin=${start.lat},${start.lng}&destination=${dest.lat},${dest.lng}&key=${this.apiKey}`;
-        if (time) {
-            url = `${url}&departure_time=now`; // ${encodeURIComponent(time)}`;
-        }
-        return new GoogleRequest(start, dest, time, url, this);
+        return new GoogleRequest(start, dest, time, this);
     }
 
     /**
