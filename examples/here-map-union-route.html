@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HERE MAP - web components</title>
+    <script type="text/javascript" src="credentials.js"></script>
+    <script type="module" src="../comp/here/platform.js"></script>
+    <script type="module" src="../comp/here/map.js"></script>
+    <script type="module" src="../comp/here/transit-router.js"></script>
+    <script type="module" src="../comp/here/map-route-picker.js"></script>
+    <script type="module" src="../comp/here/map-routes.js"></script>
+    <script type="module" src="../comp/route-selector.js"></script>
+
+    <script type="module" src="../comp/google/platform.js"></script>
+    <script type="module" src="../comp/google/router.js"></script>
+    <script type="module" src="../comp/union-router.js"></script>
+    <style>
+        /* component base styles */
+        here-map {
+            height: 400px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+    <google-platform id="google-platform" key="${GOOGLE_KEY}"></google-platform>
+
+    <here-transit-router id="here-router"
+        app-id="${HERE_APP_ID}"
+        app-code="${HERE_APP_CODE}">
+    </here-transit-router>
+
+    <google-router id="google-router" platform="#google-platform"></google-router>
+
+    <union-router id="union-router" routers="#here-router,#google-router"
+        start="13.30,52.43"
+        dest="13.76,52.51"
+        time="2018-12-22T19:17:07">
+    </union-router>
+
+    <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+        <!-- picker is the input tool -->
+        <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
+
+        <!-- visualize router's routes -->
+        <here-map-routes router="#union-router" styles="#picker"></here-map-routes>
+    </here-map>
+
+    <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
+        <route-selector router="#union-router"></route-selector>
+    </div>
+
+</body>
+</html>
