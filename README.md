@@ -10,8 +10,8 @@ Examples are located in _examples/_ folder.
 Concepts
 --------
 
-A normalized `Router` functionality returning same `Response` structure for all providers.
-
+- normalized `Maps`, `Router`, `Search` from different providers (Google, HERE, MapBox).
+- declarative compositing of scenarios.
 
 Support:
 --------

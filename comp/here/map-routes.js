@@ -149,7 +149,7 @@ class HereMapRoutes extends HTMLElement {
             let leg = ui.getData();
             let transport = leg.transport;
             let style = combineStyles(
-                { color: transport.color || "#888888", outline: transport.color || "#888888",  },   // color layer
+                { color: transport.color || "#888888", outline: transport.color || "#888888", lineJoin: "round", },   // color layer
                 TRANSPORT_STYLES[transport.type] || TRANSPORT_STYLES.default,
                 STATE_STYLES[state] || STATE_STYLES.default,
             );

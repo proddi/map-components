@@ -7,10 +7,14 @@ class BaseRouter extends HTMLElement {
     constructor() {
         super();
         /**
+         * Returns "abstract" for this router.
+         * @type {string}
+         */
+        this.type = "abstract";
+        /**
          * Type of the router.
          * @type {string}
          */
-        this.type   = "*abstract*";
         this.id     = this.getAttribute("id") || this.tagName;
         /** @type {Address} */
         this.start  = parseCoordString(this.getAttribute("start"));
@@ -19,8 +23,11 @@ class BaseRouter extends HTMLElement {
         /** @type {Date} */
         this.time   = this.getAttribute("time");
 
+        /** @type {Request|undefined} */
         this.currentRequest = undefined;
+        /** @type {Route[]|undefined} */
         this.currentRoutes  = undefined;
+        /** @type {Error|undefined} */
         this.currentError   = undefined;
     }
 
@@ -39,8 +46,8 @@ class BaseRouter extends HTMLElement {
      */
     update(start, dest, time=undefined) {
         // update
-        this.start = Address.enforce(start);
-        this.dest = Address.enforce(dest);
+        if (start) this.start = Address.enforce(start);
+        if (dest) this.dest = Address.enforce(dest);
         if (time) this.time = time;
 
         // perform request if possivle
@@ -66,12 +73,25 @@ class BaseRouter extends HTMLElement {
 }
 
 
+/**
+ * Router Request class.
+ */
 class Request {
-    // generic route response
-    constructor(options={}) {
-        for (let key in options) {
-            this[key] = options[key];
-        }
+    /**
+     * create instance.
+     * @param {{start:Location, dest:Location, time:Date, others:Object}} options - xxx
+     **/
+    constructor(router, start, dest, time, others={}) {
+        /** @type {BaseRouter} */
+        this.router = router;
+        /** @type {Location} */
+        this.start = start;
+        /** @type {Location} */
+        this.dest = dest;
+        /** @type {Date} */
+        this.time = time;
+
+        Object.assign(this, others);
     }
 }
 
@@ -101,27 +121,65 @@ class Response {
 /**
  * generic Location object
  */
-class Address {
+class Location {
+    /**
+     * this is object destructuring.
+     * @param {Object} param - this is object param.
+     * @param {number} param.foo - this is property param.
+     * @param {string} param.bar - this is property param.
+     */
+    /**
+     * create instance.
+     * @param {{lat:float, lng:float, ?lon:float}} param
+     * @param {float} param.lng - latitude
+     * @param {float} param.lng - longitude
+     * @param {float} [param.lon] - alias for longitude (will be used when not given .lng)
+     **/
+     constructor({lat, lng, lon}) {
+        /** @type {float} */
+        this.lat  = lat;
+        /** @type {float} */
+        this.lng  = lng || lon;
+        /** @type {string} */
+        this.type = "location";
+    }
+
+    /**
+     * Alias for {@link Location.lng}
+     * @type {float}
+     */
+    get lon() { return this.lng; }
+}
+
+
+/**
+ * generic Address object
+ */
+class Address extends Location {
     /**
      * create instance.
      * @param {{lat:float,lng:float,name:string}} object
      **/
-    constructor({lat, lon, lng, name, type, time}) {
-        /** @type {float} */
-        this.lat  = lat;
-        /** @type {float} */
-        this.lon  = lon || lng;
+    constructor({lat, lng, lon, name, time}) {
+        super({lat:lat,lng:lng,lon:lon});
+
+        this.type = "address";
+
         this._name = name;
-        /** @type {string} */
-        this.type = type;
         /** @type {Date} */
         this.time = time;
     }
 
-    get lng() { return this.lon; }
-
+    /**
+     * Returns {name} or Address.
+     * @type {string}
+     */
     get name() { return this._name || [this.lat, this.lon].map(val => Math.round(val, 2)).join(","); }
 
+    /**
+     * Returns the date as HH:MM
+     * @type {string}
+     */
     get timeString() { return this.time.getHours() + ":" + ("0"+this.time.getMinutes()).slice(-2); }
 }
 
@@ -140,6 +198,8 @@ class Stop extends Address {
     constructor(data) {
         super(data);
         /** @type {string} */
+        this.type = "location";
+        /** @type {string} */
         self.id     = data.id;
         /**
          * data source of this stop
@@ -156,7 +216,7 @@ class Stop extends Address {
 class Transport {
     /**
      * create instance.
-     * @param {{type:string,name:string,color:string}} param - foo
+     * @param {{type:string,name:string,color:string}} params - foo
      */
     constructor({type, name, color}) {
         this.type = type;
@@ -165,14 +225,8 @@ class Transport {
     }
 }
 
+
 class Route {
-    /* generic route of a response
-       properties to implement:
-        - departure -> RouterLocation { lat, lon, time, name, }
-        - arrival   -> RouterLocation { lat, lon, time, name, }
-        - legs      -> [RouteResponseRouteLeg]
-        - duration  -> arrival - departure in seconds
-    */
     constructor(uid, router, departure, arrival, legs=[]) {
         this.uid = uid;
         this.router = router;

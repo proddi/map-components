@@ -13,16 +13,18 @@ import {findRootElement} from '../generics.js';
  * </here-map>
  **/
 class HereMapRoutePicker extends HTMLElement {
+    /**
+     * create instance
+     */
     constructor() {
         super();
         let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("here-map"));
         let router = document.querySelector(this.getAttribute("router"));
 
         mapComp.whenReady.then(({map, behavior}) => {
-
-            let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(30, 53)})});//, {icon: new H.map.DomIcon(`<div class="svg-icon start-icon"></div>`)});
+            let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
             startMarker.draggable = true;
-            let destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(36, 63)})});//, {icon: new H.map.DomIcon(`<div class="svg-icon start-icon"></div>`)});
+            let destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(21, 50)})});
             destMarker.draggable = true;
 
             function _dragStartHandler() {
@@ -68,60 +70,8 @@ class HereMapRoutePicker extends HTMLElement {
 }
 
 
-const TRIP_START_SVG = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-     width="63px" height="65px" viewBox="0 0 63 65" enable-background="new 0 0 63 65" xml:space="preserve">
-<g opacity="0.3">
-    <g>
-        <defs>
-            <rect id="SVGID_1_" x="15" y="7.498" width="34" height="51.996"/>
-        </defs>
-        <clipPath id="SVGID_2_">
-            <use xlink:href="#SVGID_1_"  overflow="visible"/>
-        </clipPath>
-        <path clip-path="url(#SVGID_2_)" fill="#0D2E41" d="M49,7.498H20c-2.757,0-5,2.243-5,5v24c0,2.757,2.243,5,5,5h15.938
-            l-3.996,11.997c-3.287,0.016-5.944,1.352-5.944,2.999c0,1.657,2.687,3,6,3s6-1.343,6-3c0-0.946-0.878-1.788-2.247-2.339L49,40.908
-            V7.498z"/>
-    </g>
-</g>
-<polygon fill="#00A3F2" points="31.997,56.494 46.502,41.979 35.893,44.802 "/>
-<polygon fill="#1B7BA3" points="37.325,40.498 35.891,44.802 46.502,41.979 47.983,40.498 "/>
-<path fill="#00A3F2" d="M48,40.498v-32H20c-2.2,0-4,1.8-4,4v24c0,2.2,1.8,4,4,4H48z"/>
-</svg>`;
-
-const TRIP_DEST_SVG = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-     width="73.119px" height="82.604px" viewBox="0 0 73.119 82.604" enable-background="new 0 0 73.119 82.604" xml:space="preserve">
-<g opacity="0.3">
-    <g>
-        <defs>
-            <rect id="SVGID_1_" x="20" y="15.304" width="34" height="51.996"/>
-        </defs>
-        <clipPath id="SVGID_2_">
-            <use xlink:href="#SVGID_1_"  overflow="visible"/>
-        </clipPath>
-        <path clip-path="url(#SVGID_2_)" fill="#0D2E41" d="M54,15.304H25c-2.757,0-5,2.243-5,5v24c0,2.757,2.243,5,5,5h15.938
-            l-3.996,11.997c-3.287,0.016-5.944,1.352-5.944,2.999c0,1.657,2.687,3,6,3s6-1.343,6-3c0-0.946-0.878-1.788-2.247-2.339L54,48.714
-            V15.304z"/>
-    </g>
-</g>
-<polygon fill="#FFFFFF" points="36.997,64.3 51.502,49.785 40.892,52.608 "/>
-<polygon fill="#999999" points="42.325,48.304 40.891,52.608 51.502,49.785 52.983,48.304 "/>
-<rect x="29" y="16.306" fill="#020C1F" width="8" height="8"/>
-<rect x="37" y="16.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="45" y="16.306" fill="#020C1F" width="8" height="8"/>
-<rect x="21" y="24.306" fill="#020C1F" width="8" height="8"/>
-<rect x="29" y="24.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="37" y="24.306" fill="#020C1F" width="8" height="8"/>
-<rect x="45" y="24.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="21" y="32.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="29" y="32.306" fill="#020C1F" width="8" height="8"/>
-<rect x="37" y="32.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="45" y="32.306" fill="#020C1F" width="8" height="8"/>
-<rect x="29" y="40.306" fill="#FFFFFF" width="8" height="8"/>
-<rect x="37" y="40.306" fill="#020C1F" width="8" height="8"/>
-<rect x="45" y="40.306" fill="#FFFFFF" width="8" height="8"/>
-<path fill="#020C1F" d="M29,40.306h-8v3.998c0,2.194,1.79,4.002,3.98,4.002H29V40.306z"/>
-<path fill="#FFFFFF" d="M29,16.306h-4c-2.2,0-4,1.798-4,3.998v4.002h8V16.306z"/>
-</svg>`;
+const TRIP_START_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path id="b" d="M34.25 31.652A19.015 19.015 0 0 0 39 19.06C39 8.549 30.478 0 20 0S1 8.55 1 19.059c0 4.823 1.795 9.233 4.75 12.593L19.975 46 34.25 31.652z"/><path id="a" d="M34.25 31.652A19.015 19.015 0 0 0 39 19.06C39 8.549 30.478 0 20 0S1 8.55 1 19.059c0 4.823 1.795 9.233 4.75 12.593L19.975 46 34.25 31.652z"/><mask id="c" width="38" height="46" x="0" y="0" fill="#fff"><use xlink:href="#a"/></mask></defs><g fill="none" fill-rule="evenodd"><ellipse cx="20" cy="45.16" fill="#FFF" stroke="#979797" stroke-width=".25" rx="3.5" ry="3.5"/><use fill="#01B6B2" xlink:href="#b"/><path fill="#323232" fill-opacity=".5" d="M11.81 37.66h16.38l-8.2 8z"/><use stroke="#416A86" stroke-width=".5" mask="url(#c)" xlink:href="#a"/><ellipse cx="19.81" cy="19.19" fill="#FFF" rx="4.81" ry="4.81"/></g></svg>`;
+const TRIP_DEST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path id="a" d="M34.25 31.652A19.015 19.015 0 0 0 39 19.06C39 8.549 30.478 0 20 0S1 8.55 1 19.059c0 4.823 1.795 9.233 4.75 12.593L19.975 46 32.83 33.104c.407-.374 1.419-1.452 1.419-1.452z"/><mask id="c" width="38" height="46" x="0" y="0" fill="#fff"><use xlink:href="#a"/></mask><ellipse id="b" cx="19.807" cy="19.168" rx="12.363" ry="12.197"/><mask id="d" width="25.725" height="25.394" x="-.5" y="-.5"><path fill="#fff" d="M6.944 6.471h25.725v25.394H6.944z"/><use xlink:href="#b"/></mask></defs><g fill="none" fill-rule="evenodd"><ellipse cx="20" cy="45.16" fill="#FFF" stroke="#979797" stroke-width=".25" rx="3.5" ry="3.5"/><use fill="#323232" xlink:href="#a"/><path fill="#7D7D7D" d="M12.011 37.805h15.978l-7.916 8z"/><use stroke="#7C7C7C" stroke-width=".5" mask="url(#e)" xlink:href="#a"/><use stroke="#FFF" stroke-width=".5" mask="url(#c)" xlink:href="#a"/><ellipse fill="#FFF" cx="19.807" cy="19.168" rx="12.363" ry="12.197"/><path fill="#323232" d="M6.812 6.948h6.45v6.364h-6.45zm0 12.727h6.45v6.364h-6.45zm6.45-6.363h6.45v6.364h-6.45zm0 12.727h6.45v6.364h-6.45zm6.45-19.091h6.45v6.364h-6.45zm0 12.727h6.45v6.364h-6.45zm6.45-6.363h6.45v6.364h-6.45zm0 12.727h6.45v6.364h-6.45z"/><use stroke="#FFF" mask="url(#d)" xlink:href="#b" stroke-linecap="square"/></g></svg>`;
 
 
 customElements.define("here-map-route-picker", HereMapRoutePicker);

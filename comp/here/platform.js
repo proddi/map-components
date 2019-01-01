@@ -16,6 +16,10 @@ const hereResources = loadScript(
 /**
  * The platform element is required to handle credentials for HERE services.
  *
+ * Attributes:
+ * - app_id - credentials
+ * - app_code - credentials
+ *
  * @example
  * <here-platform app-id="..." app-code="..."></here-platform>
  *
@@ -28,13 +32,16 @@ class HerePlatform extends HTMLElement {
     constructor() {
         super();
 
+        this.app_id   = parseString(this.getAttribute("app-id"), window);
+        this.app_code = parseString(this.getAttribute("app-code"), window);
+
         /** @type {Promise<{platform:H.service.Platform, maptypes:object}>} */
         this.whenReady = hereResources.then(_ => {
             let platform = new H.service.Platform({
                 useCIT: true,
                 useHTTPS: true,
-                app_id: parseString(this.getAttribute("app-id"), window),
-                app_code: parseString(this.getAttribute("app-code"), window),
+                app_id: this.app_id,
+                app_code: this.app_code,
             });
             let maptypes = platform.createDefaultLayers();
             return Promise.resolve({ platform: platform, maptypes: maptypes });

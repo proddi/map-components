@@ -17,6 +17,8 @@ class RouteSelector extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
+        render(MARKUP(), this.shadowRoot);
+        this._root = this.shadowRoot.querySelector("div");
 
         this._routes = [];
         this._error = undefined;
@@ -77,15 +79,15 @@ class RouteSelector extends HTMLElement {
     }
 
     showResponse(routes, status) {
-        render(TEMPLATE(routes), this.shadowRoot);
+        render(ROUTES(routes), this._root);
     }
 
     showLoading(request) {
-        render(LOADING(request), this.shadowRoot);
+        render(LOADING(request), this._root);
     }
 
     showError(error) {
-        render(ERROR(error), this.shadowRoot);
+        render(ERROR(error), this._root);
     }
 
     // DATA api
@@ -149,25 +151,25 @@ class RouteSelector extends HTMLElement {
 }
 
 
-const TEMPLATE = (routes) => html`
+const MARKUP = () => html`
         <style>
-            :host > div {
+            :host {
                 border: 2px solid blue;
                 display: block;
             }
-            :host > div > div {
+            :host .route {
                 border-top: 1px solid #999;
-                padding: 12px 8px;
+                padding: 8px 8px 12px 8px;
                 position: relative;
             }
-            :host > div > div:hover {
+            :host .route:hover {
                 background: #DDD;
                 cursor: pointer;
             }
-            :host .type {
+            :host .leg {
                 padding: 2px 3px;
                 border: 1px solid #555;
-                border-radius: 3px;
+                border-radius: 2px;
                 margin: 0 2px 0 0;
                 font-size: .7em;
                 font-weight: bold;
@@ -176,41 +178,38 @@ const TEMPLATE = (routes) => html`
                 position: absolute;
                 right:5px;
                 bottom:2px;
+                padding: 0px 3px;
                 font-size: .65em;
-                color: #666;
+                color: #000;
+                background: rgba(128, 128, 128, .3);
             }
-        </style>
-        <div>
-            ${routes.map(route => html`
-            <div data-route="${route.uid}">
-                ${route.departure.timeString} -&gt; ${route.arrival.timeString} (${route.duration})<br>
-                <span>${route.legs.map(leg => html`<span class="type type-${leg.transport.type}" style="background-color: ${leg.transport.color};">${leg.transport.name}</span>`)}</span>
-                <span class="provider">${route.router.type}</span>
-            </div>
-            `)}
-        </div>
-    `;
-
-const ERROR = (error) => html`
-        <style>
-            :host > div {
-                border: 2px solid blue;
-                display: block;
+            :host .loading {
+                background-color: rgba(192, 128, 96, .8);
+            }
+            :host .error {
                 background-color: rgba(255, 0, 0, .8);
             }
         </style>
-        <div>${error}</div>
+        <div></div>
+    `;
+
+
+const ROUTES = (routes) => html`
+    ${routes.map(route => html`
+    <div class="route" data-route="${route.uid}">
+        ${route.departure.timeString} -&gt; ${route.arrival.timeString} (${route.duration})<br>
+        <span>${route.legs.map(leg => html`<span class="leg leg-${leg.transport.type}" style="background-color: ${leg.transport.color};">${leg.transport.name}</span>`)}</span>
+        <span class="provider">${route.router.type}</span>
+    </div>
+    `)}
+    `;
+
+const ERROR = (error) => html`
+    <div class="error">${error}</div>
     `;
 
 const LOADING = (request) => html`
-        <style>
-            :host > div {
-                border: 2px solid blue;
-                display: block;
-                background-color: rgba(192, 192, 192, .8);
-            }
-        </style>
-        <div>loading <span class="loc">${request.start.name}</span> -&gt; <span class="loc">${request.dest.name}</span></div>
+    <div class="loading">loading <span class="loc">${request.start.name}</span> -&gt; <span class="loc">${request.dest.name}</span></div>
     `;
 
 

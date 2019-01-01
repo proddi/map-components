@@ -1,21 +1,15 @@
 import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString} from '../generics.js';
 
 
-class HereTransitRequest {
-    constructor(start, dest, time, url) {
-        this.start = start;
-        this.dest = dest;
-        this.time = time;
-//        super(start, dest, time);
-        this.url = url;
-    }
-}
-
 /**
  * Router element to perform transit routing. Results can be displayed at a Map (e.g. {@link HereMap})
  *
+ * Requires `platform` or `_app_id_`+`app_code` attributes.
+ *
  * @example
  * <here-transit-router
+ *     platform="..."                 # requires platform
+ *     app-id="..." app_code="..."    #     -or- app-id + appcode
  *     start="lat,lng"
  *     dest="lat,lng"
  *     time="2019-01-12T14:30:00">
@@ -26,7 +20,12 @@ class HereTransitRequest {
 class HereTransitRouter extends BaseRouter {
     constructor() {
         super();
-        this.type   = "here";
+        /**
+         * Returns "here" for this router.
+         * @const
+         * @type {string}
+         */
+        this.type   = "here-transit";
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
     }
 
@@ -39,17 +38,15 @@ class HereTransitRouter extends BaseRouter {
         if (time) {
             url = `${url}&time=${encodeURIComponent(time)}`;
         }
-        return new HereTransitRequest(start, dest, time, url);
+        return new Request(this, start, dest, time, {url:url});
     }
-/*
-    buildRequest(start, dest, time=undefined) {
-        let url = `${this.server}/api/v2/route.json?startY=${start.lat}&startX=${start.lng}&destY=${dest.lat}&destX=${dest.lng}&accessId=${this.accessId}&client=um_refclient&graph=1`;
-        if (time) {
-            url = `${url}&time=${encodeURIComponent(time)}`;
-        }
-        return new HereTransitRequest(start, dest, time, url);
-    }
-*/
+
+    /**
+     * Perform a route request.
+     * @async
+     * @param {Request} request - route request.
+     * @returns {Promise<Response, Error>} - route response
+     */
     async route(request) {
         return fetch(request.url).then(res => res.json()).then(res => {
                 if (res.Res.Message) {

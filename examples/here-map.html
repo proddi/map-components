@@ -9,11 +9,15 @@
     <script type="module" src="../comp/here/map-route-picker.js"></script>
     <script type="module" src="../comp/here/map-routes.js"></script>
     <script type="module" src="../comp/route-selector.js"></script>
+    <script type="module" src="../comp/route-debug.js"></script>
     <style>
         /* component base styles */
         here-map {
             height: 400px;
             display: block;
+        }
+        body {
+            font-family: "FiraSansRegular", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
         }
     </style>
 </head>
@@ -22,8 +26,8 @@
 
     <here-router id="here-router"
         platform="#here-platform"
-        start="13.40,52.53"
-        dest="13.56,52.41"
+        start="13.387234135880135,52.516663186138175"
+        dest="13.422018470882904,52.51460610994581"
         time="2018-12-22T19:17:07">
     </here-router>
 
@@ -31,7 +35,7 @@
         <!-- picker is the input tool -->
         <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
         <!-- visualize router's routes -->
-        <here-map-routes router="#here-router" styles="#picker"></here-map-routes>
+        <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
 
     </here-map>
 
@@ -39,5 +43,13 @@
         <route-selector id="route-selector" router="#here-router"></route-selector>
     </div>
 
+    <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
+    <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
+    <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>
+    <route-link router="#here-router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658" time=2018-12-22T19:17:07>Belgium</route-link>
+    <route-link router="#here-router" start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777" time=2018-12-22T19:17:07>London</route-link>
+
+    <hr>
+    <route-debug router="#here-router"></route-debug>
 </body>
 </html>
