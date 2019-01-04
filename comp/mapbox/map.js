@@ -4,7 +4,7 @@ import { MapboxPlatform } from './platform.js';
 
 /**
  * Shows HERE map. This is the base canvas for other visualisation elements.
- * It requires a {@link HerePlatform} component to handle credentials.
+ * It requires a {@link MapboxPlatform} component to handle credentials.
  *
  * @example
  * <mapbox-platform token="..."></mapbox-platform>
@@ -15,7 +15,8 @@ import { MapboxPlatform } from './platform.js';
  * @see https://www.mapbox.com/mapbox.js/api/v3.1.1/
  **/
 class MapboxMap extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         let platform = findRootElement(this, this.getAttribute("platform"), MapboxPlatform);
         let center = parseCoordString(this.getAttribute("center"));
         let zoom   = this.getAttribute("zoom");

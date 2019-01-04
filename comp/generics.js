@@ -98,9 +98,6 @@ class Request {
 
 /**
  * Router Response class.
- * @param {Request} request - related request.
- * @param {string} inDirPath - root directory path.
- * @private
  */
 class Response {
     /**
@@ -219,8 +216,11 @@ class Transport {
      * @param {{type:string,name:string,color:string}} params - foo
      */
     constructor({type, name, color}) {
+        /** @type {string} */
         this.type = type;
+        /** @type {string} */
         this.name = name;
+        /** @type {Color} */
         this.color = color;
     }
 }
@@ -228,10 +228,15 @@ class Transport {
 
 class Route {
     constructor(uid, router, departure, arrival, legs=[]) {
+        /** @type {string} */
         this.uid = uid;
+        /** @type {BaseRouter} */
         this.router = router;
+        /** @type {Location} */
         this.departure = departure;
+        /** @type {Location} */
         this.arrival = arrival;
+        /** @type {Leg[]} */
         this.legs = legs;
     }
 
@@ -253,22 +258,40 @@ class Route {
 
 
 class Leg {
-    /*
-        - start     -> RouterLocation object
-        - end       -> RouterLocation object
-        - duration  ->
-        - distance  ->
-        - geometry  -> [[y,x], ...]
-        - transport -> Transport object
-    */
+    /**
+     * create instance.
+     * @param {Location} departure - start location
+     * @param {Location} arrival - dest location
+     * @param {Transport} transport - transport definition
+     * @param {CoordinatePair[]} geometry - the geometry points excluding start, dest
+     */
     constructor(departure, arrival, transport, geometry=[]) {
+        /** @type {Location} */
         this.departure = departure;
+        /** @type {Location} */
         this.arrival = arrival;
+        /** @type {Transport} */
         this.transport = transport;
+        /** @type {CoordinatePair[]} */
         this.geometry = geometry;
     }
 }
 
+/**
+ * @typedef {[lat:float, lng:float]} CoordinatePair
+ * @example
+ * let pair = [52.5, 13.2];
+ */
+
+/**
+ * @typedef {string<#rrggbb>} Color
+ * @example
+ * let color = "#ccbbaa";
+ */
+
+/**
+ * @external {HTMLElement} https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+ */
 
 function parseCoordString(s) {
     if (!s) return null;
