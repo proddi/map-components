@@ -25,5 +25,5 @@ docs-es-proposals:
 
 .PHONY: server
 server:
-	python -m SimpleHTTPServer 8082 &
 	sensible-browser http://localhost:8082/
+	python -m SimpleHTTPServer 8082

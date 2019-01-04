@@ -34,10 +34,15 @@ class HereTransitRouter extends BaseRouter {
         dest = new Address(dest);
         let app_id = parseString(this.getAttribute("app-id"), window);
         let app_code = parseString(this.getAttribute("app-code"), window);
+        let max = this.getAttribute("max");
         let url = `${this.server}/v3/route.json?dep=${start.lat},${start.lng}&arr=${dest.lat},${dest.lng}&app_id=${app_id}&app_code=${app_code}&client=webcomponents&graph=1`;
         if (time) {
             url = `${url}&time=${encodeURIComponent(time)}`;
         }
+        if (max) {
+            url += `&max=${encodeURIComponent(max)}`;
+        }
+
         return new Request(this, start, dest, time, {url:url});
     }
 
@@ -81,9 +86,11 @@ function buildTransport(transport) {
 
 
 const ROUTER_MODES = {
+    3:  "train",
     4:  "metro",
     5:  "bus",
     7:  "subway",
+    8:  "tram",
     20: "walk",
 }
 

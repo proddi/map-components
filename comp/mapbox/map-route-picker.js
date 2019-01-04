@@ -42,6 +42,7 @@ class MapboxMapRoutePicker extends HTMLElement {
                 let request = ev.detail;
                 startMarker.setLatLng(request.start);
                 destMarker.setLatLng(request.dest);
+                map.fitBounds([request.start, request.dest]);
             });
             if (router.currentRequest) {
                 startMarker.setLatLng(router.currentRequest.start);

@@ -12,7 +12,7 @@ import { MapboxPlatform } from './platform.js';
  * <mapbox-map platform="mapbox-platform" center="13.5,52.5" zoom="11">
  * </mapbox-map>
  *
- * @see https://www.mapbox.com/api-documentation/#maps
+ * @see https://www.mapbox.com/mapbox.js/api/v3.1.1/
  **/
 class MapboxMap extends HTMLElement {
     connectedCallback() {
