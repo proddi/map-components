@@ -1,4 +1,5 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop} from '../generics.js';
+import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString, findRootElement, createUID, buildURI} from '../generics.js';
+import {HerePlatform} from './platform.js';
 
 
 /**
@@ -11,6 +12,8 @@ import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop} fro
  *     dest="13.76,52.51"
  *     time="2018-12-22T19:17:07">
  * </here-router>
+ *
+ * @see https://developer.here.com/documentation/routing/topics/resource-calculate-route.html
  **/
 class HereRouter extends BaseRouter {
     /**
@@ -25,12 +28,21 @@ class HereRouter extends BaseRouter {
         this.type = "here";
     }
 
+    connectedCallback() {
+        this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+        this.app_id   = this.platform ? this.platform.app_id   : parseString(this.getAttribute("app-id"), window);
+        this.app_code = this.platform ? this.platform.app_code : parseString(this.getAttribute("app-code"), window);
+        super.connectedCallback();
+    }
+
     /**
      * returns a Request object
      * @returns {Request}
      */
     buildRequest(start, dest, time=undefined) {
-        return new Request(this, start, dest, time);
+        let modes = (this.getAttribute("modes") || "transit").split(",");
+        let max = this.getAttribute("max");
+        return new Request(this, start, dest, time, { modes: modes.map(mode => REQ_MODES[mode] || mode), max: max });
     }
 
     /**
@@ -40,15 +52,19 @@ class HereRouter extends BaseRouter {
      * @returns {Promise<Response, Error>} - route response
      */
     async route(request) {
-        let platform = document.querySelector(this.getAttribute("platform"));
-
-        let app_id   = platform && platform.app_id || parseString(this.getAttribute("app-id"), window);
-        let app_code = platform && platform.app_code || parseString(this.getAttribute("app-code"), window);
-
-        let url = `https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0=geo!${request.start.lat},${request.start.lng}&waypoint1=geo!${request.dest.lat},${request.dest.lng}&mode=fastest;publicTransportTimeTable&alternatives=3&representation=display&legAttributdes=travelTime,shape&maneuverAttributes=position,publicTransportLine&routeAttributes=legs,shape,lines,groups&app_id=${app_id}&app_code=${app_code}`;
-        if (request.time) {
-            url = `${url}&departure=${encodeURIComponent(request.time)}`;
-        }
+        let url = buildURI("https://route.api.here.com/routing/7.2/calculateroute.json", {
+                waypoint0:          `geo!${request.start.lat},${request.start.lng}`,
+                waypoint1:          `geo!${request.dest.lat},${request.dest.lng}`,
+                time:               request.time,
+                mode:               `fastest;${request.modes.join(",")}`,
+                alternatives:       request.max || 3,
+                representation:     `display`,
+                legAttributdes:     `travelTime,shape`,
+                maneuverAttributes: `position,publicTransportLine`,
+                routeAttributes:    `legs,shape,lines,groups`,
+                app_id:             this.app_id,
+                app_code:           this.app_code,
+            });
 
         return fetch(url).then(res => res.json()).then(res => {
             if (res.details) return Promise.reject(res.details);
@@ -57,7 +73,7 @@ class HereRouter extends BaseRouter {
 //                console.log("ROUTE", index, route);
                 // extract lines index
                 let lines = {};
-                for (let e of route.publicTransportLine) lines[e.id] = e;
+                for (let e of route.publicTransportLine || []) lines[e.id] = e;
                 // build route
                 let departure = new Address({
                     lat: route.waypoint[0].mappedPosition.latitude,
@@ -87,11 +103,19 @@ class HereRouter extends BaseRouter {
                     return curr;
                 });
 //                legs.forEach(leg => console.log(index, leg.id, leg.departure, "->", leg.arrival));
-                return new Route(`route-${index}`, this, departure, arrival, legs);
+                return new Route(createUID("h-route-{uid}"), this, departure, arrival, legs);
             });
             return new Response(request, ...routes);
-        });
+        }).catch(error => new Response(request).setError(error));
     }
+}
+
+
+const REQ_MODES = {
+    "walk":     "pedestrian",
+    "car":      "car",
+    "transit":  "publicTransportTimeTable",
+    "bike":     "bicycle",
 }
 
 

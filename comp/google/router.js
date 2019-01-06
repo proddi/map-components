@@ -1,15 +1,5 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address} from '../generics.js';
-
-
-class GoogleRequest {
-    constructor(start, dest, time, router) {
-        this.start = start;
-        this.dest = dest;
-        this.time = time;
-//        super(start, dest, time);
-        this.router = router;
-    }
-}
+import {BaseRouter, Request, Response, Route, Leg, Transport, Address, findRootElement, parseString, buildURI, createUID} from '../generics.js';
+import {GooglePlatform} from './platform.js';
 
 
 /**
@@ -17,41 +7,56 @@ class GoogleRequest {
  *
  * @example
  * <google-router id="google-router"
- *     access-id="${GOOGLE_KEY}"
+ *     platform="google-platform"
  *     start="13.30,52.43"
  *     dest="13.76,52.51"
  *     time="2018-12-22T19:17:07">
  * </google-router>
+ *
+ * @see https://developers.google.com/maps/documentation/directions/start
  **/
 class GoogleDirectionsRouter extends BaseRouter {
     constructor() {
         super();
         this.type = "google";
+
+        /** @type {GooglePlatform} */
+        this.platform = undefined;
     }
+
+    connectedCallback() {
+        this.platform = findRootElement(this, this.getAttribute("platform"), GooglePlatform);
+        super.connectedCallback();
+    }
+
     /**
      * returns a Request object
-     * @returns {Request}
+     * @return {Request}
      */
     buildRequest(start, dest, time=undefined) {
-        start = new Address(start);
-        dest = new Address(dest);
-        return new GoogleRequest(start, dest, time, this);
+        return new Request(this, start, dest, time, {
+                mode: this.getAttribute("mode") || "DRIVING",
+                alternatives: Boolean(this.getAttribute("max")),
+            });
     }
 
     /**
      * Perform a route request.
      * @async
      * @param {Request} request - route request.
-     * @returns {Promise<Response>} - route response
+     * @return {Promise<Response|Error>} - route response
      */
     async route(request) {
-        let platform = document.querySelector(this.getAttribute("platform"));
-        return platform.whenReady.then(({ service }) => {
+        return this.platform.whenReady.then(({ service }) => {
             return new Promise((resolve, reject) => {
                 service.route({
                     origin: `${request.start.lat},${request.start.lng}`,
                     destination: `${request.dest.lat},${request.dest.lng}`,
-                    travelMode: 'TRANSIT'
+                    travelMode: request.mode,
+                    transitOptions: {
+                        departureTime: new Date(),
+                    },
+                    provideRouteAlternatives: request.alternatives,
                 }, function(res, status) {
                     if (status === 'OK') {
                         resolve(res);
@@ -62,40 +67,80 @@ class GoogleDirectionsRouter extends BaseRouter {
             }).then(res => {
                 let routes = res.routes.map((route, index) => {
                     let leg = route.legs[0];
-                    let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: leg.departure_time.value});
-                    let arrival = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: leg.arrival_time.value});
-                    let date = leg.departure_time.value;
+//                    console.log(index, leg);
+                    let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: (leg.departure_time || {}).value || new Date()});
+                    let arrival = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: (leg.arrival_time || {}).value || new Date(departure.time.getTime() + leg.duration.value*1000)});
+                    let accumulativeTime = departure.time;
                     let steps = leg.steps.map((step, index) => {
-                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: "name", time: "time"});
-                        let arrival = new Address({lat:step.end_location.lat(), lon:step.end_location.lng()});
-                        let transport = new Transport({
-                                mode: this._getStepMode(step),
-                                name: step.transit && step.transit.line.short_name || "walk"
-                            });
+                        let transit = step.transit || {};
+                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: "name", time: (transit.departure_time || {}).value || accumulativeTime});
+                        accumulativeTime = new Date(accumulativeTime.getTime() + leg.duration.value*1000);
+                        let arrival = new Address({lat:step.end_location.lat(), lon:step.end_location.lng(), time: (transit.arrival_time || {}).value || accumulativeTime});
+                        let transport = buildTransport(step);
                         let geometry = step.path.map(point => [point.lat(), point.lng()]);
-                        return new Leg(departure, arrival, transport, geometry);
+                        return new Leg(departure, arrival, transport, geometry, {
+                                id:       createUID("g-leg-{uid}"),
+                                distance: step.distance.value,
+                                summary:  step.instructions,
+                            });
                     });
-                    return new Route(`route-${index}`, this, departure, arrival, steps);
+                    return new Route(createUID("g-route-{uid}"), this, departure, arrival, removeConsecModes(steps));
                 });
+//                console.log("G-RES", routes);
                 return new Response(request, ...routes);
-            });
+            }).catch(error => new Response(request).setError(error));
         });
-    }
-
-    _getStepMode(step) {
-        let mode = step.transit && step.transit.line.vehicle.type || step.travel_mode;
-        return _ROUTER_MODE_MAP[mode] || mode;
     }
 }
 
-const _ROUTER_MODE_MAP = {
-    "WALKING":          "walk",
-    "COMMUTER_TRAIN":   "metro",
-    "SUBWAY":           "subway",
-    "HEAVY_RAIL":       "train",
-    "HIGH_SPEED_TRAIN": "train",
-    "LONG_DISTANCE_TRAIN": "train",
-    "BUS":              "bus",
+
+const LINE_MODE_MAP = {
+    WALKING:                "walk",
+    COMMUTER_TRAIN:         "metro",
+    SUBWAY:                 "subway",
+    HEAVY_RAIL:             "train",
+    HIGH_SPEED_TRAIN:       "train",
+    LONG_DISTANCE_TRAIN:    "train",
+    BUS:                    "bus",
+}
+
+const TRAVEL_MODE_MAP = {
+    BICYCLING:  "bike",
+    DRIVING:    "car",
+    WALKING:    "walk",
+    TRANSIT:    "transit"
+}
+
+function buildTransport(step) {
+    let tm = TRAVEL_MODE_MAP[step.travel_mode] || step.travel_mode;
+    if (tm === "transit") {
+        let transit = step.transit || {};
+        let line = transit.line || {};
+        return new Transport({
+                type: LINE_MODE_MAP[step.transit.line.vehicle.type] || step.transit.line.vehicle.type,
+                name: line.short_name,
+                color: line.color,
+                headsign: transit.headsign,
+            });
+    } else {
+        return new Transport({
+                type: tm,
+                name: tm,
+            });
+    }
+}
+
+function removeConsecModes(legs) {
+    let dedup = [legs[0]];
+    for (let prev=legs[0], index=1, curr; (curr=legs[index]); index++ ) {
+        if (curr.transport.isSame(prev.transport)) {
+            prev.extendLeg(curr);
+        } else {
+            dedup.push(curr);
+            prev = curr;
+        }
+    }
+    return dedup;
 }
 
 

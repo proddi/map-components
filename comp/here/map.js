@@ -47,6 +47,21 @@ class HereMap extends HTMLElement {
 }
 
 
+/**
+ * @external {H.Map} https://developer.here.com/documentation/maps/topics_api/h-map.html
+ */
+
+
+/**
+ * @external {H.service.Platform} https://developer.here.com/documentation/maps/topics_api/h-service-platform.html
+ */
+
+
+/**
+ * @external {H.mapevents.Behavior} https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html
+ */
+
+
 customElements.define("here-map", HereMap);
 
 

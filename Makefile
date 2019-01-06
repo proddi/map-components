@@ -1,14 +1,19 @@
+.PHONY: init
+init:
+	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "npm install"
+
 .PHONY: clean
 clean:
-	@rm -rf package-lock.json node_modules
+	@rm -rf package-lock.json node_modules build
 	@cd docs && make clean
 
 .PHONY: build
 build:
-	docker run --rm --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src/src rust:1.23.0 /bin/bash -c "ls -la;rustc hello.rs"
+	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "node node_modules/polymer-cli/bin/polymer.js build --entrypoint examples/material/routing-app.html"
 
 .PHONY: bash
 bash:
+	make init
 	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "ls -la; /bin/bash -i"
 
 .PHONY: docs

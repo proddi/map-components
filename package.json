@@ -1,0 +1,25 @@
+{
+    "name": "@proddi/map-components",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/proddi/map-components.git"
+    },
+    "dependencies": {
+        "@polymer/font-roboto-local": "^3.0.2",
+        "@polymer/iron-demo-helpers": "^3.0.2",
+        "@polymer/iron-icons": "^3.0.1",
+        "@polymer/iron-pages": "^3.0.1",
+        "@polymer/paper-card": "^3.0.1",
+        "@polymer/paper-icon-button": "^3.0.1",
+        "@polymer/paper-item": "^3.0.1",
+        "@polymer/paper-tabs": "^3.0.1",
+        "lit-html": "^0.14.0"
+    },
+    "devDependencies": {
+        "esdoc": "^1.1.0",
+        "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+        "esdoc-standard-plugin": "^1.0.0",
+        "polymer-cli": "^1.9.4"
+    }
+}

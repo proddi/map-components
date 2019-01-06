@@ -1,0 +1,149 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script type="module">
+        import "@polymer/font-roboto-local/roboto.js";
+        import "@polymer/iron-demo-helpers/demo-pages-shared-styles.js";
+        import "@polymer/iron-demo-helpers/demo-snippet.js";
+        import "@polymer/paper-styles/typography.js";
+        import "@polymer/paper-tabs/paper-tabs.js";
+        import "@polymer/paper-tabs/paper-tab.js";
+        import "@polymer/paper-card/paper-card.js";
+        import "@polymer/paper-item/paper-item.js";
+        import "@polymer/iron-pages/iron-pages.js";
+        import "@polymer/paper-icon-button/paper-icon-button.js";
+        import "@polymer/iron-icons/iron-icons.js";
+        import "@polymer/iron-icons/maps-icons.js";
+
+        import "../../comp/here/platform.js";
+        import "../../comp/here/map.js";
+        import "../../comp/here/map-route-picker.js";
+        import "../../comp/here/map-routes.js";
+        import "../../comp/here/transit-router.js";
+        import "../../comp/here/router.js";
+        import "../../comp/google/platform.js";
+        import "../../comp/google/router.js";
+        import "../../comp/union-router.js";
+        import "../../comp/route-selector.js";
+        import "../../comp/route-link.js";
+        import "../../comp/route-debug.js";
+    </script>
+    <script type="text/javascript" src="../credentials.js"></script>
+    <style>
+        body {
+            font-family: Roboto;
+        }
+        div#panel {
+            width: 400px;
+        }
+    </style>
+    <custom-style>
+      <style is="custom-style">
+        paper-tabs {
+          background-color: var(--paper-blue-900);
+          color: #fff;
+        }
+      </style>
+    </custom-style>
+    <custom-style>
+      <style is="custom-style">
+        paper-icon-button.directions {
+          color: white;
+          --paper-icon-button-ink-color: white;
+        }
+      </style>
+    </custom-style>
+</head>
+<body>
+    <google-platform key="${GOOGLE_KEY}"></google-platform>
+    <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+
+    <google-router id="car-router" platform="google-platform"
+        name="google/car">
+    </google-router>
+
+    <google-router id="walk-router" platform="google-platform"
+        name="google/walk"
+        mode="WALKING">
+    </google-router>
+
+    <google-router id="bike-router" platform="google-platform"
+        name="google/bike"
+        mode="BICYCLING">
+    </google-router>
+
+    <here-transit-router id="transit-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
+        name="here-transit"
+        modes="-private_bus"
+        max=6
+        s_tart="13.31709,52.54441"
+        d_est="13.56,52.41"
+        t_ime="2018-12-22T19:17:07">
+    </here-transit-router>
+
+    <here-transit-router id="taxi-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
+        name="here-transit/taxi"
+        modes="private_bus"
+        max=3
+        s_tart="13.31709,52.54441"
+        d_est="13.56,52.41"
+        t_ime="2018-12-22T19:17:07">
+    </here-transit-router>
+
+    <union-router id="union-router"
+        routers="#car-router,#transit-router,#bike-router,#walk-router,#taxi-router"
+        start="13.31709,52.54441"
+        dest="13.56,52.41"
+        time="2018-12-22T19:17:07">
+    </union-router>
+
+    <div id="panel" style="position: absolute;left:0;top:0;bottom:0;width:400px">
+        <paper-tabs selected="0" scrollable fit-container>
+          <paper-tab data-router="#union-router"><paper-icon-button icon="maps:navigation" title="all modes" class="directions"></paper-icon-button></paper-tab>
+          <paper-tab data-router="#car-router"><paper-icon-button icon="maps:directions-car" title="car" class="directions"></paper-icon-button></paper-tab>
+          <paper-tab data-router="#transit-router"><paper-icon-button icon="maps:directions-bus" title="public transport" class="directions"></paper-icon-button></paper-tab>
+          <paper-tab data-router="#taxi-router"><paper-icon-button icon="maps:local-taxi" title="taxi" class="directions"></paper-icon-button></paper-tab>
+          <paper-tab data-router="#walk-router"><paper-icon-button icon="maps:directions-walk" title="walk" class="directions"></paper-icon-button></paper-tab>
+          <paper-tab data-router="#bike-router"><paper-icon-button icon="maps:directions-bike" title="bike" class="directions"></paper-icon-button></paper-tab>
+        </paper-tabs>
+
+        <route-selector-2 router="#union-router">
+            <template as="route">
+                <paper-item class="route" data-route="${route.uid}">
+                    ${route.departure.timeString} -&gt; ${route.arrival.timeString} (${route.duration})<br>
+                    <div class="legs">${route.legs.map(leg => html`<span class="leg leg-${leg.transport.type}" title="${leg.summary || ''}" style="background-color: ${leg.transport.color};">${leg.transport.name}</span>`)}</div>
+                    <span class="provider">${route.router.name}</span>
+                </paper-item>
+            </template>
+        </route-selector-2>
+        <script>
+            let tabs = document.querySelector("#panel > paper-tabs");
+            let routeSelector = document.querySelector("#panel > route-selector-2");
+            tabs.addEventListener("selected-item-changed", function(ev) {
+                let tab = ev.detail.value;
+                if (!tab) return;
+                console.log("selected-item-changed", tab, tab.dataset.router);
+                routeSelector.setRouter(tab.dataset.router);
+            });
+        </script>
+    </div>
+
+    <here-map center="13.5,52.5" zoom="11" platform="here-platform" style="display:block;margin-left:400px;height:600px">
+        <!-- picker is the input tool -->
+        <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
+        <!-- visualize router's routes -->
+        <here-map-routes router="#union-router" styler="route-selector-2"></here-map-routes>
+    </here-map>
+    <div style="margin-left:400px;">
+        <route-link router="#union-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
+        <route-link router="#union-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
+        <route-link router="#union-router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>
+        <route-link router="#union-router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658" time=2018-12-22T19:17:07>Belgium</route-link>
+        <route-link router="#union-router" start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777" time=2018-12-22T19:17:07>London</route-link>
+
+        <hr>
+        <route-debug router="#union-router"></route-debug>
+    </div>
+</body>
+</html>

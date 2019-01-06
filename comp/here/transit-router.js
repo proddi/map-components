@@ -1,4 +1,5 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString} from '../generics.js';
+import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString, findRootElement, buildURI, createUID} from '../generics.js';
+import {HerePlatform} from './platform.js';
 
 
 /**
@@ -26,22 +27,24 @@ class HereTransitRouter extends BaseRouter {
          * @type {string}
          */
         this.type   = "here-transit";
+        /** @type {string} */
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
     }
 
     buildRequest(start, dest, time=undefined) {
-        start = new Address(start);
-        dest = new Address(dest);
-        let app_id = parseString(this.getAttribute("app-id"), window);
-        let app_code = parseString(this.getAttribute("app-code"), window);
-        let max = this.getAttribute("max");
-        let url = `${this.server}/v3/route.json?dep=${start.lat},${start.lng}&arr=${dest.lat},${dest.lng}&app_id=${app_id}&app_code=${app_code}&client=webcomponents&graph=1`;
-        if (time) {
-            url = `${url}&time=${encodeURIComponent(time)}`;
-        }
-        if (max) {
-            url += `&max=${encodeURIComponent(max)}`;
-        }
+        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+
+        let url = buildURI(`${this.server}/v3/route.json`, {
+                dep:        `${start.lat},${start.lng}`,
+                arr:        `${dest.lat},${dest.lng}`,
+                time:       time,
+                client:     "webcomponents",
+                graph:      1,
+                modes:      this.getAttribute("modes"),
+                max:        this.getAttribute("max"),
+                app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
+                app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
+            });
 
         return new Request(this, start, dest, time, {url:url});
     }
@@ -65,12 +68,16 @@ class HereTransitRouter extends BaseRouter {
                         let arrival = buildLocation(sec.Arr);
                         let transport = buildTransport(sec.Dep.Transport);
                         let geometry = sec.graph ? sec.graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [];
-                        return new Leg(departure, arrival, transport, geometry);
+                        return new Leg(departure, arrival, transport, geometry, {
+                                id:       createUID("g-leg-{uid}"),
+                                distance: sec.Journey.distance,
+                                summary:  `Go to ${arrival.name}`,
+                            });
                     });
-                    return new Route(`route-${conn.id}`, this, departure, arrival, legs);
+                    return new Route(createUID("h-t-route-{uid}-{salt}", conn.id), this, departure, arrival, legs);
                 });
                 return new Response(request, ...routes);
-            });
+            }).catch(error => new Response(request).setError(error));
     }
 
 }

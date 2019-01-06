@@ -33,6 +33,11 @@ class MapboxPlatform extends HTMLElement {
 }
 
 
+/**
+ * @external {L} https://www.mapbox.com/mapbox.js/api/v3.1.1/
+ */
+
+
 customElements.define("mapbox-platform", MapboxPlatform);
 
 

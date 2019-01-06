@@ -25,23 +25,25 @@
     </style>
 </head>
 <body>
-    <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-    <google-platform id="google-platform" key="${GOOGLE_KEY}"></google-platform>
+    <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+    <google-platform key="${GOOGLE_KEY}"></google-platform>
 
     <here-transit-router id="here-router"
+        name="here/transit"
         app-id="${HERE_APP_ID}"
         app-code="${HERE_APP_CODE}">
     </here-transit-router>
 
-    <google-router id="google-router" platform="#google-platform"></google-router>
+    <google-router id="google-router" platform="google-platform" mode="DRIVING" name="google/car"></google-router>
+    <google-router id="walk-router" platform="google-platform" mode="WALKING" name="google/walk"></google-router>
 
-    <union-router id="union-router" routers="#here-router,#google-router"
+    <union-router id="union-router" routers="#here-router,#google-router,#walk-router"
         start="13.30,52.43"
         dest="13.76,52.51"
         time="2018-12-22T19:17:07">
     </union-router>
 
-    <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+    <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
         <!-- picker is the input tool -->
         <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
 

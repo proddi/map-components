@@ -21,7 +21,7 @@ class MapboxMap3d extends HTMLElement {
         let center = parseCoordString(this.getAttribute("center"));
         let zoom   = this.getAttribute("zoom");
 
-        /** @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}>} */
+        /** @type {Promise<{L:L, mapboxgl:mapboxgl, map:mapboxgl.Map}>} */
         this.whenReady = loadResources3d(parseString(this.getAttribute("token"), window)).then(({L, mapboxgl}) => {
             let map = new mapboxgl.Map({
                 style: 'mapbox://styles/mapbox/streets-v10',
@@ -39,6 +39,15 @@ class MapboxMap3d extends HTMLElement {
         });
     }
 }
+
+
+/**
+ * @external {mapboxgl.Map} https://www.mapbox.com/mapbox-gl-js/api/#map
+ */
+
+/**
+ * @external {mapboxgl} https://www.mapbox.com/mapbox-gl-js/api/
+ */
 
 
 customElements.define("mapbox-map3d", MapboxMap3d);

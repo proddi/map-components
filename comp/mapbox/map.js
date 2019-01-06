@@ -32,6 +32,11 @@ class MapboxMap extends HTMLElement {
 }
 
 
+/**
+ * @external {L.mapbox.map} https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/
+ */
+
+
 customElements.define("mapbox-map", MapboxMap);
 
 
