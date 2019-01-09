@@ -4,7 +4,7 @@ init:
 
 .PHONY: clean
 clean:
-	@rm -rf package-lock.json node_modules build
+	@rm -rf package-lock.json node_modules build/docs build/dist
 	@cd docs && make clean
 
 .PHONY: build
@@ -23,8 +23,8 @@ docs:
 
 .PHONY: docs-publish
 docs-publish:
-	git checkout master
-	git subtree split --prefix build/docs -b gh-pages
+	git checkout gh-pages
+	git subtree split --prefix build -b gh-pages
 	git push -f origin gh-pages:gh-pages
 	git branch -D gh-pages
 
