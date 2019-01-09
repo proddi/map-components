@@ -68,10 +68,12 @@ class HereTransitRouter extends BaseRouter {
                         let arrival = buildLocation(sec.Arr);
                         let transport = buildTransport(sec.Dep.Transport);
                         let geometry = sec.graph ? sec.graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [];
+                        let steps = (sec.Journey.Stop || []).map(e => buildLocation(e, {time:"dep"}));
                         return new Leg(departure, arrival, transport, geometry, {
                                 id:       createUID("g-leg-{uid}"),
                                 distance: sec.Journey.distance,
                                 summary:  `Go to ${arrival.name}`,
+                                steps:    steps,
                             });
                     });
                     return new Route(createUID("h-t-route-{uid}-{salt}", conn.id), this, departure, arrival, legs);
@@ -86,9 +88,11 @@ class HereTransitRouter extends BaseRouter {
 function buildTransport(transport) {
     let t = Object.assign({}, transport.At || {}, transport);
     return new Transport({
-            type: ROUTER_MODES[t.mode] || t.mode,
-            name: t.name || "walk",
-            color: t.color});
+            type:       ROUTER_MODES[t.mode] || t.mode,
+            name:       t.name || "walk",
+            color:      t.color,
+            headsign:   t.dir,
+        });
 }
 
 
@@ -98,11 +102,12 @@ const ROUTER_MODES = {
     5:  "bus",
     7:  "subway",
     8:  "tram",
+    12: "bus_rapid",
     20: "walk",
 }
 
 
-function buildLocation(loc) {
+function buildLocation(loc, {time="time"}={}) {
     let stn = loc.Stn,
         addr = loc.Addr;
 
@@ -111,7 +116,7 @@ function buildLocation(loc) {
             lng:  stn.x,
             name: stn.name,
             type: "stop",
-            time: new Date(loc.time),
+            time: new Date(loc.time || loc.arr || loc.dep),
             id:   stn.id,
         });
 
@@ -119,7 +124,7 @@ function buildLocation(loc) {
             lat:  addr.y,
             lng:  addr.x,
             type: "address",
-            time: new Date(loc.time),
+            time: new Date(loc.time || loc.arr || loc.dep),
         });
 }
 

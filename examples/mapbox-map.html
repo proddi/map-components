@@ -3,14 +3,15 @@
 <head>
     <title>MAPBOX MAP - web components</title>
     <script type="text/javascript" src="credentials.js"></script>
-    <script type="module" src="../comp/here/transit-router.js"></script>
-    <script type="module" src="../comp/mapbox/platform.js"></script>
-    <script type="module" src="../comp/mapbox/map.js"></script>
-    <script type="module" src="../comp/mapbox/map-route-picker.js"></script>
-    <script type="module" src="../comp/mapbox/map-routes.js"></script>
-    <script type="module" src="../comp/route-selector.js"></script>
-    <script type="module" src="../comp/route-link.js"></script>
-    <script type="module" src="../comp/route-debug.js"></script>
+    <script type="module" src="../src/maps/example.js"></script>
+    <script type="module" src="../src/here/transit-router.js"></script>
+    <script type="module" src="../src/mapbox/platform.js"></script>
+    <script type="module" src="../src/mapbox/map.js"></script>
+    <script type="module" src="../src/mapbox/map-route-picker.js"></script>
+    <script type="module" src="../src/mapbox/map-routes.js"></script>
+    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/route-link.js"></script>
+    <script type="module" src="../src/route-debug.js"></script>
     <style>
         /* component base styles */
         mapbox-map {
@@ -21,22 +22,24 @@
 </head>
 <body>
     <h3>MapBox + here transit routes</h3>
-    <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
-        start="13.40,52.53"
-        dest="13.56,52.41"
-        time="2019-01-03T19:17:07">
-    </here-transit-router>
+    <maps-example>
+        <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
+            start="13.40,52.53"
+            dest="13.56,52.41"
+            time="2019-01-03T19:17:07">
+        </here-transit-router>
 
-    <mapbox-platform token="${MAPBOX_TOKEN}"></mapbox-platform>
+        <mapbox-platform token="${MAPBOX_TOKEN}"></mapbox-platform>
 
-    <mapbox-map center="13.5,52.5" zoom="11" style="height:700px" platform="mapbox-platform">
-        <mapbox-map-route-picker router="#here-router"></mapbox-map-route-picker>
-        <mapbox-map-routes router="#here-router" styler="#route-selector"></mapbox-map-routes>
-    </mapbox-map>
+        <mapbox-map center="13.5,52.5" zoom="11" style="height:700px" platform="mapbox-platform">
+            <mapbox-map-route-picker router="#here-router"></mapbox-map-route-picker>
+            <mapbox-map-routes router="#here-router" styler="#route-selector"></mapbox-map-routes>
+        </mapbox-map>
 
-    <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-        <route-selector id="route-selector" router="#here-router"></route-selector>
-    </div>
+        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
+            <route-selector id="route-selector" router="#here-router"></route-selector>
+        </div>
+    </maps-example>
 
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
     <route-link router="#here-router" start="-117.03735351562501,32.63012300670739" dest="-122.28332519531251,47.45037978769006" time=2019-01-03T19:17:07>Westcoast</route-link>

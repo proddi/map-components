@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GOOGLE MAP - map-components</title>
+    <script type="text/javascript" src="../credentials.js"></script>
+    <script type="module" src="../../src/google/platform.js"></script>
+    <script type="module" src="../../src/google/map.js"></script>
+    <script type="module" src="../../src/maps/example.js"></script>
+</head>
+<body>
+    <h3>Simple GoogleMap</h3>
+    <maps-example>
+        <google-platform key="${GOOGLE_KEY}"></google-platform>
+        <google-map style="height:500px"
+            platform="google-platform"
+            center="13.5,52.5"
+            zoom="11">
+        </google-map>
+    </maps-example>
+</body>
+</html>

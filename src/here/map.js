@@ -1,4 +1,6 @@
-import {parseCoordString, loadScript} from '../generics.js';
+"use strict";
+import {parseCoordString, findRootElement, deferredPromise} from '../generics.js';
+import {HerePlatform} from './platform.js';
 
 
 /**
@@ -14,19 +16,22 @@ import {parseCoordString, loadScript} from '../generics.js';
  * @see https://developer.here.com/documentation/maps/
  **/
 class HereMap extends HTMLElement {
+
     constructor() {
         super();
+        this.center = parseCoordString(this.getAttribute("center"));
+        this.zoom = this.getAttribute("zoom");
+        /** @type {HerePlatform */
+        this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform);
+        /** @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
+        this.whenReady = deferredPromise();
+    }
 
-        var center = parseCoordString(this.getAttribute("center"));
-        var zoom   = this.getAttribute("zoom");
-
-        let platform = document.querySelector(this.getAttribute("platform"));
-
-        /** @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}>} */
-        this.whenReady = platform.whenReady.then(({platform, maptypes}) => {
+    connectedCallback() {
+        this.platform.whenReady.then(({platform, maptypes}) => {
             let map = new H.Map(this, maptypes.terrain.map, {
-                center: center,
-                zoom: zoom,
+                center: this.center,
+                zoom: this.zoom,
                 margin: 150,
                 renderBaseBackground: {lower: 1, higher: 1},
     //            pixelRatio: pixelRatio
@@ -40,9 +45,9 @@ class HereMap extends HTMLElement {
             window.addEventListener('resize', function() { map.getViewPort().resize(); });
 
             let ui = new H.ui.UI(map, {});
-//            this.map = map;
-            return Promise.resolve({map:map, behavior:behavior, platform:platform, maptypes:maptypes});
-        });
+
+            this.whenReady.resolve({map:map, behavior:behavior, platform:platform, maptypes:maptypes});
+        }).catch(error => this.whenReady.reject(error));
     }
 }
 

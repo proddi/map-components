@@ -1,3 +1,4 @@
+"use strict";
 import {loadScript, parseString} from '../generics.js';
 
 

@@ -3,31 +3,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script type="module">
-        import "@polymer/font-roboto-local/roboto.js";
-        import "@polymer/iron-demo-helpers/demo-pages-shared-styles.js";
-        import "@polymer/iron-demo-helpers/demo-snippet.js";
-        import "@polymer/paper-styles/typography.js";
-        import "@polymer/paper-tabs/paper-tabs.js";
-        import "@polymer/paper-tabs/paper-tab.js";
-        import "@polymer/paper-card/paper-card.js";
-        import "@polymer/paper-item/paper-item.js";
-        import "@polymer/iron-pages/iron-pages.js";
-        import "@polymer/paper-icon-button/paper-icon-button.js";
-        import "@polymer/iron-icons/iron-icons.js";
-        import "@polymer/iron-icons/maps-icons.js";
-
-        import "../../comp/here/platform.js";
-        import "../../comp/here/map.js";
-        import "../../comp/here/map-route-picker.js";
-        import "../../comp/here/map-routes.js";
-        import "../../comp/here/transit-router.js";
-        import "../../comp/here/router.js";
-        import "../../comp/google/platform.js";
-        import "../../comp/google/router.js";
-        import "../../comp/union-router.js";
-        import "../../comp/route-selector.js";
-        import "../../comp/route-link.js";
-        import "../../comp/route-debug.js";
+        import "https://unpkg.com/@polymer/font-roboto-local/roboto.js?module";
+//        import "https://unpkg.com/@polymer/iron-demo-helpers/demo-pages-shared-styles.js?module";
+//        import "https://unpkg.com/@polymer/iron-demo-helpers/demo-snippet.js?module";
+        import "https://unpkg.com/@polymer/paper-styles/typography.js?module";
+        import "https://unpkg.com/@polymer/paper-tabs/paper-tabs.js?module";
+        import "https://unpkg.com/@polymer/paper-tabs/paper-tab.js?module";
+//        import "https://unpkg.com/@polymer/paper-card/paper-card.js?module";
+//        import "https://unpkg.com/@polymer/paper-item/paper-item.js?module";
+//        import "https://unpkg.com/@polymer/iron-pages/iron-pages.js?module";
+//        import "https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module";
+        import "https://unpkg.com/@polymer/iron-icons/iron-icons.js?module";
+        import "https://unpkg.com/@polymer/iron-icons/maps-icons.js?module";
+/*
+        import "../../src/here/platform.js";
+        import "../../src/here/map.js";
+        import "../../src/here/map-route-picker.js";
+        import "../../src/here/map-routes.js";
+        import "../../src/here/transit-router.js";
+        import "../../src/here/router.js";
+        import "../../src/google/platform.js";
+        import "../../src/google/router.js";
+        import "../../src/union-router.js";
+        import "../../src/route-selector.js";
+        import "../../src/route-link.js";
+        import "../../src/route-debug.js";
+*/
     </script>
     <script type="text/javascript" src="../credentials.js"></script>
     <style>
@@ -107,6 +108,27 @@
           <paper-tab data-router="#walk-router"><paper-icon-button icon="maps:directions-walk" title="walk" class="directions"></paper-icon-button></paper-tab>
           <paper-tab data-router="#bike-router"><paper-icon-button icon="maps:directions-bike" title="bike" class="directions"></paper-icon-button></paper-tab>
         </paper-tabs>
+
+        <div role="listbox">
+          <paper-icon-item>
+            <div class="avatar blue" slot="item-icon"></div>
+            <paper-item-body two-line>
+              <div>Photos</div>
+              <div secondary>Jan 9, 2014</div>
+            </paper-item-body>
+            <paper-icon-button icon="star" alt="favourite this!">
+            </paper-icon-button>
+          </paper-icon-item>
+          <paper-icon-item>
+            <div class="avatar" slot="item-icon"></div>
+            <paper-item-body two-line>
+              <div>Recipes</div>
+              <div secondary>Jan 17, 2014</div>
+            </paper-item-body>
+            <paper-icon-button icon="star" alt="favourite this!">
+            </paper-icon-button>
+          </paper-icon-item>
+        </div>
 
         <route-selector-2 router="#union-router">
             <template as="route">

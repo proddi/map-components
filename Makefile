@@ -12,15 +12,21 @@ build:
 	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "node node_modules/polymer-cli/bin/polymer.js build --entrypoint examples/material/routing-app.html"
 
 .PHONY: bash
-bash:
-	make init
-	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "ls -la; /bin/bash -i"
+bash: init
+	docker run --rm -it --net host --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "npm run; /bin/bash -i"
 
 .PHONY: docs
 docs:
-	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "npm install esdoc esdoc-standard-plugin; ./node_modules/.bin/esdoc -c docs/conf.json"
+	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src node:lts-slim /bin/bash -c "npm run build:docs"
 	@echo -e "\033[95m\n\nBuild successful! View the docs homepage at docs/build\n\033[0m"
-	sensible-browser docs/build/index.html
+	sensible-browser http://localhost:8082/build/docs/
+
+.PHONY: docs-publish
+docs-publish:
+	git checkout master
+	git subtree split --prefix build/docs -b gh-pages
+	git push -f origin gh-pages:gh-pages
+	git branch -D gh-pages
 
 .PHONY: docs-es-proposals
 docs-es-proposals:

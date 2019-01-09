@@ -67,13 +67,13 @@ class GoogleDirectionsRouter extends BaseRouter {
             }).then(res => {
                 let routes = res.routes.map((route, index) => {
                     let leg = route.legs[0];
-//                    console.log(index, leg);
                     let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: (leg.departure_time || {}).value || new Date()});
                     let arrival = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: (leg.arrival_time || {}).value || new Date(departure.time.getTime() + leg.duration.value*1000)});
                     let accumulativeTime = departure.time;
-                    let steps = leg.steps.map((step, index) => {
+                    let legs = leg.steps.map((step, index) => {
+                        console.log(step);
                         let transit = step.transit || {};
-                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: "name", time: (transit.departure_time || {}).value || accumulativeTime});
+                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: step.instructions, time: (transit.departure_time || {}).value || accumulativeTime});
                         accumulativeTime = new Date(accumulativeTime.getTime() + leg.duration.value*1000);
                         let arrival = new Address({lat:step.end_location.lat(), lon:step.end_location.lng(), time: (transit.arrival_time || {}).value || accumulativeTime});
                         let transport = buildTransport(step);
@@ -84,7 +84,7 @@ class GoogleDirectionsRouter extends BaseRouter {
                                 summary:  step.instructions,
                             });
                     });
-                    return new Route(createUID("g-route-{uid}"), this, departure, arrival, removeConsecModes(steps));
+                    return new Route(createUID("g-route-{uid}"), this, departure, arrival, removeConsecModes(legs));
                 });
 //                console.log("G-RES", routes);
                 return new Response(request, ...routes);

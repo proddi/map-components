@@ -3,14 +3,15 @@
 <head>
     <title>HERE transit routing - demo - maps web components</title>
     <script type="text/javascript" src="credentials.js"></script>
-    <script type="module" src="../comp/here/platform.js"></script>
-    <script type="module" src="../comp/here/map.js"></script>
-    <script type="module" src="../comp/here/transit-router.js"></script>
-    <script type="module" src="../comp/here/map-route-picker.js"></script>
-    <script type="module" src="../comp/here/map-routes.js"></script>
-    <script type="module" src="../comp/route-selector.js"></script>
-    <script type="module" src="../comp/route-link.js"></script>
-    <script type="module" src="../comp/route-debug.js"></script>
+    <script type="module" src="../src/maps/example.js"></script>
+    <script type="module" src="../src/here/platform.js"></script>
+    <script type="module" src="../src/here/map.js"></script>
+    <script type="module" src="../src/here/transit-router.js"></script>
+    <script type="module" src="../src/here/map-route-picker.js"></script>
+    <script type="module" src="../src/here/map-routes.js"></script>
+    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/route-link.js"></script>
+    <script type="module" src="../src/route-debug.js"></script>
     <style>
         here-map {
             position: relative;
@@ -28,23 +29,24 @@
 </head>
 <body>
     <h3>HERE transit routing</h3>
-    <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+    <maps-example>
+        <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-    <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
-        start="13.31709,52.54441"
-        dest="13.56,52.41"
-        time="2018-12-22T19:17:07">
-    </here-transit-router>
+        <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
+            start="13.31709,52.54441"
+            dest="13.56,52.41"
+            time="2018-12-22T19:17:07">
+        </here-transit-router>
 
-    <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
-        <!-- picker is the input tool -->
-        <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
-        <!-- visualize router's routes -->
-        <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
+        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+            <!-- picker is the input tool -->
+            <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
+            <!-- visualize router's routes -->
+            <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
 
-        <route-selector id="route-selector" router="#here-router"></route-selector>
-    </here-map>
-
+            <route-selector id="route-selector" router="#here-router"></route-selector>
+        </here-map>
+    </maps-example>
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
     <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
     <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>

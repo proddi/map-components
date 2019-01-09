@@ -338,6 +338,7 @@ class SampleElement extends HTMLElement {
     <array-2-selector id="selector" items="{ {items} }" selected="{ {selectedItems} }" selected-item="{ {selectedItem} }"></array-2-selector>
 
     <div id="routes">
+        <div>${response.error}</div>
         ${repeat(response.routes || [], (route) => route.id, (route, index) => itemTemplate(route))}
     </div>
     `; }
@@ -395,7 +396,7 @@ class SampleElement extends HTMLElement {
     }
 
     showLoading(request) {
-        clearRoutes();
+        this.clearRoutes();
     }
 
     showError(error) {

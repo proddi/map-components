@@ -3,19 +3,20 @@
 <head>
     <title>HERE MAP - web components</title>
     <script type="text/javascript" src="credentials.js"></script>
-    <script type="module" src="../comp/here/platform.js"></script>
-    <script type="module" src="../comp/here/map.js"></script>
-    <script type="module" src="../comp/here/transit-router.js"></script>
-    <script type="module" src="../comp/here/map-route-picker.js"></script>
-    <script type="module" src="../comp/here/map-routes.js"></script>
+    <script type="module" src="../src/maps/example.js"></script>
+    <script type="module" src="../src/here/platform.js"></script>
+    <script type="module" src="../src/here/map.js"></script>
+    <script type="module" src="../src/here/transit-router.js"></script>
+    <script type="module" src="../src/here/map-route-picker.js"></script>
+    <script type="module" src="../src/here/map-routes.js"></script>
 
-    <script type="module" src="../comp/google/platform.js"></script>
-    <script type="module" src="../comp/google/router.js"></script>
+    <script type="module" src="../src/google/platform.js"></script>
+    <script type="module" src="../src/google/router.js"></script>
 
-    <script type="module" src="../comp/route-selector.js"></script>
-    <script type="module" src="../comp/union-router.js"></script>
-    <script type="module" src="../comp/route-link.js"></script>
-    <script type="module" src="../comp/route-debug.js"></script>
+    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/union-router.js"></script>
+    <script type="module" src="../src/route-link.js"></script>
+    <script type="module" src="../src/route-debug.js"></script>
     <style>
         /* component base styles */
         here-map {
@@ -25,37 +26,39 @@
     </style>
 </head>
 <body>
-    <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-    <google-platform key="${GOOGLE_KEY}"></google-platform>
+    <maps-example>
+        <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+        <google-platform key="${GOOGLE_KEY}"></google-platform>
 
-    <here-transit-router id="here-router"
-        name="here/transit"
-        app-id="${HERE_APP_ID}"
-        app-code="${HERE_APP_CODE}">
-    </here-transit-router>
+        <here-transit-router id="here-router"
+            name="here/transit"
+            app-id="${HERE_APP_ID}"
+            app-code="${HERE_APP_CODE}">
+        </here-transit-router>
 
-    <google-router id="google-router" platform="google-platform" mode="DRIVING" name="google/car"></google-router>
-    <google-router id="walk-router" platform="google-platform" mode="WALKING" name="google/walk"></google-router>
+        <google-router id="google-router" platform="google-platform" mode="DRIVING" name="google/car"></google-router>
+        <google-router id="walk-router" platform="google-platform" mode="WALKING" name="google/walk"></google-router>
 
-    <union-router id="union-router" routers="#here-router,#google-router,#walk-router"
-        start="13.30,52.43"
-        dest="13.76,52.51"
-        time="2018-12-22T19:17:07">
-    </union-router>
+        <union-router id="union-router" routers="#here-router,#google-router,#walk-router"
+            start="13.30,52.43"
+            dest="13.76,52.51"
+            time="2018-12-22T19:17:07">
+        </union-router>
 
-    <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-        <!-- picker is the input tool -->
-        <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
+        <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
+            <!-- picker is the input tool -->
+            <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
 
-        <!-- visualize router's routes -->
-        <here-map-routes router="#union-router" styler="route-selector"></here-map-routes>
-    </here-map>
+            <!-- visualize router's routes -->
+            <here-map-routes router="#union-router" styler="route-selector"></here-map-routes>
+        </here-map>
 
-    <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-        <route-selector router="#union-router"></route-selector>
-    </div>
+        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
+            <route-selector router="#union-router"></route-selector>
+        </div>
+    </maps-example>
 
-    <route-link router="#union-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
+    <route-link router="#union-router" start="13.31709,52.54441" dest="13.03205086063835,52.306711574213146" time="2018-12-22T19:17:07">route1</route-link>
     <route-link router="#union-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
     <route-link router="#union-router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>
     <route-link router="#union-router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658" time=2018-12-22T19:17:07>Belgium</route-link>

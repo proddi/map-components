@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
  *
@@ -60,13 +61,16 @@ class BaseRouter extends HTMLElement {
             this.currentRequest = request;
             this.dispatchEvent(new CustomEvent('request', { detail: request }));
             this.route(request).then(response => {
+                console.trace(this, response);
                 this.currentRoutes = response.routes;
                 this.currentError = undefined;
                 this.dispatchEvent(new CustomEvent('response', { detail: response }));
                 this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
             }, error => {
+                console.trace(this, error);
                 this.currentRoutes = undefined;
                 this.currentError = error;
+                this.dispatchEvent(new CustomEvent('response', { detail: response }));
                 this.dispatchEvent(new CustomEvent('error', { detail: error }));
                 throw error;
             });
@@ -219,8 +223,12 @@ class Stop extends Address {
         super(data);
         /** @type {string} */
         this.type = "location";
+
         /** @type {string} */
         self.id     = data.id;
+
+        /** @type {string} */
+        self.platform = data.platform;
         /**
          * data source of this stop
          * @type {object}
@@ -296,9 +304,9 @@ class Leg {
      * @param {Location} arrival - dest location
      * @param {Transport} transport - transport definition
      * @param {CoordinatePair[]} [geometry] - the geometry points excluding start, dest
-     * @param {{id:string,distance:number,summary:string}} params - Optional parameters.
+     * @param {{id:string,distance:number,summary:string,steps:Location[]}} params - Optional parameters.
      */
-    constructor(departure, arrival, transport, geometry=[], {id,distance,summary}) {
+    constructor(departure, arrival, transport, geometry=[], {id,distance,summary,steps}={}) {
         /** @type {string} */
         this.id = id;
         /** @type {Location} */
@@ -313,6 +321,8 @@ class Leg {
         this.distance = distance;
         /** @type {string} */
         this.summary = summary;
+        /** @type {location[]} */
+        this.steps = steps || [];
     }
 
     /**
@@ -325,6 +335,8 @@ class Leg {
         this.geometry = this.geometry.concat(other.geometry);
         this.arrival = other.arrival;
         this.distance += other.distance;
+        this.steps = this.steps.concat([other.departure]).concat(other.steps);
+//        this.steps = this.steps.conat([other.departure]).concat(other.steps);
     }
 }
 
@@ -449,16 +461,29 @@ const _uidCounter = {};
 
 
 /**
+ * Create a Promise that can be resolved later.
+ * @return {Promise}
+ */
+function deferredPromise() {
+    let _resolve, _reject;
+    let promise = new Promise((resolve, reject) => [_resolve, _reject] = [resolve, reject]);
+    promise.resolve = _resolve;
+    promise.reject = _reject;
+    return promise;
+}
+
+
+/**
  * Loads scripts asyncronously
  * @async
  * @param {...SRC} srcs - Sourcs to load.
- * @return {Promise<undefined[]|Error>}
+ * @return {Promise<DOMNode[]|Error>}
  */
 function loadScript(...srcs) {
     return Promise.all(srcs.map(src => new Promise((resolve, reject) => {
         let script = document.createElement('script');
         script.onload = function() {
-            resolve();
+            resolve(script);
         }
         script.type = "text/javascript";
         script.src = src;
@@ -472,7 +497,7 @@ function loadScript(...srcs) {
  * Loads styles asyncronously
  * @async
  * @param {...HREF} hrefs - Styles to load.
- * @return {Promise<undefined[]|Error>}
+ * @return {Promise<DOMNode[]|Error>}
  */
 function loadStyle(...hrefs) {
     return Promise.all(hrefs.map(href => new Promise((resolve, reject) => {
@@ -482,7 +507,7 @@ function loadStyle(...hrefs) {
         link.href = href;
         link.media = 'all';
         document.head.append(link);
-        resolve();
+        resolve(link);
     })));
 }
 
@@ -490,6 +515,6 @@ function loadStyle(...hrefs) {
 export {
     BaseRouter,
     Request, Response, Route, Leg, Transport, Address, Stop,
-    parseCoordString, findRootElement, buildURI, parseString, createUID,
+    parseCoordString, findRootElement, buildURI, deferredPromise, parseString, createUID,
     loadScript, loadStyle
 }

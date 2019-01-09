@@ -3,13 +3,14 @@
 <head>
     <title>HERE MAP - web components</title>
     <script type="text/javascript" src="credentials.js"></script>
-    <script type="module" src="../comp/here/platform.js"></script>
-    <script type="module" src="../comp/here/map.js"></script>
-    <script type="module" src="../comp/here/router.js"></script>
-    <script type="module" src="../comp/here/map-route-picker.js"></script>
-    <script type="module" src="../comp/here/map-routes.js"></script>
-    <script type="module" src="../comp/route-selector.js"></script>
-    <script type="module" src="../comp/route-debug.js"></script>
+    <script type="module" src="../src/maps/example.js"></script>
+    <script type="module" src="../src/here/platform.js"></script>
+    <script type="module" src="../src/here/map.js"></script>
+    <script type="module" src="../src/here/router.js"></script>
+    <script type="module" src="../src/here/map-route-picker.js"></script>
+    <script type="module" src="../src/here/map-routes.js"></script>
+    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/route-debug.js"></script>
     <style>
         /* component base styles */
         here-map {
@@ -22,26 +23,33 @@
     </style>
 </head>
 <body>
-    <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+    <maps-example>
+        <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-    <here-router id="here-router"
-        platform="#here-platform"
-        start="13.387234135880135,52.516663186138175"
-        dest="13.422018470882904,52.51460610994581"
-        time="2018-12-22T19:17:07">
-    </here-router>
+        <here-router id="here-router"
+            platform="#here-platform"
+            start="13.387234135880135,52.516663186138175"
+            dest="13.422018470882904,52.51460610994581"
+            time="2019-01-22T19:17:07">
+        </here-router>
 
-    <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
-        <!-- picker is the input tool -->
-        <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
-        <!-- visualize router's routes -->
-        <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
+        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+            <!-- picker is the input tool -->
+            <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
+            <!-- visualize router's routes -->
+            <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
 
-    </here-map>
+        </here-map>
 
-    <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-        <route-selector id="route-selector" router="#here-router"></route-selector>
-    </div>
+        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
+            <route-selector id="route-selector" router="#here-router"></route-selector>
+            <route-selector-2 router="#here-router">
+                <template as="route">
+                    <div>${route.id}</div>
+                </template>
+            </route-selector-2>
+        </div>
+    </maps-example>
 
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
     <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>

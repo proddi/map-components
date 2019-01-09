@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <title>paper-item demo</title>
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+
+    <script type="module" src="https://unpkg.com/@polymer/font-roboto/roboto.js?module"></script>
+    <script type="module" src="https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module"></script>
+    <script type="module" src="https://unpkg.com/@polymer/paper-item/paper-item-body.js?module"></script>
+    <script type="module" src="https://unpkg.com/@polymer/iron-icons@3.0.1/iron-icons.js?module"></script>
+    <script type="module" src="https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module"></script>
+
+    <style>
+        .route-lines {
+            background-color: #f0f0f0;
+            width: 100%;
+            border-radius: 0.9rem;
+            height: 0.3rem;
+            margin: 0.2rem 0 0.3rem 0;
+        }
+        .route-lines > span {
+            display: inline-block;
+            vertical-align: top;
+            borde_r-radius: 0.9rem;
+            height: 0.3rem;
+            b_order-left: 2px solid white;
+            border-right: 2px solid white;
+        }
+        .route-lines >span.walk {
+            background-color: #b7b9bc;
+        }
+    </style>
+
+</head>
+<body unresolved="">
+    <div role="listbox">
+
+      <paper-icon-item>
+        <iron-icon icon="maps:directions-car" slot="item-icon"></iron-icon>
+        <paper-item-body two-line>
+          <div>19:19 -> 20:40 (1 hr 21 mins)</div>
+          <div secondary>
+              walk - U8 - <iron-icon icon="maps:directions-car"></iron-icon> - walk
+          </div>
+        </paper-item-body>
+      </paper-icon-item>
+
+      <paper-icon-item>
+        <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
+        <paper-item-body three-line>
+          <div>49 min</div>
+          <div secondary>
+            <div class="route-modes">
+              <span style="color: rgb(125, 23, 107);">Bus 110</span> &rsaquo; <span style="color: rgb(223, 106, 28);">Tram M4</span> &rsaquo; <span style="color: rgb(191, 90, 42);">S42</span>
+            </div>
+            <div class="route-lines">
+              <span class="walk" style="width: 7.6%"></span><span class="tram" style="width: 10.2389%; background-color: rgb(125, 23, 107);"></span><span class="walk" style="width: 3.6%"></span><span class="tram" style="width: 18.2389%; background-color: rgb(223, 106, 28);"></span><span class="walk" style="width: 3.6%"></span><span class="tram" style="width: 18.2389%; background-color: rgb(223, 106, 28);"></span><span class="walk" style="width: 3.6%"></span>
+            </div>
+            <div class="route-details">
+                <span style="float: right">here</span>
+                <time datetime="2019-01-08T14:29:17.000Z">Leave 3:29 pm</time>
+            </div>
+          </div>
+        </paper-item-body>
+      </paper-icon-item>
+
+      <paper-icon-item>
+        <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
+        <paper-item-body three-line>
+          <div>49 min</div>
+          <div secondary>
+            <div class="route-modes">
+              <span style="color: rgb(125, 23, 107);">Bus 110</span> &rsaquo; <span style="color: rgb(223, 106, 28);">Tram M4</span> &rsaquo; <span style="color: rgb(191, 90, 42);">S42</span>
+            </div>
+            <div class="route-lines">
+              <span class="walk" style="width: 7.6%"></span><span class="tram" style="width: 10.2389%; background-color: rgb(125, 23, 107);"></span><span class="walk" style="width: 3.6%"></span><span class="tram" style="width: 18.2389%; background-color: rgb(223, 106, 28);"></span><span class="walk" style="width: 3.6%"></span><span class="tram" style="width: 18.2389%; background-color: rgb(223, 106, 28);"></span><span class="walk" style="width: 3.6%"></span>
+            </div>
+            <div class="route-details">
+                <time datetime="2019-01-08T14:29:17.000Z">Leave 3:29 pm</time>
+            </div>
+          </div>
+        </paper-item-body>
+      </paper-icon-item>
+
+    </div>
+</body>
+</html>

@@ -1,11 +1,21 @@
 {
     "name": "@proddi/map-components",
     "version": "0.0.1",
+    "license": "MIT",
+    "module": "src/index.js",
+    "main": "build/dist/map-components.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/proddi/map-components.git"
     },
+    "scripts": {
+        "build": "./node_modules/.bin/webpack --config webpack.config.js",
+        "build:prod": "NODE_ENV=production npm run build",
+        "build:docs": "rm -rf build/docs; ./node_modules/.bin/esdoc -c docs/conf.json",
+        "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\""
+    },
     "dependencies": {
+        "@polymer/app-layout": "^3.0.2",
         "@polymer/font-roboto-local": "^3.0.2",
         "@polymer/iron-demo-helpers": "^3.0.2",
         "@polymer/iron-icons": "^3.0.1",
@@ -13,13 +23,18 @@
         "@polymer/paper-card": "^3.0.1",
         "@polymer/paper-icon-button": "^3.0.1",
         "@polymer/paper-item": "^3.0.1",
+        "@polymer/paper-progress": "^3.0.1",
         "@polymer/paper-tabs": "^3.0.1",
+        "esdoc-external-events-plugin": "^1.0.0",
         "lit-html": "^0.14.0"
     },
     "devDependencies": {
         "esdoc": "^1.1.0",
         "esdoc-ecmascript-proposal-plugin": "^1.0.0",
         "esdoc-standard-plugin": "^1.0.0",
-        "polymer-cli": "^1.9.4"
+        "gh-pages": "^2.0.1",
+        "polymer-cli": "^1.9.4",
+        "webpack": "^4.28.3",
+        "webpack-cli": "^3.2.0"
     }
 }
