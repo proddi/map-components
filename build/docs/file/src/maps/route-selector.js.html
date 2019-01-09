@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/maps/route-selector.js | @proddi/map-components</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/proddi/map-components.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Address.html">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~BaseRouter.html">BaseRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Leg.html">Leg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Location.html">Location</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Request.html">Request</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Response.html">Response</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Route.html">Route</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Stop.html">Stop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Transport.html">Transport</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-debug.js~RouteDebug.html">RouteDebug</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-link.js~RouteLink.html">RouteLink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/union-router.js~UnionRouter.html">UnionRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildURI">buildURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createUID">createUID</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deferredPromise">deferredPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findRootElement">findRootElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadScript">loadScript</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadStyle">loadStyle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseCoordString">parseCoordString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseString">parseString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Color">Color</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CoordinatePair">CoordinatePair</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element">DOMNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">DOMSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#google">google</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/map.js~GoogleMap.html">GoogleMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/platform.js~GooglePlatform.html">GooglePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/router.js~GoogleDirectionsRouter.html">GoogleDirectionsRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#here">here</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-route-picker.js~HereMapRoutePicker.html">HereMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-routes.js~HereMapRoutes.html">HereMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map.js~HereMap.html">HereMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/platform.js~HerePlatform.html">HerePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/router.js~HereRouter.html">HereRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/transit-router.js~HereTransitRouter.html">HereTransitRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#mapbox">mapbox</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-route-picker.js~MapboxMapRoutePicker.html">MapboxMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-routes.js~MapboxMapRoutes.html">MapboxMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map.js~MapboxMap.html">MapboxMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-route-picker.js~MapboxMap3dRoutePicker.html">MapboxMap3dRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-routes.js~MapboxMap3dRoutes.html">MapboxMap3dRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d.js~MapboxMap3d.html">MapboxMap3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/platform.js~MapboxPlatform.html">MapboxPlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources">loadResources</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources3d">loadResources3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#maps">maps</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/example.js~MapsExample.html">MapsExample</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-details.js~RouteDetails.html">RouteDetails</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/tools.js~OpenPromise.html">OpenPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDistance">formatDistance</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDuration">formatDuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatTime">formatTime</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/maps/route-selector.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {html, render} from &apos;https://unpkg.com/lit-html?module&apos;;
+import {repeat} from &quot;https://unpkg.com/lit-html/directives/repeat?module&quot;;
+import {BaseRouter} from &apos;../generics.js&apos;;
+
+import &apos;https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module&apos;;
+import &apos;https://unpkg.com/@polymer/paper-item/paper-item-body.js?module&apos;;
+import &apos;https://unpkg.com/@polymer/iron-icons@3.0.1/iron-icons.js?module&apos;;
+import &apos;https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module&apos;;
+
+
+/**
+ * Selector watches a router and emits style events according to user input (mouse)
+ *
+ * @example
+ * &lt;router id=&quot;router&quot; ...&gt;&lt;/router&gt;
+ *
+ * &lt;route-selector router=&quot;#router&quot;&gt;&lt;/route-selector&gt;
+ *
+ * @listens {BaseRouter#request} to clear the list (loading state).
+ * @listens {BaseRouter#response} to update the list.
+ * @emits {RouteSelector#RouteSelected} when a route gets selected.
+ * @emits {RouteSelector#RouteUnselected} when a route gets selected.
+ * @emits {RouteSelector#RouteLegSelected} when a route gets selected.
+ * @emits {RouteSelector#RouteLegUnselected} when a route gets selected.
+ *
+ **/
+class RouteSelector extends HTMLElement {
+
+    constructor() {
+        super();
+
+        // get templates
+        this._rootTemplate = getBaseRenderer(this);
+        this._routeTemplate = getDefaultRouteTemplate(this);
+
+        // prepare root
+        this.attachShadow({mode: &apos;open&apos;});
+        this.clearRoutes();
+
+        /** @type {Response|undefined} */
+        this.response = undefined;
+
+        /** @type {Route|undefined} */
+        this.selectedRoute = undefined;
+
+        // router event handler
+        this._routeRequestHandler  = (ev) =&gt; this.showLoading(ev.detail);
+        this._routeResponseHandler = (ev) =&gt; this.showResponse(ev.detail);
+        this._routeRoutesHandler   = (ev) =&gt; this.addRoutes(ev.detail.routes);
+        this._routeErrorHandler    = (ev) =&gt; this.showError(ev.detail);
+/*
+        // mouse events
+        this.shadowRoot.addEventListener(&quot;mouseover&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.highlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;mouseout&quot;, (ev)  =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.unhighlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;click&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.toggleSelectRoute(route);
+        });
+*/
+    }
+
+    connectedCallback() {
+        if (this.router === undefined) this.setRouter(this.getAttribute(&quot;router&quot;));
+    }
+
+    clearRoutes() {
+        render(this._rootTemplate({}, this._routeTemplate), this.shadowRoot);
+    }
+
+    addRoutes(routes) {
+        console.warn(&quot;NOT IMPLEMENTED&quot;);
+    }
+
+    showLoading(request) {
+        this.clearRoutes();
+    }
+
+    showResponse(response) {
+        render(this._rootTemplate(response, this._routeTemplate), this.shadowRoot);
+    }
+
+    showError(error) {
+        console.trace(&quot;NOT IMPLEMENTED&quot;);
+    }
+
+    /**
+     * sets a new router source
+     * @param {BaseRouter|DOMSelector} router - The new routes source
+     */
+    setRouter(router) {
+        // ensure a BaseRouter instance
+        if (!(router instanceof BaseRouter)) router = document.querySelector(router);
+
+        // unregister events @old router
+        if (this.router) {
+            this.router.removeEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.removeEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.removeEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.removeEventListener(&quot;error&quot;, this._routeErrorHandler);
+            this.clearRoutes();
+        }
+
+        this.router = router;
+
+        // register events @new router
+        if (this.router) {
+            this.router.addEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.addEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.addEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.addEventListener(&quot;error&quot;, this._routeErrorHandler);
+        // set current state
+//          this.showLoading(router.currentRequest);
+            router.currentRoutes &amp;&amp; this.addRoutes(router.currentRoutes);
+            router.currentError &amp;&amp; this.showError(router.currentError);
+        }
+    }
+
+    highlightRoute(route) {
+        this.dispatchEvent(new CustomEvent(&apos;highlighted&apos;, { detail: route }));
+    }
+
+    unhighlightRoute(route) {
+        this.dispatchEvent(new CustomEvent(&apos;unhighlighted&apos;, { detail: route }));
+    }
+
+    selectRoute(route) {
+        if (route === this.selectedRoute) return;
+        this.selectedRoute &amp;&amp; this.dispatchEvent(new CustomEvent(&apos;unselected&apos;, { detail: this.selectedRoute }));
+        this.selectedRoute = route;
+        this.selectedRoute &amp;&amp; this.dispatchEvent(new CustomEvent(&apos;selected&apos;, { detail: this.selectedRoute }));
+    }
+
+    toggleSelectedRoute(route) {
+        this.selectRoute(route === this.selectedRoute ? undefined : route);
+    }
+}
+
+
+/**
+ * Extracts a template content from {DOMNode} specified via {DOMSelector}
+ */
+function elementTemplate(node, ...fields) {
+    let data_as = node.getAttribute(&quot;data-as&quot;) || &quot;data&quot;;
+    let markup = node.innerHTML.trim()
+        .replace(&quot;=&amp;gt;&quot;, &quot;=&gt;&quot;);
+    node.parentNode.removeChild(node);
+    let fn = Function.apply(null, [&quot;html&quot;, data_as].concat(fields.map(([name, lookup]) =&gt; name)).concat([`return html\`${markup}\`;`]));
+    return (...args) =&gt; fn(html, args[0], ...fields.map(([name, lookup]) =&gt; lookup(...args)));
+}
+
+
+function getBaseRenderer(scope) {
+    return (response, routeTemplate) =&gt; html`
+    &lt;style&gt;
+        :host {
+            display: block;
+        }
+        :host .route-lines {
+            background-color: #f0f0f0;
+            width: 100%;
+            border-radius: 0.9rem;
+            height: 0.3rem;
+            margin: 0.2rem 0 0.3rem 0;
+        }
+        :host .route-lines &gt; span {
+            display: inline-block;
+            vertical-align: top;
+            borde_r-radius: 0.9rem;
+            height: 0.3rem;
+            b_order-left: 2px solid white;
+            border-right: 2px solid white;
+            background-color: #b7b9bc;
+        }
+        :host .route-lines &gt; span.walk {
+            background-color: #b7b9bc;
+        }
+        :host .route-lines &gt; span.car {
+            background-color: #2c48a1;
+        }
+        :host .provider {
+            float: right;
+        }
+        :host paper-icon-item {
+            cursor: pointer;
+        }
+        :host paper-icon-item:hover {
+            background-color: #f0f0f0;
+        }
+    &lt;/style&gt;
+
+    &lt;div role=&quot;listbox&quot;&gt;
+        &lt;div&gt;${response.error}&lt;/div&gt;
+        ${repeat(response.routes || [], (route) =&gt; route.id, (route, index) =&gt; routeTemplate(route, response))}
+    &lt;p&gt;&lt;/p&gt;
+    &lt;/div&gt;
+`;
+}
+
+
+function getDefaultRouteTemplate(self) {
+    return (route, response) =&gt; html`
+      &lt;paper-icon-item data-route=&quot;${route.uid}&quot;
+            @click=${_ =&gt; self.toggleSelectedRoute(route)}
+            @mouseenter=${_ =&gt; self.highlightRoute(route)}
+            @mouseleave=${_ =&gt; self.unhighlightRoute(route)}&gt;
+        &lt;iron-icon icon=&quot;maps:directions-transit&quot; slot=&quot;item-icon&quot;&gt;&lt;/iron-icon&gt;
+        &lt;paper-item-body three-line&gt;
+          &lt;div&gt;${route.duration}&lt;/div&gt;
+          &lt;div secondary&gt;
+            &lt;div class=&quot;route-modes&quot;&gt;
+                ${route.legs.filter(leg =&gt; leg.transport.type !== &quot;walk&quot;).map(leg =&gt; html`&lt;span class=&quot;leg leg-${leg.transport.type}&quot; title=&quot;${leg.summary || &apos;&apos;}&quot; style=&quot;color: ${leg.transport.color};&quot;&gt;${leg.transport.name}&lt;/span&gt;  &amp;rsaquo; `)}
+            &lt;/div&gt;
+            &lt;div class=&quot;route-lines&quot;&gt;
+                ${foo(response, route).map(([leg, width]) =&gt; html`&lt;span class=&quot;${leg.transport.type}&quot; title=&quot;${leg.summary || &apos;&apos;}&quot; style=&quot;width: ${width}%; background-color: ${leg.transport.color};&quot;&gt;&lt;/span&gt;`)}
+            &lt;/div&gt;
+            &lt;div class=&quot;route-details&quot;&gt;
+                &lt;span class=&quot;provider&quot;&gt;${route.router.name}&lt;/span&gt;
+                Leave: ${route.departure.timeString} -&amp;gt; ${route.arrival.timeString}
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/paper-item-body&gt;
+      &lt;/paper-icon-item&gt;
+`;
+}
+
+import {Leg, Transport} from &apos;../generics.js&apos;;
+import {formatTime} from &apos;./tools.js&apos;;
+
+
+const WAITING = new Transport({type: &quot;wait&quot;, name: &quot;wait&quot;, color: &quot;transparent&quot;, summary: &quot;Waiting...&quot;});
+
+function foo(response, route) {
+    let departure = response.routes.map(route =&gt; route.departure).reduce((prev, curr) =&gt; curr.time &lt; prev.time ? curr : prev);
+    let arrival = response.routes.map(route =&gt; route.arrival).reduce((prev, curr) =&gt; curr.time &gt; prev.time ? curr : prev);
+    let duration = (arrival.time - departure.time) / 100;
+//    console.log(route.id, formatTime(departure.time), formatTime(arrival.time), duration);
+    let waiting = new Leg(departure, route.legs[0].departure, WAITING, [], {id:&quot;0&quot;, summary: &quot;wait here&quot;});
+    return [waiting].concat(route.legs).map(leg =&gt; [leg, (leg.arrival.time - leg.departure.time)/duration]);
+}
+
+
+
+customElements.define(&apos;route-selector&apos;, RouteSelector);
+
+
+export { RouteSelector }
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

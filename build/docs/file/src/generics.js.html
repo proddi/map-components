@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/generics.js | @proddi/map-components</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/proddi/map-components.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Address.html">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~BaseRouter.html">BaseRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Leg.html">Leg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Location.html">Location</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Request.html">Request</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Response.html">Response</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Route.html">Route</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Stop.html">Stop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Transport.html">Transport</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-debug.js~RouteDebug.html">RouteDebug</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-link.js~RouteLink.html">RouteLink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/union-router.js~UnionRouter.html">UnionRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildURI">buildURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createUID">createUID</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deferredPromise">deferredPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findRootElement">findRootElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadScript">loadScript</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadStyle">loadStyle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseCoordString">parseCoordString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseString">parseString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Color">Color</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CoordinatePair">CoordinatePair</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element">DOMNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">DOMSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#google">google</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/map.js~GoogleMap.html">GoogleMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/platform.js~GooglePlatform.html">GooglePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/router.js~GoogleDirectionsRouter.html">GoogleDirectionsRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#here">here</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-route-picker.js~HereMapRoutePicker.html">HereMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-routes.js~HereMapRoutes.html">HereMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map.js~HereMap.html">HereMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/platform.js~HerePlatform.html">HerePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/router.js~HereRouter.html">HereRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/transit-router.js~HereTransitRouter.html">HereTransitRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#mapbox">mapbox</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-route-picker.js~MapboxMapRoutePicker.html">MapboxMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-routes.js~MapboxMapRoutes.html">MapboxMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map.js~MapboxMap.html">MapboxMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-route-picker.js~MapboxMap3dRoutePicker.html">MapboxMap3dRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-routes.js~MapboxMap3dRoutes.html">MapboxMap3dRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d.js~MapboxMap3d.html">MapboxMap3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/platform.js~MapboxPlatform.html">MapboxPlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources">loadResources</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources3d">loadResources3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#maps">maps</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/example.js~MapsExample.html">MapsExample</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-details.js~RouteDetails.html">RouteDetails</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/tools.js~OpenPromise.html">OpenPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDistance">formatDistance</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDuration">formatDuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatTime">formatTime</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/generics.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&quot;use strict&quot;;
+/**
+ * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
+ *
+ * @abstract
+ */
+class BaseRouter extends HTMLElement {
+//    static getType() { return &quot;abstract&quot;; };
+
+    constructor() {
+        super();
+        /**
+         * Returns &quot;abstract&quot; for this router.
+         * @type {string}
+         */
+        this.type = &quot;abstract&quot;;
+        /**
+         * Type of the router.
+         * @type {string}
+         */
+        this.id     = this.getAttribute(&quot;id&quot;) || this.tagName;
+        /** @type {string} */
+        this.name   = this.getAttribute(&quot;name&quot;) || this.type;
+        /** @type {Address} */
+        this.start  = parseCoordString(this.getAttribute(&quot;start&quot;));
+        /** @type {Address} */
+        this.dest   = parseCoordString(this.getAttribute(&quot;dest&quot;));
+        /** @type {Date} */
+        this.time   = this.getAttribute(&quot;time&quot;);
+
+        /** @type {Request|undefined} */
+        this.currentRequest = undefined;
+        /** @type {Route[]|undefined} */
+        this.currentRoutes  = undefined;
+        /** @type {Error|undefined} */
+        this.currentError   = undefined;
+    }
+
+    connectedCallback() {
+        setTimeout(() =&gt; {
+            this.update(this.start, this.dest, this.time);
+        }, 50);
+    }
+
+    buildRequest() {
+        console.warn(&quot;Need to implement router.buildRequest() method&quot;);
+    }
+
+    /**
+     * @fires GenericRouter#request
+     */
+    update(start, dest, time=undefined) {
+        // update
+        if (start) this.start = Address.enforce(start);
+        if (dest) this.dest = Address.enforce(dest);
+        if (time) this.time = time;
+
+        // perform request if possivle
+        if (this.start &amp;&amp; this.dest &amp;&amp; this.time) {
+            let request = this.buildRequest(this.start, this.dest, this.time);
+            this.currentRequest = request;
+            this.dispatchEvent(new CustomEvent(&apos;request&apos;, { detail: request }));
+            this.route(request).then(response =&gt; {
+                this.currentRoutes = response.routes;
+                this.currentError = undefined;
+                this.dispatchEvent(new CustomEvent(&apos;response&apos;, { detail: response }));
+                this.dispatchEvent(new CustomEvent(&apos;routes&apos;, { detail: { routes: response.routes }}));
+            }, error =&gt; {
+                this.currentRoutes = undefined;
+                this.currentError = error;
+                this.dispatchEvent(new CustomEvent(&apos;response&apos;, { detail: response }));
+                this.dispatchEvent(new CustomEvent(&apos;error&apos;, { detail: error }));
+                throw error;
+            });
+        } else {
+            console.warn(this.id, &quot;doesn&apos;t have all request data&quot;);
+        }
+    }
+}
+
+
+/**
+ * Router Request class.
+ */
+class Request {
+    /**
+     * create instance.
+     * @param {{start:Location, dest:Location, time:Date, others:Object}} options - xxx
+     **/
+    constructor(router, start, dest, time, others={}) {
+        /** @type {BaseRouter} */
+        this.router = router;
+        /** @type {Location} */
+        this.start = start;
+        /** @type {Location} */
+        this.dest = dest;
+        /** @type {Date} */
+        this.time = time;
+
+        Object.assign(this, others);
+
+        this._constructTime = new Date();
+    }
+
+    /**
+     * Calculates current elapsed time in seconds
+     * @return {float} - seconds elapsed
+     */
+    _elapsedTime() {
+        return (new Date() - this._constructTime) / 1000;
+    }
+}
+
+
+/**
+ * Router Response class.
+ */
+class Response {
+    /**
+     * create instance.
+     * @param {Request} request - related request.
+     * @param {Array&lt;Route&gt;} routes - response routes
+     */
+    constructor(request, ...routes) {
+        /** @type {Request} */
+        this.request = request;
+        /** @type {Array&lt;Route&gt;} */
+        this.routes = routes;
+        /** @type {Object} */
+        this.error = undefined;
+        /** @type {float} */
+        this.elapsed = request._elapsedTime();
+//        console.log(&quot;Request took&quot;, this.elapsed, &quot;secs:&quot;, this.request);
+    }
+
+    setError(error) {
+        this.error = error;
+        return this;
+    }
+}
+
+
+/**
+ * generic Location object
+ */
+class Location {
+    /**
+     * this is object destructuring.
+     * @param {Object} param - this is object param.
+     * @param {number} param.foo - this is property param.
+     * @param {string} param.bar - this is property param.
+     */
+    /**
+     * create instance.
+     * @param {{lat:float, lng:float, ?lon:float}} param
+     * @param {float} param.lng - latitude
+     * @param {float} param.lng - longitude
+     * @param {float} [param.lon] - alias for longitude (will be used when not given .lng)
+     **/
+     constructor({lat, lng, lon}) {
+        /** @type {float} */
+        this.lat  = lat;
+        /** @type {float} */
+        this.lng  = lng || lon;
+        /** @type {string} */
+        this.type = &quot;location&quot;;
+    }
+
+    /**
+     * Alias for {@link Location.lng}
+     * @type {float}
+     */
+    get lon() { return this.lng; }
+}
+
+
+/**
+ * generic Address object
+ */
+class Address extends Location {
+    /**
+     * create instance.
+     * @param {{lat:float,lng:float,name:string}} object
+     **/
+    constructor({lat, lng, lon, name, time}) {
+        super({lat:lat,lng:lng,lon:lon});
+
+        this.type = &quot;address&quot;;
+
+        this._name = name;
+        /** @type {Date} */
+        this.time = time;
+    }
+
+    /**
+     * Returns {name} or Address.
+     * @type {string}
+     */
+    get name() { return this._name || [this.lat, this.lon].map(val =&gt; Math.round(val, 2)).join(&quot;,&quot;); }
+
+    /**
+     * Returns the date as HH:MM
+     * @type {string}
+     */
+    get timeString() { return this.time.getHours() + &quot;:&quot; + (&quot;0&quot;+this.time.getMinutes()).slice(-2); }
+}
+
+/**
+ * Returns Address object if not already Address.
+ * @param {object|Address} addr
+ * @return {Address} addr as Address
+ */
+Address.enforce = (addr) =&gt; (addr instanceof Address) ? addr : new Address(addr);
+
+
+/**
+ * generic Stop object
+ */
+class Stop extends Address {
+    constructor(data) {
+        super(data);
+        /** @type {string} */
+        this.type = &quot;location&quot;;
+
+        /** @type {string} */
+        self.id     = data.id;
+
+        /** @type {string} */
+        self.platform = data.platform;
+        /**
+         * data source of this stop
+         * @type {object}
+         */
+        self.source = data.source;
+    }
+}
+
+
+/**
+ * Transport object for {@link Leg}
+ */
+class Transport {
+    /**
+     * create instance.
+     * @param {{type:string,name:string,color:Color,headsign:string}} params - foo
+     */
+    constructor({type, name, color, headsign}) {
+        /** @type {string} */
+        this.type = type;
+        /** @type {string} */
+        this.name = name;
+        /** @type {Color} */
+        this.color = color;
+        /** @type {string} */
+        this.headsign = headsign;
+    }
+
+    isSame(other) { return this.type === other.type &amp;&amp; this.name === other.name; }
+}
+
+
+class Route {
+    constructor(id, router, departure, arrival, legs=[]) {
+        /** @type {string} */
+        this.id = id;
+        /** @type {BaseRouter} */
+        this.router = router;
+        /** @type {Location} */
+        this.departure = departure;
+        /** @type {Location} */
+        this.arrival = arrival;
+        /** @type {Leg[]} */
+        this.legs = legs;
+    }
+
+    /**
+     * @deprecated use {Route#id} instead of this.
+     * @type {string} */
+    get uid() { return this.id; }
+
+    get duration() {
+        const FOO = [[60*60*1000, &quot;hr&quot;, &quot;hrs&quot;], [60*1000, &quot;min&quot;, &quot;mins&quot;], [1000, &quot;sec&quot;, &quot;secs&quot;]];
+        let ms = this.arrival.time - this.departure.time;
+        let parts = [];
+        for (let [factor, sn, pl] of FOO) {
+            let val = Math.floor(ms/factor);
+            if (val) {
+                let unit = val==1 ? sn : pl;
+                parts.push(`${val} ${unit}`);
+                ms -= val * factor;
+            }
+        }
+        return parts.join(&quot; &quot;);
+    }
+}
+
+
+class Leg {
+    /**
+     * create instance.
+     * @param {Location} departure - start location
+     * @param {Location} arrival - dest location
+     * @param {Transport} transport - transport definition
+     * @param {CoordinatePair[]} [geometry] - the geometry points excluding start, dest
+     * @param {{id:string,distance:number,summary:string,steps:Location[]}} params - Optional parameters.
+     */
+    constructor(departure, arrival, transport, geometry=[], {id,distance,summary,steps}={}) {
+        /** @type {string} */
+        this.id = id;
+        /** @type {Location} */
+        this.departure = departure;
+        /** @type {Location} */
+        this.arrival = arrival;
+        /** @type {Transport} */
+        this.transport = transport;
+        /** @type {CoordinatePair[]} */
+        this.geometry = geometry;
+        /** @type {number} */
+        this.distance = distance;
+        /** @type {string} */
+        this.summary = summary;
+        /** @type {location[]} */
+        this.steps = steps || [];
+    }
+
+    /**
+     * Extends this Leg with the `other` Leg
+     * @param {Leg} other - The other Leg to be added.
+     */
+    extendLeg(other) {
+        // TODO: check this.arrival == other.departure
+        this.geometry.push([this.arrival.lat, this.arrival.lng]);
+        this.geometry = this.geometry.concat(other.geometry);
+        this.arrival = other.arrival;
+        this.distance += other.distance;
+        this.steps = this.steps.concat([other.departure]).concat(other.steps);
+//        this.steps = this.steps.conat([other.departure]).concat(other.steps);
+    }
+}
+
+/**
+ * @typedef {[lat:float, lng:float]} CoordinatePair
+ * @example
+ * let pair = [52.5, 13.2];
+ */
+
+/**
+ * @typedef {string&lt;#rrggbb&gt;} Color
+ * @example
+ * let color = &quot;#ccbbaa&quot;;
+ */
+
+/**
+ * @external {HTMLElement} https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+ */
+
+/**
+ * @external {DOMNode} https://developer.mozilla.org/en-US/docs/Web/API/Element
+ */
+
+/**
+ * @external {DOMSelector} https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors
+ */
+
+
+/**
+ * Return coordinate-object for coordinte-string
+ * @param {string} s - A string like `&quot;52.432,13.254&quot;`
+ * @returns {CoordinatePair} - The object representation.
+ */
+function parseCoordString(s) {
+    if (!s) return null;
+    var coords = s.split(&quot;,&quot;).map(parseFloat);
+    return { lat: coords[1], lng: coords[0], }
+}
+
+
+/**
+ * Find a DOMElement. It has various ways:
+ * - try finding {@link DOMNode} by {@link DOMSelector} including a class check
+ * - iterate over parent-nodes to find a {@link DOMNode} of the specified class
+ * - find a {@link DOMNode} by querying by tag-name. Fails if not exactly one node found.
+ * - return default if specified or throw error.
+ *
+ * @param {DOMNode} node - The node to start lookup.
+ * @param {DOMSelector|undefined} selector - The dom selector to find the element.
+ * @param {HTMLElement} Element - The required type.
+ * @param {Object|string|number} [defaultValue] - Returned value if not found. NEED TO BE DIFFERENT THAN `undefined`!!
+ * @return {DOMNode|undefined} - The node or undefined if not found.
+ * @throws Exception when no {DOMNode} was found and no defaultValue was provided.
+ */
+function findRootElement(node, selector, Element, defaultValue=undefined) {
+    let found;
+    // return node by selector
+    if (selector) {
+        found = document.querySelectorAll(selector);
+        if (found.length == 1) return verifyClass(found[0], Element, defaultValue);
+        if (defaultValue !== undefined) return defaultValue;
+        console.error(&quot;Reference in node&quot;, node, `(${selector}) points to ${found} and no default provided.`);
+        throw `One reference target for ${node}(${selector}) is required but returned: ${found}`
+    }
+
+    // return when it&apos;s a parent (nesting)
+    found = node;
+    while (found = found.parentNode) {
+        if (found instanceof Element) return found;
+    }
+
+    // last option .. global search
+    found = document.querySelectorAll(Element.tagName);
+    if (found.length == 1) return verifyClass(found[0], Element, defaultValue);
+
+    // nope
+    if (defaultValue !== undefined) return defaultValue;
+    console.error(&quot;Fallback reference in node&quot;, node, `(${Element.tagName}) points to ${found} and no default provided.`);
+    throw `Could not find node type &quot;${Element.tagName}&quot; (${node})`;
+}
+
+
+function verifyClass(instance, Klass, defaultValue, message=&quot;Check console!&quot;) {
+    if (instance instanceof Klass) return instance;
+    if (defaultValue !== undefined) return defaultValue;
+    console.error(instance, &quot;isn&apos;t of type&quot;, Klass, &quot;Did you forget to include html-tag support?&quot;);
+    throw message;
+}
+
+/**
+ * Builds a URI from a base-url and params. Empty values gets filteres.
+ * @param {string} url - Base url
+ * @param {Object} params - Parameters to be encoded in the url.
+ * @returns {string}
+ */
+function buildURI(url, params) {
+    let p = Object.keys(params)
+        .map(key =&gt; [key, params[key]])
+        .filter(([ley, value]) =&gt; (value !== undefined) &amp;&amp; (value !== null))
+        .map(([key, value]) =&gt; `${key}=${encodeURIComponent(value)}`);
+    return url + (p.length &gt; 0 ? &quot;?&quot; + p.join(&quot;&amp;&quot;) : &quot;&quot;);
+}
+
+
+function parseString(markup, scope) {
+    if (!markup) return markup;
+    return new Function(&quot;return `&quot; + markup + &quot;`&quot;).call(scope);
+}
+
+/**
+ * Creates a unique string-identifier
+ * @param {string} [template] - The template for the identifier.
+ * @param {string} [salt] - The salt.
+ * @return {string} - The unique string identifier
+ */
+function createUID(template=&quot;uid-{uid}&quot;, salt=&quot;&quot;) {
+    return (template
+        .replace(&quot;{uid}&quot;, _uidCounter[template] = (_uidCounter[template] || 0) + 1)
+        .replace(&quot;{salt}&quot;, salt));
+}
+const _uidCounter = {};
+
+
+/**
+ * Create a Promise that can be resolved later.
+ * @return {Promise}
+ */
+function deferredPromise() {
+    let _resolve, _reject;
+    let promise = new Promise((resolve, reject) =&gt; [_resolve, _reject] = [resolve, reject]);
+    promise.resolve = _resolve;
+    promise.reject = _reject;
+    return promise;
+}
+
+
+/**
+ * Loads scripts asyncronously
+ * @async
+ * @param {...SRC} srcs - Sourcs to load.
+ * @return {Promise&lt;DOMNode[]|Error&gt;}
+ */
+function loadScript(...srcs) {
+    return Promise.all(srcs.map(src =&gt; new Promise((resolve, reject) =&gt; {
+        let script = document.createElement(&apos;script&apos;);
+        script.onload = function() {
+            resolve(script);
+        }
+        script.type = &quot;text/javascript&quot;;
+        script.src = src;
+        script.async = true;
+        document.head.append(script);
+    })));
+}
+
+
+/**
+ * Loads styles asyncronously
+ * @async
+ * @param {...HREF} hrefs - Styles to load.
+ * @return {Promise&lt;DOMNode[]|Error&gt;}
+ */
+function loadStyle(...hrefs) {
+    return Promise.all(hrefs.map(href =&gt; new Promise((resolve, reject) =&gt; {
+        let link = document.createElement(&apos;link&apos;);
+        link.rel  = &apos;stylesheet&apos;;
+        link.type = &apos;text/css&apos;;
+        link.href = href;
+        link.media = &apos;all&apos;;
+        document.head.append(link);
+        resolve(link);
+    })));
+}
+
+
+export {
+    BaseRouter,
+    Request, Response, Route, Leg, Transport, Address, Stop,
+    parseCoordString, findRootElement, buildURI, deferredPromise, parseString, createUID,
+    loadScript, loadStyle
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

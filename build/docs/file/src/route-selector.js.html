@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/route-selector.js | @proddi/map-components</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/proddi/map-components.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Address.html">Address</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~BaseRouter.html">BaseRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Leg.html">Leg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Location.html">Location</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Request.html">Request</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Response.html">Response</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Route.html">Route</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Stop.html">Stop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/generics.js~Transport.html">Transport</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-debug.js~RouteDebug.html">RouteDebug</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-link.js~RouteLink.html">RouteLink</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/union-router.js~UnionRouter.html">UnionRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-buildURI">buildURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createUID">createUID</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deferredPromise">deferredPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-findRootElement">findRootElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadScript">loadScript</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadStyle">loadStyle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseCoordString">parseCoordString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-parseString">parseString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Color">Color</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-CoordinatePair">CoordinatePair</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element">DOMNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">DOMSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement">HTMLElement</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#google">google</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/map.js~GoogleMap.html">GoogleMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/platform.js~GooglePlatform.html">GooglePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/google/router.js~GoogleDirectionsRouter.html">GoogleDirectionsRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/javascript/reference/map">google.maps.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developers.google.com/maps/documentation/directions/start">google.maps.DirectionsService</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#here">here</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-route-picker.js~HereMapRoutePicker.html">HereMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map-routes.js~HereMapRoutes.html">HereMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/map.js~HereMap.html">HereMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/platform.js~HerePlatform.html">HerePlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/router.js~HereRouter.html">HereRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/here/transit-router.js~HereTransitRouter.html">HereTransitRouter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-map.html">H.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-mapevents-behavior.html">H.mapevents.Behavior</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.here.com/documentation/maps/topics_api/h-service-platform.html">H.service.Platform</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#mapbox">mapbox</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-route-picker.js~MapboxMapRoutePicker.html">MapboxMapRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map-routes.js~MapboxMapRoutes.html">MapboxMapRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map.js~MapboxMap.html">MapboxMap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-route-picker.js~MapboxMap3dRoutePicker.html">MapboxMap3dRoutePicker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d-routes.js~MapboxMap3dRoutes.html">MapboxMap3dRoutes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/map3d.js~MapboxMap3d.html">MapboxMap3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/mapbox/platform.js~MapboxPlatform.html">MapboxPlatform</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources">loadResources</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-loadResources3d">loadResources3d</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/l-mapbox-map/">L.mapbox.map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/">mapboxgl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox-gl-js/api/#map">mapboxgl.Map</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://www.mapbox.com/mapbox.js/api/v3.1.1/">L</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#maps">maps</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/example.js~MapsExample.html">MapsExample</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-details.js~RouteDetails.html">RouteDetails</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/route-selector.js~RouteSelector.html">RouteSelector</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/maps/tools.js~OpenPromise.html">OpenPromise</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDistance">formatDistance</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDuration">formatDuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatTime">formatTime</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/route-selector.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {html, render} from &apos;https://unpkg.com/lit-html?module&apos;;
+import {repeat} from &quot;https://unpkg.com/lit-html/directives/repeat?module&quot;;
+import {BaseRouter} from &apos;./generics.js&apos;;
+
+
+/**
+ * Selector watches a router and emits style events according to user input (mouse)
+ *
+ * @example
+ * &lt;router id=&quot;router&quot; ...&gt;&lt;/router&gt;
+ *
+ * &lt;route-selector router=&quot;#router&gt;&lt;/route-selector&gt;
+ *
+ * @emits
+ * styles
+ *
+ **/
+class RouteSelector extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({mode: &apos;open&apos;});
+        render(MARKUP(), this.shadowRoot);
+        this._root = this.shadowRoot.querySelector(&quot;div&quot;);
+
+        /** @type {?BaseRouter} */
+        this.router = undefined;
+
+        this._routes = [];
+        this._error = undefined;
+        this._selectedRoute = undefined;
+        this._highlightedRoutes = [];
+
+        // router event handler
+        this._routeRequestHandler  = (ev) =&gt; this.showLoading(ev.detail);
+        this._routeResponseHandler = (ev) =&gt; { this.response = ev.detail; window.response = this.response; }
+        this._routeRoutesHandler   = (ev) =&gt; this.addRoutes(ev.detail.routes);
+        this._routeErrorHandler    = (ev) =&gt; this.showError(ev.detail);
+
+        // mouse events
+        this.shadowRoot.addEventListener(&quot;mouseover&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.highlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;mouseout&quot;, (ev)  =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.unhighlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;click&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.toggleSelectRoute(route);
+        });
+    }
+
+    /**
+     * sets a new router source
+     * @param {BaseRouter|DOMSelector} router - The new routes source
+     */
+    setRouter(router) {
+        // ensure a BaseRouter instance
+        if (!(router instanceof BaseRouter)) router = document.querySelector(router);
+
+        // unregister events @old router
+        if (this.router) {
+            this.router.removeEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.removeEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.removeEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.removeEventListener(&quot;error&quot;, this._routeErrorHandler);
+            this.clearRoutes();
+        }
+
+        this.router = router;
+
+        // register events @new router
+        if (this.router) {
+            this.router.addEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.addEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.addEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.addEventListener(&quot;error&quot;, this._routeErrorHandler);
+        // set current state
+//          this.showLoading(router.currentRequest);
+            router.currentRoutes &amp;&amp; this.addRoutes(router.currentRoutes);
+            router.currentError &amp;&amp; this.showError(router.currentError);
+        }
+    }
+
+    connectedCallback() {
+        if (this.router === undefined) this.setRouter(this.getAttribute(&quot;router&quot;));
+        let router = this.router;
+        if (router) {
+            // router events
+            router.addEventListener(&quot;request&quot;, (ev) =&gt; {
+                this.showLoading(ev.detail);
+            });
+            router.addEventListener(&quot;routes&quot;, (ev) =&gt; {
+                this.addRoutes(ev.detail.routes);
+            });
+            router.addEventListener(&quot;error&quot;, (ev) =&gt; {
+                this.showError(ev.detail);
+            });
+
+            // set current state
+            router.currentRequest &amp;&amp; this.showLoading(router.currentRequest);
+            router.currentRoutes &amp;&amp; this.addRoutes(router.currentRoutes);
+            router.currentError &amp;&amp; this.showError(router.currentError);
+        }
+    }
+
+    _findNodeByRoute(route) {
+
+    }
+
+    _findRouteByNode(node) {
+        while (node &amp;&amp; node.getAttribute) {
+            let uid = node.getAttribute(&quot;data-route&quot;);  // fails if node = shadowRoot
+            if (uid) return this._routeLookup[uid];
+            node = node.parentNode;
+        }
+    }
+
+    showResponse(routes, status) {
+        render(ROUTES(routes), this._root);
+    }
+
+    showLoading(request) {
+        render(LOADING(request), this._root);
+    }
+
+    showError(error) {
+        render(ERROR(error), this._root);
+    }
+
+    // DATA api
+    clearRoutes() {
+        console.warn(&quot;NOT IMPLEMENTED: clearRoutes()&quot;);
+    }
+
+    /**
+     * adds routes to show.
+     * @param {Array&lt;Route&gt;} routes
+     */
+    addRoutes(routes) {
+        this._routes = routes;
+        this._routeLookup = {};
+        for (let route of routes) this._routeLookup[route.uid] = route;
+        this.dispatchEvent(new CustomEvent(&apos;routes&apos;, { detail: { routes: routes, status: {}, }}));
+        this.showResponse(routes, {});
+    }
+
+    toggleSelectRoute(route) {
+        this._selectedRoute == route ? this.unselectRoute(route) : this.selectRoute(route);
+    }
+
+    /**
+     * select route.
+     * @param {Route} route - route to be selected
+     * @param {boolean} exclusive - if true other selected routes will be unselected
+     */
+    selectRoute(route, exclusive=true) {
+        if (this._selectedRoute) {
+            this._emitRouteStyle(this._selectedRoute);
+        }
+        this._selectedRoute = route;
+        this._emitRouteStyle(this._selectedRoute, &quot;selected&quot;);
+    }
+
+    /**
+     * unselect route.
+     * @param {Route} route - route to be unselected
+     */
+    unselectRoute(route) {
+        if (route &amp;&amp; this._selectedRoute == route) {
+            this._selectedRoute = undefined;
+            this._emitRouteStyle(route);
+        }
+    }
+
+    highlightRoute(route) {
+        this._emitRouteStyle(route, this._selectedRoute == route &amp;&amp; &quot;selected&quot;, &quot;highlighted&quot;);
+    }
+
+    unhighlightRoute(route) {
+        this._emitRouteStyle(route, route == this._selectedRoute &amp;&amp; &quot;selected&quot;);
+    }
+
+    _emitRouteStyle(route, ...styles) {
+        let allStyles = {};
+        allStyles[route.uid] = styles.filter((style) =&gt; style);
+        this.dispatchEvent(new CustomEvent(&apos;styles&apos;, { detail: allStyles }));
+    }
+}
+
+
+const MARKUP = () =&gt; html`
+        &lt;style&gt;
+            :host {
+                border: 2px solid blue;
+                display: block;
+            }
+            :host .route {
+                border-top: 1px solid #999;
+                padding: 8px 8px 12px 8px;
+                position: relative;
+            }
+            :host .route:hover {
+                background: #DDD;
+                cursor: pointer;
+            }
+            :host .leg {
+                padding: 2px 3px;
+                border: 1px solid #555;
+                border-radius: 2px;
+                margin: 0 2px 0 0;
+                font-size: .7em;
+                font-weight: bold;
+            }
+            :host .provider {
+                position: absolute;
+                right:5px;
+                bottom:2px;
+                padding: 0px 3px;
+                font-size: .65em;
+                color: #000;
+                background: rgba(128, 128, 128, .3);
+            }
+            :host .loading {
+                background-color: rgba(192, 128, 96, .8);
+            }
+            :host .error {
+                background-color: rgba(255, 0, 0, .8);
+            }
+        &lt;/style&gt;
+        &lt;div&gt;&lt;/div&gt;
+    `;
+
+
+const ROUTES = (routes) =&gt; html`
+    ${routes.map(route =&gt; html`
+    &lt;div class=&quot;route&quot; data-route=&quot;${route.uid}&quot;&gt;
+        ${route.departure.timeString} -&amp;gt; ${route.arrival.timeString} (${route.duration})&lt;br&gt;
+        &lt;span&gt;${route.legs.map(leg =&gt; html`&lt;span class=&quot;leg leg-${leg.transport.type}&quot; title=&quot;${leg.summary || &apos;&apos;}&quot; style=&quot;background-color: ${leg.transport.color};&quot;&gt;${leg.transport.name}&lt;/span&gt;`)}&lt;/span&gt;
+        &lt;span class=&quot;provider&quot;&gt;${route.router.name}&lt;/span&gt;
+    &lt;/div&gt;
+    `)}
+    `;
+
+const ERROR = (error) =&gt; html`
+    &lt;div class=&quot;error&quot;&gt;${error}&lt;/div&gt;
+    `;
+
+const LOADING = (request) =&gt; html`
+    &lt;div class=&quot;loading&quot;&gt;loading &lt;span class=&quot;loc&quot;&gt;${request.start.name}&lt;/span&gt; -&amp;gt; &lt;span class=&quot;loc&quot;&gt;${request.dest.name}&lt;/span&gt;&lt;/div&gt;
+    `;
+
+
+customElements.define(&quot;route-selector&quot;, RouteSelector);
+
+
+export { RouteSelector }
+
+
+
+
+
+class SampleElement extends HTMLElement {
+    _rootTemplate(response, itemTemplate) { return html`
+    &lt;style&gt;
+      :host {
+        display: block;
+      }
+
+      @media only screen and (-webkit-max-device-pixel-ratio: 1) {
+        :host {
+          will-change: transform;
+        }
+      }
+
+      #routes {
+        @apply --iron-list-items-container;
+        position: relative;
+      }
+
+      :host(:not([grid])) #routes &gt; ::slotted(*) {
+        width: 100%;
+      }
+
+      #items &gt; ::slotted(*) {
+        box-sizing: border-box;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        will-change: transform;
+      }
+
+
+
+            :host .route {
+                @apply --iron-list-items-container;
+                border-bottom: 1px solid #999;
+                padding: 8px 8px 8px 8px;
+                position: relative;
+                display: block;
+            }
+            :host .route:hover {
+                background: #DDD;
+                cursor: pointer;
+            }
+            :host .legs {
+            }
+            :host .leg {
+                padding: 2px 3px;
+                border: 1px solid #555;
+                border-radius: 2px;
+                margin: 0 2px 0 0;
+                font-size: .7em;
+                font-weight: bold;
+            }
+            :host .leg:hover {
+                border-color: #000;
+            }
+            :host .provider {
+                position: absolute;
+                right:5px;
+                bottom:2px;
+                padding: 3px 5px;
+                font-size: .65em;
+                line-height: 1em;
+                color: #000;
+                background: rgba(128, 128, 128, .3);
+            }
+            :host .loading {
+                background-color: rgba(192, 128, 96, .8);
+            }
+            :host .error {
+                background-color: rgba(255, 0, 0, .8);
+            }
+    &lt;/style&gt;
+
+    &lt;array-2-selector id=&quot;selector&quot; items=&quot;{ {items} }&quot; selected=&quot;{ {selectedItems} }&quot; selected-item=&quot;{ {selectedItem} }&quot;&gt;&lt;/array-2-selector&gt;
+
+    &lt;div id=&quot;routes&quot;&gt;
+        &lt;div&gt;${response.error}&lt;/div&gt;
+        ${repeat(response.routes || [], (route) =&gt; route.id, (route, index) =&gt; itemTemplate(route))}
+    &lt;/div&gt;
+    `; }
+
+    constructor() {
+        super();
+
+        // prepare templates
+        // +native this._rootTemplate
+        this._itemTemplate = elementTemplate(this.querySelector(&quot;template&quot;), [&quot;route&quot;, (route) =&gt; route]);
+
+        // prepare root
+        this.attachShadow({mode: &apos;open&apos;});
+        this.clearRoutes();
+//        this._listParent = this.shadowRoot.querySelector(&quot;div&quot;);
+
+//        render(this.itemTemplate(&quot;foo&quot;, this), this._listParent);
+//        render(this.itemTemplate(&quot;bar&quot;, this), this._listParent);
+        // router event handler
+        this._routeRequestHandler  = (ev) =&gt; this.showLoading(ev.detail);
+        this._routeResponseHandler = (ev) =&gt; this.showResponse(ev.detail);
+        this._routeRoutesHandler   = (ev) =&gt; this.addRoutes(ev.detail.routes);
+        this._routeErrorHandler    = (ev) =&gt; this.showError(ev.detail);
+/*
+        // mouse events
+        this.shadowRoot.addEventListener(&quot;mouseover&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.highlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;mouseout&quot;, (ev)  =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.unhighlightRoute(route);
+        });
+        this.shadowRoot.addEventListener(&quot;click&quot;, (ev) =&gt; {
+            let route = this._findRouteByNode(ev.target);
+            route &amp;&amp; this.toggleSelectRoute(route);
+        });
+*/
+    }
+
+    connectedCallback() {
+        if (this.router === undefined) this.setRouter(this.getAttribute(&quot;router&quot;));
+    }
+
+    clearRoutes() {
+        render(this._rootTemplate({}, this._itemTemplate), this.shadowRoot);
+    }
+
+    addRoutes(routes) {
+        console.warn(&quot;NOT IMPLEMENTED&quot;);
+    }
+
+    showResponse(response) {
+        render(this._rootTemplate(response, this._itemTemplate), this.shadowRoot);
+    }
+
+    showLoading(request) {
+        this.clearRoutes();
+    }
+
+    showError(error) {
+        console.trace(&quot;NOT IMPLEMENTED&quot;);
+    }
+
+    /**
+     * sets a new router source
+     * @param {BaseRouter|DOMSelector} router - The new routes source
+     */
+    setRouter(router) {
+        // ensure a BaseRouter instance
+        if (!(router instanceof BaseRouter)) router = document.querySelector(router);
+
+        // unregister events @old router
+        if (this.router) {
+            this.router.removeEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.removeEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.removeEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.removeEventListener(&quot;error&quot;, this._routeErrorHandler);
+            this.clearRoutes();
+        }
+
+        this.router = router;
+
+        // register events @new router
+        if (this.router) {
+            this.router.addEventListener(&quot;request&quot;, this._routeRequestHandler);
+            this.router.addEventListener(&quot;response&quot;, this._routeResponseHandler);
+            this.router.addEventListener(&quot;routes&quot;, this._routeRoutesHandler);
+            this.router.addEventListener(&quot;error&quot;, this._routeErrorHandler);
+        // set current state
+//          this.showLoading(router.currentRequest);
+            router.currentRoutes &amp;&amp; this.addRoutes(router.currentRoutes);
+            router.currentError &amp;&amp; this.showError(router.currentError);
+        }
+    }
+
+}
+
+
+/**
+ * Extracts a template content from {DOMNode} specified via {DOMSelector}
+ */
+function elementTemplate(node, ...fields) {
+    let as = node.getAttribute(&quot;as&quot;) || &quot;data&quot;;
+    let markup = node.innerHTML.trim()  // .content.firstElementChild.innerHTML.trim()
+        .replace(&quot;=&amp;gt;&quot;, &quot;=&gt;&quot;);
+    node.parentNode.removeChild(node);
+    let fn = Function.apply(null, [&quot;html&quot;, as].concat(fields.map(([name, lookup]) =&gt; name)).concat([`return html\`${markup}\`;`]));
+//    console.log(fn);
+    return (...args) =&gt; fn(html, args[0], ...fields.map(([name, lookup]) =&gt; lookup(...args)));
+}
+
+
+customElements.define(&apos;route-selector-2&apos;, SampleElement);
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
