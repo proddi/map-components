@@ -3,8 +3,9 @@ MAPS Web Components
 
 This is a prototype to use maps out there in an easy and declarative way.
 
-Examples are located in _examples/_ folder.
+- [examples](examples/)
 
+- [documentation](https://proddi.github.io/map-components/build/docs/)
 
 
 Concepts
