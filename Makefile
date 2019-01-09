@@ -25,7 +25,7 @@ docs:
 docs-publish:
 	git checkout master
 	git subtree split --prefix build -b gh-pages
-	git checkout gh-master
+	git checkout gh-pages
 	git add -f build/docs
 	git commit -m "Updated docs."
 	git checkout master
