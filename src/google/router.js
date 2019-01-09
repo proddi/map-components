@@ -68,14 +68,13 @@ class GoogleDirectionsRouter extends BaseRouter {
                 let routes = res.routes.map((route, index) => {
                     let leg = route.legs[0];
                     let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: (leg.departure_time || {}).value || new Date()});
-                    let arrival = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: (leg.arrival_time || {}).value || new Date(departure.time.getTime() + leg.duration.value*1000)});
-                    let accumulativeTime = departure.time;
+                    let routeArr = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: (leg.arrival_time || {}).value || new Date(departure.time.getTime() + leg.duration.value*1000)});
+                    let lastTime = new Date(departure.time.getTime());
                     let legs = leg.steps.map((step, index) => {
-                        console.log(step);
                         let transit = step.transit || {};
-                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: step.instructions, time: (transit.departure_time || {}).value || accumulativeTime});
-                        accumulativeTime = new Date(accumulativeTime.getTime() + leg.duration.value*1000);
-                        let arrival = new Address({lat:step.end_location.lat(), lon:step.end_location.lng(), time: (transit.arrival_time || {}).value || accumulativeTime});
+                        let departure = new Address({lat:step.start_location.lat(), lon:step.start_location.lng(), name: step.instructions, time: (transit.departure_time || {}).value || lastTime});
+                        lastTime = new Date(lastTime.getTime() + step.duration.value*1000);
+                        let arrival = new Address({lat:step.end_location.lat(), lon:step.end_location.lng(), time: (transit.arrival_time || {}).value || lastTime});
                         let transport = buildTransport(step);
                         let geometry = step.path.map(point => [point.lat(), point.lng()]);
                         return new Leg(departure, arrival, transport, geometry, {
@@ -84,9 +83,8 @@ class GoogleDirectionsRouter extends BaseRouter {
                                 summary:  step.instructions,
                             });
                     });
-                    return new Route(createUID("g-route-{uid}"), this, departure, arrival, removeConsecModes(legs));
+                    return new Route(createUID("g-route-{uid}"), this, departure, routeArr, removeConsecModes(legs));
                 });
-//                console.log("G-RES", routes);
                 return new Response(request, ...routes);
             }).catch(error => new Response(request).setError(error));
         });

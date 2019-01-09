@@ -97,6 +97,7 @@ function buildTransport(transport) {
 
 
 const ROUTER_MODES = {
+    0:  "highspeed_train",
     3:  "train",
     4:  "metro",
     5:  "bus",

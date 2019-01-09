@@ -42,7 +42,7 @@ const TEMPLATE = (request) => html`
                 background-color: rgba(255, 0, 0, .8);
             }
         </style>
-        <div>start=<span>"${request.start.lng},${request.start.lat}"</span> dest=<span>"${request.dest.lng},${request.dest.lat}"</span> time=<span>${request.time}</span></div>
+        <div>start=<span>"${request.start.lng},${request.start.lat}"</span> dest=<span>"${request.dest.lng},${request.dest.lat}"</span> time=<span>"${request.time}"</span></div>
     `;
 
 

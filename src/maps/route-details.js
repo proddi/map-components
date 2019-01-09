@@ -44,6 +44,7 @@ class RouteDetails extends HTMLElement {
             subway:     transitRenderer,
             metro:      transitRenderer,
             train:      transitRenderer,
+            highspeed_train:      transitRenderer,
             bus_rapid:  transitRenderer,
             arrival:    arrivalRenderer,
         }
@@ -66,7 +67,6 @@ class RouteDetails extends HTMLElement {
     }
 
     showRoute(route) {
-        console.log(route);
         render(this._baseRenderer(route, this._legRenderer), this.shadowRoot);
     }
 
@@ -141,6 +141,10 @@ function getBaseRenderer() {
         :host paper-icon-item.leg-walk .distance {
             color: rgb(44, 72, 161);
         }
+        :host paper-icon-item .line-car {
+            border-color: #2c48a1;
+            border-left-style: dotted;
+        }
     </style>
 
     <div role="listbox">
@@ -188,6 +192,26 @@ function getTransitRenderer(self) {
 }
 
 
+function getDefaultRenderer(self) {
+    return (leg, route) => html`
+      <paper-icon-item data-leg="${route.uid}">
+        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
+        <paper-item-body two-line>
+          <div>
+            <span style="float:right">${leg.departure.timeString}</span>
+            <div>${leg.summary}</div>
+          </div>
+          <div secondary>
+            <div class="leg-details">
+                type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}
+            </div>
+          </div>
+        </paper-item-body>
+      </paper-icon-item>
+`;
+}
+
+
 function getWalkRenderer(self) {
     return (leg, route) => html`
       <paper-icon-item data-leg="${leg.id}">
@@ -211,41 +235,23 @@ function getWalkRenderer(self) {
 }
 
 
-function getDefaultRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${route.uid}">
-        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
-        <paper-item-body two-line>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>
-            <div>${leg.summary}</div>
-          </div>
-          <div secondary>
-            <div class="leg-details">
-                type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}
-            </div>
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
-`;
-}
-
-
 function getCarRenderer(self) {
     return (leg, route) => html`
       <paper-icon-item data-leg="${leg.id}">
-        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
+        <iron-icon icon="maps:directions-car" slot="item-icon"></iron-icon>
         <paper-item-body two-line>
           <div>
             <span style="float:right">${leg.departure.timeString}</span>
-            <div>Strt at ${leg.departure.name}</div>
+            <div>Drive from at ${leg.departure.name}</div>
           </div>
           <div secondary><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-          <div secondary>Steps: ${leg.steps.length}</div>
+          <div secondary>Manuevers: ${leg.steps.length}</div>
         </paper-item-body>
       </paper-icon-item>
         ${repeat(leg.steps || [], (step, index) => html`
-      <paper-icon-item data-leg-step="${leg.id}">
+
+      <paper-icon-item data-leg-step="${leg.id}-1">
+        <div class="line line-car"></div>
         <iron-icon icon="maps:near-me" slot="item-icon"></iron-icon>
         <paper-item-body>
           <div secondary>
@@ -254,6 +260,7 @@ function getCarRenderer(self) {
           </div>
         </paper-item-body>
       </paper-icon-item>
+
         `)}
 `;
 }
@@ -283,6 +290,7 @@ const _TYPE_MAP = {
     tram:       "maps:tram",
     subway:     "maps:directions-subway",
     metro:      "maps:directions-railway",
+    highspeed_train:    "maps:train",
     train:      "maps:train",
 }
 function foo(leg) {

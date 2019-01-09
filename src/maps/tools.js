@@ -54,7 +54,7 @@ function formatDuration(time1, time2) {
             ms -= val * factor;
         }
     }
-    return parts.join(" ");
+    return parts.join(" ") || "0 secs";
 }
 
 

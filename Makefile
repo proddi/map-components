@@ -23,8 +23,12 @@ docs:
 
 .PHONY: docs-publish
 docs-publish:
-	git checkout gh-pages
+	git checkout master
 	git subtree split --prefix build -b gh-pages
+	git checkout gh-master
+	git add -f build/docs
+	git commit -m "Updated docs."
+	git checkout master
 	git push -f origin gh-pages:gh-pages
 	git branch -D gh-pages
 

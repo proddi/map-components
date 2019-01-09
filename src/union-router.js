@@ -60,17 +60,9 @@ class UnionRouter extends BaseRouter {
         return Promise.all(
             request.routers.map(router => router.route(router.buildRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
         ).then(responses => {
+            let errors = responses.filter(response => response.error).map(response => response.error).join("; ");
             let routes = responses.map(response => response.routes).reduce((prev, curr) => prev.concat(curr), []);
-//            for (let response of responses) {
-//                console.log("RESPONSE", response.request.router.name, response.routes.length, response.error);
-//                if (response) {
-//                    routes = routes.concat(response.routes);
-//                    response.routes.forEach(route => {
-//                        console.log("ROUTE:", route.id);
-//                    });
-//                }
-//            }
-            return new Response(request, ...routes);
+            return new Response(request, ...routes).setError(errors);
         }); // error will be te first error occurred
     }
 }

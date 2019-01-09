@@ -61,13 +61,11 @@ class BaseRouter extends HTMLElement {
             this.currentRequest = request;
             this.dispatchEvent(new CustomEvent('request', { detail: request }));
             this.route(request).then(response => {
-                console.trace(this, response);
                 this.currentRoutes = response.routes;
                 this.currentError = undefined;
                 this.dispatchEvent(new CustomEvent('response', { detail: response }));
                 this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
             }, error => {
-                console.trace(this, error);
                 this.currentRoutes = undefined;
                 this.currentError = error;
                 this.dispatchEvent(new CustomEvent('response', { detail: response }));

@@ -30,7 +30,7 @@ class RouteSelector extends HTMLElement {
         super();
 
         // get templates
-        this._rootTemplate = getDefaultRootTemplate(this);
+        this._rootTemplate = getBaseRenderer(this);
         this._routeTemplate = getDefaultRouteTemplate(this);
 
         // prepare root
@@ -155,7 +155,7 @@ function elementTemplate(node, ...fields) {
 }
 
 
-function getDefaultRootTemplate() {
+function getBaseRenderer(scope) {
     return (response, routeTemplate) => html`
     <style>
         :host {
@@ -175,9 +175,13 @@ function getDefaultRootTemplate() {
             height: 0.3rem;
             b_order-left: 2px solid white;
             border-right: 2px solid white;
-        }
-        :host .route-lines >span.walk {
             background-color: #b7b9bc;
+        }
+        :host .route-lines > span.walk {
+            background-color: #b7b9bc;
+        }
+        :host .route-lines > span.car {
+            background-color: #2c48a1;
         }
         :host .provider {
             float: right;
@@ -193,6 +197,7 @@ function getDefaultRootTemplate() {
     <div role="listbox">
         <div>${response.error}</div>
         ${repeat(response.routes || [], (route) => route.id, (route, index) => routeTemplate(route, response))}
+    <p></p>
     </div>
 `;
 }
@@ -225,6 +230,8 @@ function getDefaultRouteTemplate(self) {
 }
 
 import {Leg, Transport} from '../generics.js';
+import {formatTime} from './tools.js';
+
 
 const WAITING = new Transport({type: "wait", name: "wait", color: "transparent", summary: "Waiting..."});
 
@@ -232,6 +239,7 @@ function foo(response, route) {
     let departure = response.routes.map(route => route.departure).reduce((prev, curr) => curr.time < prev.time ? curr : prev);
     let arrival = response.routes.map(route => route.arrival).reduce((prev, curr) => curr.time > prev.time ? curr : prev);
     let duration = (arrival.time - departure.time) / 100;
+//    console.log(route.id, formatTime(departure.time), formatTime(arrival.time), duration);
     let waiting = new Leg(departure, route.legs[0].departure, WAITING, [], {id:"0", summary: "wait here"});
     return [waiting].concat(route.legs).map(leg => [leg, (leg.arrival.time - leg.departure.time)/duration]);
 }
