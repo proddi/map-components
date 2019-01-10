@@ -25,7 +25,7 @@ class MapboxMap3dRoutePicker extends HTMLElement {
             destMarker.addTo(map);
 
             function update() {
-                router.update(startMarker.getLngLat(), destMarker.getLngLat());
+                router.update({start: startMarker.getLngLat(), dest: destMarker.getLngLat(),});
             }
 
             startMarker.on('dragend', update);

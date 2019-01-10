@@ -39,10 +39,11 @@ class HereRouter extends BaseRouter {
      * returns a Request object
      * @returns {Request}
      */
-    buildRequest(start, dest, time=undefined) {
-        let modes = (this.getAttribute("modes") || "transit").split(",");
-        let max = this.getAttribute("max");
-        return new Request(this, start, dest, time, { modes: modes.map(mode => REQ_MODES[mode] || mode), max: max });
+    buildRequest(start, dest, time) {
+        return super.buildRequest(start, dest, time, {
+                modes: (this.getAttribute("modes") || "transit").split(",").map(mode => REQ_MODES[mode] || mode),
+                max: this.getAttribute("max"),
+            });
     }
 
     /**
@@ -55,7 +56,7 @@ class HereRouter extends BaseRouter {
         let url = buildURI("https://route.api.here.com/routing/7.2/calculateroute.json", {
                 waypoint0:          `geo!${request.start.lat},${request.start.lng}`,
                 waypoint1:          `geo!${request.dest.lat},${request.dest.lng}`,
-                time:               request.time,
+                departure:          request.time.toISOString(),
                 mode:               `fastest;${request.modes.join(",")}`,
                 alternatives:       request.max || 3,
                 representation:     `display`,
@@ -65,12 +66,12 @@ class HereRouter extends BaseRouter {
                 app_id:             this.app_id,
                 app_code:           this.app_code,
             });
+        let response = new Response(request);
 
         return fetch(url).then(res => res.json()).then(res => {
             if (res.details) return Promise.reject(res.details);
 
             let routes = res.response.route.map((route, index) => {
-//                console.log("ROUTE", index, route);
                 // extract lines index
                 let lines = {};
                 for (let e of route.publicTransportLine || []) lines[e.id] = e;
@@ -90,7 +91,6 @@ class HereRouter extends BaseRouter {
                     time: new Date(),
                 });
                 let legs = route.leg[0].maneuver.filter(leg => leg.shape.length > 1).map((leg, index) => {
-//                    console.log("LEG", index, leg);
                     let geometry = route.shape.slice(1).map(s => s.split(",").map(v => parseFloat(v)));
                     let departure = buildLocation(leg);
                     leg = new Leg(departure, arrival, buildTransport(leg, lines[leg.line]), geometry);
@@ -102,11 +102,10 @@ class HereRouter extends BaseRouter {
                     prev.arrival = curr.departure;
                     return curr;
                 });
-//                legs.forEach(leg => console.log(index, leg.id, leg.departure, "->", leg.arrival));
                 return new Route(createUID("h-route-{uid}"), this, departure, arrival, legs);
             });
-            return new Response(request, ...routes);
-        }).catch(error => new Response(request).setError(error));
+            return response.setRoutes(routes);
+        }).catch(error => response.setError(error));
     }
 }
 

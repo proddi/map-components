@@ -30,7 +30,7 @@ class MapboxMapRoutePicker extends HTMLElement {
             destMarker.addTo(map);
 
             function update() {
-                router.update(startMarker.getLatLng(), destMarker.getLatLng());
+                router.update({start: startMarker.getLatLng(), dest: destMarker.getLatLng(),});
             }
 
             startMarker.on('dragend', update);

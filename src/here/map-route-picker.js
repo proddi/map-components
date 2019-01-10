@@ -36,7 +36,7 @@ class HereMapRoutePicker extends HTMLElement {
                     data = target.getData(),
                     position = target.getPosition();
                 behavior.enable();
-                router.update(startMarker.getPosition(), destMarker.getPosition());
+                router.update({start: startMarker.getPosition(), dest: destMarker.getPosition(),});
             }
 
             function _dragHandler(ev) {

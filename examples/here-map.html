@@ -11,6 +11,7 @@
     <script type="module" src="../src/here/map-routes.js"></script>
     <script type="module" src="../src/route-selector.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
+    <script type="module" src="../src/route-link.js"></script>
     <style>
         /* component base styles */
         here-map {
@@ -43,11 +44,6 @@
 
         <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
             <route-selector id="route-selector" router="#here-router"></route-selector>
-            <route-selector-2 router="#here-router">
-                <template as="route">
-                    <div>${route.id}</div>
-                </template>
-            </route-selector-2>
         </div>
     </maps-example>
 

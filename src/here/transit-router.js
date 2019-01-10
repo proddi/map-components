@@ -31,22 +31,12 @@ class HereTransitRouter extends BaseRouter {
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
     }
 
-    buildRequest(start, dest, time=undefined) {
-        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
-
-        let url = buildURI(`${this.server}/v3/route.json`, {
-                dep:        `${start.lat},${start.lng}`,
-                arr:        `${dest.lat},${dest.lng}`,
-                time:       time,
-                client:     "webcomponents",
-                graph:      1,
-                modes:      this.getAttribute("modes"),
-                max:        this.getAttribute("max"),
-                app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
-                app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
+    buildRequest(start, dest, time) {
+        return super.buildRequest(start, dest, time, {
+                server: this.server,
+                modes: this.getAttribute("modes"),
+                max: this.getAttribute("max"),
             });
-
-        return new Request(this, start, dest, time, {url:url});
     }
 
     /**
@@ -56,7 +46,23 @@ class HereTransitRouter extends BaseRouter {
      * @returns {Promise<Response, Error>} - route response
      */
     async route(request) {
-        return fetch(request.url).then(res => res.json()).then(res => {
+        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+
+        let url = buildURI(`${request.server}/v3/route.json`, {
+                dep:        `${request.start.lat},${request.start.lng}`,
+                arr:        `${request.dest.lat},${request.dest.lng}`,
+                time:       request.time.toISOString(),
+                client:     "webcomponents",
+                graph:      1,
+                modes:      request.modes,
+                max:        request.max,
+                app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
+                app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
+            });
+
+
+        let response = new Response(request);
+        return fetch(url).then(res => res.json()).then(res => {
                 if (res.Res.Message) {
                     throw res.Res.Message.text;
                 }
@@ -78,8 +84,8 @@ class HereTransitRouter extends BaseRouter {
                     });
                     return new Route(createUID("h-t-route-{uid}-{salt}", conn.id), this, departure, arrival, legs);
                 });
-                return new Response(request, ...routes);
-            }).catch(error => new Response(request).setError(error));
+                return response.setRoutes(routes);
+            }).catch(error => response.setError(error));
     }
 
 }

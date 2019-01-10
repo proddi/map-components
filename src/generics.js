@@ -22,14 +22,16 @@ class BaseRouter extends HTMLElement {
         /** @type {string} */
         this.name   = this.getAttribute("name") || this.type;
         /** @type {Address} */
-        this.start  = parseCoordString(this.getAttribute("start"));
+        this.start  = this.getAttribute("start");
         /** @type {Address} */
-        this.dest   = parseCoordString(this.getAttribute("dest"));
+        this.dest   = this.getAttribute("dest");
         /** @type {Date} */
         this.time   = this.getAttribute("time");
 
         /** @type {Request|undefined} */
         this.currentRequest = undefined;
+        /** @type {Response|undefined} */
+        this.currentResponse = undefined;
         /** @type {Route[]|undefined} */
         this.currentRoutes  = undefined;
         /** @type {Error|undefined} */
@@ -38,44 +40,63 @@ class BaseRouter extends HTMLElement {
 
     connectedCallback() {
         setTimeout(() => {
-            this.update(this.start, this.dest, this.time);
+            this.update({start:this.start, dest:this.dest, time:this.time});
         }, 50);
     }
 
-    buildRequest() {
-        console.warn("Need to implement router.buildRequest() method");
+    buildRequest(start, dest, time, others={}) {
+        return new Request(
+                this,
+                parseCoordString(start),
+                parseCoordString(dest),
+                parseTimeString(time),
+                others
+            );
     }
 
     /**
      * @fires GenericRouter#request
+     * @fires GenericRouter#response
      */
-    update(start, dest, time=undefined) {
-        // update
-        if (start) this.start = Address.enforce(start);
-        if (dest) this.dest = Address.enforce(dest);
+    update({start, dest, time}={}) {
+        if (start) this.start = start; //Address.enforce(start);
+        if (dest) this.dest = dest; //Address.enforce(dest);
         if (time) this.time = time;
 
         // perform request if possivle
-        if (this.start && this.dest && this.time) {
-            let request = this.buildRequest(this.start, this.dest, this.time);
-            this.currentRequest = request;
-            this.dispatchEvent(new CustomEvent('request', { detail: request }));
-            this.route(request).then(response => {
-                this.currentRoutes = response.routes;
-                this.currentError = undefined;
-                this.dispatchEvent(new CustomEvent('response', { detail: response }));
-                this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
-            }, error => {
-                this.currentRoutes = undefined;
-                this.currentError = error;
-                this.dispatchEvent(new CustomEvent('response', { detail: response }));
-                this.dispatchEvent(new CustomEvent('error', { detail: error }));
-                throw error;
-            });
-        } else {
-            console.warn(this.id, "doesn't have all request data");
+        if (this.start || this.dest || this.time) {
+            if (this.start && this.dest) {
+                let request = this.buildRequest(this.start, this.dest, this.time || new Date());
+                this.currentRequest = request;
+                this.currentResponse = undefined;
+                this.dispatchEvent(new CustomEvent('request', { detail: request }));
+                return this.route(request).then(response => {
+                    this.currentResponse = response;
+                    this.currentRoutes = response.routes;
+                    this.currentError = undefined;
+                    this.dispatchEvent(new CustomEvent('response', { detail: response }));
+                    this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
+                }, error => {
+                    this.currentRoutes = undefined;
+                    this.currentError = error;
+//                        this.dispatchEvent(new CustomEvent('response', { detail: response }));
+                    this.dispatchEvent(new CustomEvent('error', { detail: error }));
+                    throw error;
+                });
+            } else {
+                console.warn(this, "doesn't have all request data");
+            }
         }
     }
+/*
+    static get observedAttributes() { return ["start", "dest", "time"]; }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        let args = {};
+        args[name] = newValue;
+        this.update(args);
+    }
+*/
 }
 
 
@@ -129,11 +150,21 @@ class Response {
         /** @type {Object} */
         this.error = undefined;
         /** @type {float} */
-        this.elapsed = request._elapsedTime();
-//        console.log("Request took", this.elapsed, "secs:", this.request);
+        this.elapsed = undefined; //request._elapsedTime();
+
+        this._constructTime = new Date();
     }
 
+    // success
+    setRoutes(routes) {
+        this.elapsed = (new Date() - this._constructTime) / 1000;
+        this.routes = routes;
+        return this;
+    }
+
+    // error
     setError(error) {
+        this.elapsed = (new Date() - this._constructTime) / 1000;
         this.error = error;
         return this;
     }
@@ -220,18 +251,18 @@ class Stop extends Address {
     constructor(data) {
         super(data);
         /** @type {string} */
-        this.type = "location";
+        this.type = "stop";
 
         /** @type {string} */
-        self.id     = data.id;
+        this.id     = data.id;
 
         /** @type {string} */
-        self.platform = data.platform;
+        this.platform = data.platform;
         /**
          * data source of this stop
          * @type {object}
          */
-        self.source = data.source;
+        this.source = data.source;
     }
 }
 
@@ -369,9 +400,18 @@ class Leg {
  * @returns {CoordinatePair} - The object representation.
  */
 function parseCoordString(s) {
+    if (typeof s === 'string' || s instanceof String) {
+        let coords = s.split(",");
+        return { lat: parseFloat(coords[1]), lng: parseFloat(coords[0]), name: coords[2], }
+    }
+    return Address.enforce(s);
+}
+
+
+function parseTimeString(s) {
     if (!s) return null;
-    var coords = s.split(",").map(parseFloat);
-    return { lat: coords[1], lng: coords[0], }
+    let time = new Date(s);
+    return isNaN(time) ? s : time;
 }
 
 
@@ -513,6 +553,6 @@ function loadStyle(...hrefs) {
 export {
     BaseRouter,
     Request, Response, Route, Leg, Transport, Address, Stop,
-    parseCoordString, findRootElement, buildURI, deferredPromise, parseString, createUID,
+    parseCoordString, parseTimeString, findRootElement, buildURI, deferredPromise, parseString, createUID,
     loadScript, loadStyle
 }

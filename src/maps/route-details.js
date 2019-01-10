@@ -41,6 +41,7 @@ class RouteDetails extends HTMLElement {
             walk:       walkRenderer,
             car:        carRenderer,
             bus:        transitRenderer,
+            tram:       transitRenderer,
             subway:     transitRenderer,
             metro:      transitRenderer,
             train:      transitRenderer,
@@ -71,6 +72,7 @@ class RouteDetails extends HTMLElement {
     }
 
     showResponse(response) {
+        console.log("Route", response);
         this.showRoute(response.routes[0]);
     }
 
@@ -101,6 +103,7 @@ class RouteDetails extends HTMLElement {
             this.router.addEventListener("response", this._routeResponseHandler);
         // set current state
 //          this.showLoading(router.currentRequest);
+            router.currentResponse && this.showResponse(router.currentResponse);
 //            router.currentRoutes && this.addRoutes(router.currentRoutes);
 //            router.currentError && this.showError(router.currentError);
         }

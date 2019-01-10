@@ -6,6 +6,8 @@
     <script type="module" src="../../src/maps/example.js"></script>
     <script type="module" src="../../src/route-link.js"></script>
 
+    <script type="module" src="../../src/dev/mockup-router.js"></script>
+
     <script type="module" src="../../src/here/transit-router.js"></script>
 
     <script type="module" src="../../src/google/platform.js"></script>
@@ -35,17 +37,23 @@
     <google-router id="car-router" platform="google-platform" mode="DRIVING" name="google/car"></google-router>
     <google-router id="walk-router" platform="google-platform" mode="WALKING" name="google/walk"></google-router>
 
-    <union-router id="router" routers="#transit-router,#car-router,#w_alk-router"
-        start="13.31709,52.54441"
-        dest="13.56,52.41"
-        time="2019-01-09T05:15:07">
+    <union-router id="union-router" routers="#transit-router,#car-router,#wa_lk-router">
     </union-router>
 
-    <route-link router="#router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
-    <route-link router="#router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508">route2</route-link>
-    <route-link router="#router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511">Berlin-Halle</route-link>
-    <route-link router="#router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658">Belgium</route-link>
-    <route-link router="#router" start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777">London</route-link>
+    <mockup-router id="router"
+        fallback-router="#union-router"
+        name="mockup"
+        src="../responses/here-transit-{start}-{dest}.json"
+        start="A"
+        dest="B"
+        time="2019-01-09T05:15:07">
+    </mockup-router>
+
+    <route-link router="#router" start="A" dest="B">Berlin:A-B</route-link>
+    <route-link router="#router" start="13.447128295898438,52.512864781394114,foo" dest="13.383270263671875,52.46101698509508,bar">route2</route-link>
+    <route-link router="#router" start="BERLIN" dest="HALLE">Berlin-Halle</route-link>
+    <route-link router="#router" start="UTRECHT" dest="DORDRECHT">Belgium:Utrecht-Dordrecht</route-link>
+    <route-link router="#router" start="LONDON_A" dest="LONDON_B">London:A-B</route-link>
 
     <maps-example style="float:right; width:38%; margin-left:0">
         <route-details router="#router"></route-details>

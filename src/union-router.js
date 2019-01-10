@@ -39,11 +39,11 @@ class UnionRouter extends BaseRouter {
     setRouters(routers) {
         // currently just domselectors supported
         this.routers = (routers && routers.split(",") || [])
-            .map(selector => document.querySelector(selector))
-            .filter(router => {
+            .map(selector => [selector, document.querySelector(selector)])
+            .filter(([selector, router]) => {
                     if (router instanceof BaseRouter) return true;
-                    console.warn(router, "is not a valid Router object. Did you include html-tag support?");
-                });
+                    console.warn(`${this.tagName}(${this.id}): The selector "${selector}" doesn't refer to valid router element. Did you include html-tag support?`);
+                }).map(([selector, router]) => router);
     }
 
     buildRequest(start, dest, time=undefined) {
@@ -57,13 +57,14 @@ class UnionRouter extends BaseRouter {
      * @returns {Promise<Response, Error>} - route response
      */
     async route(request) {
+        let response = new Response(request);
         return Promise.all(
             request.routers.map(router => router.route(router.buildRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
         ).then(responses => {
-            let errors = responses.filter(response => response.error).map(response => response.error).join("; ");
+            let errors = responses.filter(response => response.error).map(response => response.error);
             let routes = responses.map(response => response.routes).reduce((prev, curr) => prev.concat(curr), []);
-            return new Response(request, ...routes).setError(errors);
-        }); // error will be te first error occurred
+            return response.setRoutes(routes).setError(errors.join("; ") || undefined);
+        });
     }
 }
 

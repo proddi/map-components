@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HERE transit routing - demo - maps web components</title>
+    <script type="text/javascript" src="../credentials.js"></script>
+    <script type="module" src="../../src/maps/example.js"></script>
+    <script type="module" src="../../src/here/platform.js"></script>
+    <script type="module" src="../../src/here/map.js"></script>
+    <script type="module" src="../../src/dev/mockup-router.js"></script>
+    <script type="module" src="../../src/here/map-route-picker.js"></script>
+    <script type="module" src="../../src/here/map-routes.js"></script>
+    <script type="module" src="../../src/route-selector.js"></script>
+    <script type="module" src="../../src/route-link.js"></script>
+    <script type="module" src="../../src/route-debug.js"></script>
+    <style>
+        here-map {
+            position: relative;
+            height: 400px;
+            display: block;
+        }
+        here-map > route-selector {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, .8);
+        }
+    </style>
+</head>
+<body>
+    <h3>HERE transit routing</h3>
+    <maps-example>
+        <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+
+        <mockup-router id="router"
+            name="mockup"
+            src="../responses/here-transit-{start}-{dest}.json"
+            start="A"
+            dest="B"
+            time="2018-12-22T19:17:07">
+        </mockup-router>
+
+        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+            <!-- picker is the input tool -->
+            <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
+            <!-- visualize router's routes -->
+            <here-map-routes router="#router" styler="#route-selector"></here-map-routes>
+
+            <route-selector id="route-selector" router="#router"></route-selector>
+        </here-map>
+    </maps-example>
+
+    <route-link router="#router" start="A" dest="B">Berlin A-B</route-link>
+    <route-link router="#router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
+    <route-link router="#router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>
+    <route-link router="#router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658" time=2018-12-22T19:17:07>Belgium</route-link>
+    <route-link router="#router" start="LONDON_A" dest="LONDON_B">London A-B</route-link>
+</body>
+</html>

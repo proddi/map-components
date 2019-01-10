@@ -48,6 +48,7 @@ maps-example > pre {
     border-top: 1px solid #888;
     background: #eee;
     font-size: 0.7em;
+    overflow-x: scroll;
 }
 `;
         document.head.appendChild(style);

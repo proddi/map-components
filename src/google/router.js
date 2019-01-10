@@ -33,8 +33,8 @@ class GoogleDirectionsRouter extends BaseRouter {
      * returns a Request object
      * @return {Request}
      */
-    buildRequest(start, dest, time=undefined) {
-        return new Request(this, start, dest, time, {
+    buildRequest(start, dest, time) {
+        return super.buildRequest(start, dest, time, {
                 mode: this.getAttribute("mode") || "DRIVING",
                 alternatives: Boolean(this.getAttribute("max")),
             });
@@ -47,6 +47,7 @@ class GoogleDirectionsRouter extends BaseRouter {
      * @return {Promise<Response|Error>} - route response
      */
     async route(request) {
+        let response = new Response(request);
         return this.platform.whenReady.then(({ service }) => {
             return new Promise((resolve, reject) => {
                 service.route({
@@ -54,8 +55,11 @@ class GoogleDirectionsRouter extends BaseRouter {
                     destination: `${request.dest.lat},${request.dest.lng}`,
                     travelMode: request.mode,
                     transitOptions: {
-                        departureTime: new Date(),
+                        departureTime: request.time,
                     },
+//                    drivingOptions: {
+//                        departureTime: request.time,
+//                    },
                     provideRouteAlternatives: request.alternatives,
                 }, function(res, status) {
                     if (status === 'OK') {
@@ -67,7 +71,7 @@ class GoogleDirectionsRouter extends BaseRouter {
             }).then(res => {
                 let routes = res.routes.map((route, index) => {
                     let leg = route.legs[0];
-                    let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: (leg.departure_time || {}).value || new Date()});
+                    let departure = new Address({lat: leg.start_location.lat(), lng: leg.start_location.lng(), name: leg.start_address, type: "addr", time: (leg.departure_time || {}).value || request.time});
                     let routeArr = new Address({lat: leg.end_location.lat(), lng: leg.end_location.lng(), name: leg.end_address, type: "addr", time: (leg.arrival_time || {}).value || new Date(departure.time.getTime() + leg.duration.value*1000)});
                     let lastTime = new Date(departure.time.getTime());
                     let legs = leg.steps.map((step, index) => {
@@ -85,8 +89,8 @@ class GoogleDirectionsRouter extends BaseRouter {
                     });
                     return new Route(createUID("g-route-{uid}"), this, departure, routeArr, removeConsecModes(legs));
                 });
-                return new Response(request, ...routes);
-            }).catch(error => new Response(request).setError(error));
+                return response.setRoutes(routes);
+            }).catch(error => response.setError(error));
         });
     }
 }

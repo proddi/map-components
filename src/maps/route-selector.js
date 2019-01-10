@@ -116,8 +116,9 @@ class RouteSelector extends HTMLElement {
             this.router.addEventListener("error", this._routeErrorHandler);
         // set current state
 //          this.showLoading(router.currentRequest);
-            router.currentRoutes && this.addRoutes(router.currentRoutes);
-            router.currentError && this.showError(router.currentError);
+            router.currentResponse && this.showResponse(router.currentResponse);
+//            router.currentRoutes && this.addRoutes(router.currentRoutes);
+//            router.currentError && this.showError(router.currentError);
         }
     }
 
