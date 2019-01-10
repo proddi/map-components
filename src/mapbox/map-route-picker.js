@@ -5,12 +5,12 @@ import {MapboxMap} from './map.js';
  * Adds start+stop map-marker to map and bind them to the router. When markers dragged the router gets updated.
  *
  * @example
- * <here-platform app-id="..." app-code="..."></here-platform>
+ * <mapbox-platform token="..."></mapbox-platform>
  * <router id="router"></router>
  *
- * <here-map platform="here-platform" center="13.5,52.5" zoom="11">
- *   <here-map-route-picker router="#router"></here-map-route-picker>
- * </here-map>
+ * <mapbox-map platform="mapbox-platform" center="13.5,52.5" zoom="11">
+ *   <mapbox-map-route-picker router="#router"></mapbox-map-route-picker>
+ * </mapbox-map>
  **/
 class MapboxMapRoutePicker extends HTMLElement {
     connectedCallback() {

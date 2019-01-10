@@ -17,19 +17,34 @@ const LOCATIONS = {
 class MockupRouter extends BaseRouter {
     constructor() {
         super();
+
         /**
-         * Returns "here" for this router.
+         * Returns `"mockup"` for this router.
          * @const
          * @type {string}
          */
         this.type   = "mockup";
-        /** @type {string} */
+
+        /**
+         * A reference to the mocked response. It can contain placeholders
+         * (e.g. `src="../responses/here-transit-{start}-{dest}.json"`).
+         * @type {string}
+         */
         this.src = this.getAttribute("src");
+
+        /**
+         * If a fallback router is specified (`fallback-router="#other-router"`), all non matching routes
+         * will be forwarded to this router
+         * @type {BaseRouter|undefined}
+         */
+        this.fallbackRouter = undefined;
+
+        this.locations = {}
     }
 
     connectedCallback() {
-        this.fallbackRouter = document.querySelector(this.getAttribute("fallback-router"));
         super.connectedCallback();
+        this.fallbackRouter = document.querySelector(this.getAttribute("fallback-router"));
     }
 
     buildRequest(start, dest, time) {
@@ -37,9 +52,8 @@ class MockupRouter extends BaseRouter {
         let destLoc = LOCATIONS[dest];
         if (!(startLoc && destLoc)) {
             if (this.fallbackRouter) return this.fallbackRouter.buildRequest(start, dest, time);
-            return super.buildRequest(startLoc || "1,1", destLoc || "2,2", time, {
-                    error: `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}"`,
-                });
+            return super.buildRequest(startLoc || "1,1", destLoc || "2,2", time).setError(
+                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}"`);
         }
         return super.buildRequest(startLoc, destLoc, time, {
                 src: this.src.replace("{start}", start).replace("{dest}", dest),
@@ -53,9 +67,9 @@ class MockupRouter extends BaseRouter {
      * @returns {Promise<Response, Error>} - route response
      */
     async route(request) {
-        if (request.router !== this) return request.router.route(request);
+//        if (request.router !== this) return request.router.route(request);
         let response = new Response(request);
-        if (request.error) return Promise.resolve(response.setError(request.error));
+//        if (request.error) return Promise.resolve(response.setError(request.error));
         return fetch(request.src).then(res => res.json()).then(data => {
             let routes = data.routes.map(data => new Route(
                 data.id,

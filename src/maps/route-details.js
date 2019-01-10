@@ -72,7 +72,6 @@ class RouteDetails extends HTMLElement {
     }
 
     showResponse(response) {
-        console.log("Route", response);
         this.showRoute(response.routes[0]);
     }
 

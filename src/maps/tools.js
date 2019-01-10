@@ -1,3 +1,6 @@
+import {html, render} from 'https://unpkg.com/lit-html?module';
+
+
 /**
  * Create a Promise that can be resolved later.
  * @example
@@ -63,7 +66,33 @@ function formatDistance(distance) {
 }
 
 
+function ensureStyles(id, styles) {
+    if (document.head.querySelector(`style[for="${id}"]`)) return;
+    let style = document.createElement('style');
+    style.setAttribute("for", id);
+    style.textContent=styles;
+    document.head.appendChild(style);
+}
+
+
+/**
+ * Extracts a template content from {DOMNode} specified via {DOMSelector}
+ */
+function elementTemplate(node) {
+    if (!node) return node;
+    let argNames = (node.getAttribute("args-as") || "data").split(",");
+    let markup = node.innerHTML.trim();
+//    console.log(markup);
+//    markup = markup.replace(/=&gt;/g, "=>");
+//    console.log(markup);
+    node.parentNode.removeChild(node);
+    let fn = Function.apply(null, ["html"].concat(argNames).concat([`return html\`${markup}\`;`]));
+    return (...args) => fn(html, ...args);
+}
+
+
 export {
     OpenPromise,
-    formatDuration, formatTime, formatDistance
+    formatDuration, formatTime, formatDistance,
+    ensureStyles, elementTemplate
 }

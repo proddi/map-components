@@ -70,7 +70,7 @@ class BaseRouter extends HTMLElement {
                 this.currentRequest = request;
                 this.currentResponse = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
-                return this.route(request).then(response => {
+                return (request.error ? Promise.reject(request.error) : request.router.route(request)).then(response => {
                     this.currentResponse = response;
                     this.currentRoutes = response.routes;
                     this.currentError = undefined;
@@ -117,18 +117,14 @@ class Request {
         this.dest = dest;
         /** @type {Date} */
         this.time = time;
-
         Object.assign(this, others);
 
         this._constructTime = new Date();
     }
 
-    /**
-     * Calculates current elapsed time in seconds
-     * @return {float} - seconds elapsed
-     */
-    _elapsedTime() {
-        return (new Date() - this._constructTime) / 1000;
+    setError(error) {
+        this.error = error;
+        return this;
     }
 }
 
@@ -149,8 +145,11 @@ class Response {
         this.routes = routes;
         /** @type {Object} */
         this.error = undefined;
-        /** @type {float} */
-        this.elapsed = undefined; //request._elapsedTime();
+        /**
+         * Contains elapsed time in seconds for this request.
+         * @type {float}
+         */
+        this.elapsed = undefined;
 
         this._constructTime = new Date();
     }

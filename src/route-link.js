@@ -21,7 +21,29 @@ class RouteLink extends HTMLElement {
                     time:  this.getAttribute("time"),
                 });
         });
+
+        ensureStyles("route-link", `
+route-link {
+    border: 1px solid rgba(128, 128, 128, .5);
+    box-shadow: 1px 1px 2px rgba(128, 128, 128, .5);
+    border-radius: 2px;
+    padding: 1px 5px;
+    cursor: pointer;
+}
+route-link:hover {
+    background-color: rgba(128, 128, 128, .15);
+}
+`)
     }
+}
+
+
+function ensureStyles(id, styles) {
+    if (document.head.querySelector(`style[for="${id}"]`)) return;
+    let style = document.createElement('style');
+    style.setAttribute("for", id);
+    style.textContent=styles;
+    document.head.appendChild(style);
 }
 
 

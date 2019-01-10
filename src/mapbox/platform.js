@@ -11,21 +11,20 @@ const resources = Promise.all([
  * The platform element is required to handle credentials for HERE services.
  *
  * @example
- * <here-platform app-id="..." app-code="..."></here-platform>
+ * <mapbox-platform token="..."></mapbox-platform>
  *
- * <here-map platform="here-platform" center="13.5,52.5" zoom="11">
- * </here-map>
+ * <mapbox-map platform="mapbox-platform" center="13.5,52.5" zoom="11">
+ * </mapbox-map>
  *
- * @see https://developer.here.com/documentation/maps/
+ * @see https://www.mapbox.com/mapbox.js/api/v3.1.1/
  **/
 class MapboxPlatform extends HTMLElement {
     constructor() {
         super();
 
-        /** @type {Promise<{platform:H.service.Platform, maptypes:object}>} */
-//        this.whenReady = loadResources(parseString(this.getAttribute("token"), window));
-
+        /** @type {Promise<{L:L}|Error>} */
         this.whenReady = resources.then(_ => {
+                let L = L.noConflict();
                 L.mapbox.accessToken = parseString(this.getAttribute("token"), window);
                 return {L:L};
             });
