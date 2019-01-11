@@ -1,6 +1,7 @@
 import {html, render} from 'https://unpkg.com/lit-html?module';
 import {repeat} from "https://unpkg.com/lit-html/directives/repeat?module";
 import {BaseRouter} from '../generics.js';
+import {elementTemplate} from './tools.js';
 
 import 'https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module';
 import 'https://unpkg.com/@polymer/paper-item/paper-item-body.js?module';
@@ -30,8 +31,8 @@ class RouteSelector extends HTMLElement {
         super();
 
         // get templates
-        this._rootTemplate = getBaseRenderer(this);
-        this._routeTemplate = getDefaultRouteTemplate(this);
+        this._baseRenderer = baseRenderer;
+        this._routeRenderer = routeRenderer;
 
         // prepare root
         this.attachShadow({mode: 'open'});
@@ -48,21 +49,6 @@ class RouteSelector extends HTMLElement {
         this._routeResponseHandler = (ev) => this.showResponse(ev.detail);
         this._routeRoutesHandler   = (ev) => this.addRoutes(ev.detail.routes);
         this._routeErrorHandler    = (ev) => this.showError(ev.detail);
-/*
-        // mouse events
-        this.shadowRoot.addEventListener("mouseover", (ev) => {
-            let route = this._findRouteByNode(ev.target);
-            route && this.highlightRoute(route);
-        });
-        this.shadowRoot.addEventListener("mouseout", (ev)  => {
-            let route = this._findRouteByNode(ev.target);
-            route && this.unhighlightRoute(route);
-        });
-        this.shadowRoot.addEventListener("click", (ev) => {
-            let route = this._findRouteByNode(ev.target);
-            route && this.toggleSelectRoute(route);
-        });
-*/
     }
 
     connectedCallback() {
@@ -70,7 +56,7 @@ class RouteSelector extends HTMLElement {
     }
 
     clearRoutes() {
-        render(this._rootTemplate({}, this._routeTemplate), this.shadowRoot);
+        render(this._baseRenderer(this, {}, this._routeRenderer), this.shadowRoot);
     }
 
     addRoutes(routes) {
@@ -82,7 +68,7 @@ class RouteSelector extends HTMLElement {
     }
 
     showResponse(response) {
-        render(this._rootTemplate(response, this._routeTemplate), this.shadowRoot);
+        render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
     }
 
     showError(error) {
@@ -143,21 +129,22 @@ class RouteSelector extends HTMLElement {
 }
 
 
-/**
- * Extracts a template content from {DOMNode} specified via {DOMSelector}
- */
-function elementTemplate(node, ...fields) {
-    let data_as = node.getAttribute("data-as") || "data";
-    let markup = node.innerHTML.trim()
-        .replace("=&gt;", "=>");
-    node.parentNode.removeChild(node);
-    let fn = Function.apply(null, ["html", data_as].concat(fields.map(([name, lookup]) => name)).concat([`return html\`${markup}\`;`]));
-    return (...args) => fn(html, args[0], ...fields.map(([name, lookup]) => lookup(...args)));
+import {Leg, Transport} from '../generics.js';
+
+
+const WAITING = new Transport({type: "wait", name: "wait", color: "transparent", summary: "Waiting..."});
+
+function foo(response, route) {
+    let departure = response.routes.map(route => route.departure).reduce((prev, curr) => curr.time < prev.time ? curr : prev);
+    let arrival = response.routes.map(route => route.arrival).reduce((prev, curr) => curr.time > prev.time ? curr : prev);
+    let duration = (arrival.time - departure.time) / 100;
+    let waiting = new Leg(departure, route.legs[0].departure, WAITING, [], {id:"0", summary: "wait here"});
+    return [waiting].concat(route.legs).map(leg => [leg, (leg.arrival.time - leg.departure.time)/duration]);
 }
 
 
-function getBaseRenderer(scope) {
-    return (response, routeTemplate) => html`
+function baseRenderer(self, response, routeTemplate) {
+    return html`
     <style>
         :host {
             display: block;
@@ -172,9 +159,7 @@ function getBaseRenderer(scope) {
         :host .route-lines > span {
             display: inline-block;
             vertical-align: top;
-            borde_r-radius: 0.9rem;
             height: 0.3rem;
-            b_order-left: 2px solid white;
             border-right: 2px solid white;
             background-color: #b7b9bc;
         }
@@ -191,21 +176,20 @@ function getBaseRenderer(scope) {
             cursor: pointer;
         }
         :host paper-icon-item:hover {
-            background-color: #f0f0f0;
+            background-color: rgba(128, 128, 128, .12);
         }
     </style>
 
     <div role="listbox">
         <div>${response.error}</div>
-        ${repeat(response.routes || [], (route) => route.id, (route, index) => routeTemplate(route, response))}
-    <p></p>
+        ${repeat(response.routes || [], (route) => route.id, (route, index) => routeTemplate(self, route, response))}
     </div>
 `;
 }
 
 
-function getDefaultRouteTemplate(self) {
-    return (route, response) => html`
+function routeRenderer(self, route, response) {
+    return html`
       <paper-icon-item data-route="${route.uid}"
             @click=${_ => self.toggleSelectedRoute(route)}
             @mouseenter=${_ => self.highlightRoute(route)}
@@ -229,22 +213,6 @@ function getDefaultRouteTemplate(self) {
       </paper-icon-item>
 `;
 }
-
-import {Leg, Transport} from '../generics.js';
-import {formatTime} from './tools.js';
-
-
-const WAITING = new Transport({type: "wait", name: "wait", color: "transparent", summary: "Waiting..."});
-
-function foo(response, route) {
-    let departure = response.routes.map(route => route.departure).reduce((prev, curr) => curr.time < prev.time ? curr : prev);
-    let arrival = response.routes.map(route => route.arrival).reduce((prev, curr) => curr.time > prev.time ? curr : prev);
-    let duration = (arrival.time - departure.time) / 100;
-//    console.log(route.id, formatTime(departure.time), formatTime(arrival.time), duration);
-    let waiting = new Leg(departure, route.legs[0].departure, WAITING, [], {id:"0", summary: "wait here"});
-    return [waiting].concat(route.legs).map(leg => [leg, (leg.arrival.time - leg.departure.time)/duration]);
-}
-
 
 
 customElements.define('route-selector', RouteSelector);

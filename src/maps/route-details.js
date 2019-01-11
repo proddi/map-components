@@ -171,7 +171,7 @@ function getTransitRenderer(self) {
         </paper-item-body>
       </paper-icon-item>
 
-      <paper-icon-item data-leg="${leg.id}">
+      <paper-icon-item data-leg="${leg.id}" tabIndex="-1">
         <div class="line ${leg.transport.type}" style="border-color: ${leg.transport.color}"></div>
         <paper-item-body two-line>
           <div>

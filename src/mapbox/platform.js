@@ -24,7 +24,6 @@ class MapboxPlatform extends HTMLElement {
 
         /** @type {Promise<{L:L}|Error>} */
         this.whenReady = resources.then(_ => {
-                let L = L.noConflict();
                 L.mapbox.accessToken = parseString(this.getAttribute("token"), window);
                 return {L:L};
             });

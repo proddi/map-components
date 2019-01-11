@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>route-details - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="module" src="../../src/maps/example.js"></script>
+
+    <script type="module" src="../../src/dev/demo-router.js"></script>
+
+    <script type="module" src="../../src/maps/route-selector.js"></script>
+    <script type="module" src="../../src/maps/route-details.js"></script>
+    <script type="module" src="../../src/union-router.js"></script>
+    <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
+
+</head>
+<body>
+    <h3>Real maps examples</h3>
+    <p>You need to enter your credentials to make them working. The credentials will be stored locally using localStorage interface.</p>
+
+<form>
+    <fieldset>
+        <legend>HERE credentials</legend>
+
+        <label for="here_app_id">APP-ID</label>
+        <input type='text' name="here_app_id" id="HERE_APP_ID"/><br>
+        <label for="here_app_code">APP-CODE</label>
+        <input type='text' name="here_app_code" id="HERE_APP_CODE"/><br>
+    </fieldset>
+
+    <fieldset>
+        <legend>GOOGLE credentials</legend>
+
+        <label for="google_key">KEY</label>
+        <input type='text' name="google_key" id="GOOGLE_KEY"/><br>
+    </fieldset>
+
+    <fieldset>
+        <legend>MAPBOX credentials</legend>
+
+        <label for="mapbox_token">TOKEN</label><br>
+        <input type='text' name="mapbox_token" id="MAPBOX_TOKEN"/><br>
+    </fieldset>
+
+
+    <button onclick="save_data()" type="button">Save</button>
+</form>
+
+    <script>
+        let fieldNames = ["HERE_APP_ID", "HERE_APP_CODE", "GOOGLE_KEY", "MAPBOX_TOKEN"];
+
+        fieldNames.forEach(id => document.querySelector(`input#${id}`).value = localStorage.getItem(id));
+
+        function save_data() {
+            fieldNames.forEach(id => localStorage.setItem(id, document.querySelector(`input#${id}`).value));
+
+            alert("Saved!");
+        }
+    </script>
+
+
+    <ul>
+        <li><a href="google-maps.html">Google Maps</a> - Simple Google Maps</li>
+        <li><a href="here-map-transit.html">HERE Transit</a> - Transit routing using HERE Maps</li>
+        <li><a href="mapbox-map.html">Mapbox Map</a> - Mapbox Map (inkl HERE maps routing)</li>
+        <li><a href="mapbox-map3d.html">Mapbox 3D Map</a> - Mapbox 3D Map (inkl HERE maps routing)</li>
+    </ul>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapbox Map 3D - map-components</title>
+    <script type="module" src="../../src/maps/example.js"></script>
+    <script type="module" src="../../src/mapbox/map3d.js"></script>
+    <script type="module" src="../../src/mapbox/map3d-route-picker.js"></script>
+    <script type="module" src="../../src/mapbox/map3d-routes.js"></script>
+    <script type="module" src="../../src/here/transit-router.js"></script>
+    <script type="module" src="../../src/route-selector.js"></script>
+    <style>
+        /* component base styles */
+        mapbox-map3d {
+            height: 400px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h3>Mapbox 3d Map</h3>
+    <here-transit-router id="router" app-id="${localStorage.getItem('HERE_APP_ID')}" app-code="${localStorage.getItem('HERE_APP_CODE')}"
+        start="13.31709,52.54441"
+        dest="13.56,52.41"
+        time="2018-12-22T19:17:07">
+    </here-transit-router>
+
+    <maps-example>
+        <mapbox-map3d center="13.5,52.5" zoom="10" style="height:700px" token="${localStorage.getItem('MAPBOX_TOKEN')}">
+            <mapbox-map3d-route-picker map="mapbox-map3d" router="#router"></mapbox-map3d-route-picker>
+            <mapbox-map3d-routes map="mapbox-map3d" router="#router"></mapbox-map3d-routes>
+        </mapbox-map3d>
+
+        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
+            <route-selector id="route-selector" router="#router"></route-selector>
+        </div>
+    </maps-example>
+
+</body>
+</html>

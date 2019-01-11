@@ -1,51 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HERE transit routing - demo - maps web components</title>
-    <link href="../assets/examples.css" rel="stylesheet">
-    <script type="text/javascript" src="../credentials.js"></script>
+    <title>HERE Maps with transit routing - map-components</title>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
     <script type="module" src="../../src/maps/example.js"></script>
     <script type="module" src="../../src/here/platform.js"></script>
     <script type="module" src="../../src/here/map.js"></script>
-    <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/here/transit-router.js"></script>
     <script type="module" src="../../src/here/map-route-picker.js"></script>
     <script type="module" src="../../src/here/map-routes.js"></script>
-    <script type="module" src="../../src/route-selector.js"></script>
     <style>
         here-map {
             position: relative;
             height: 400px;
             display: block;
         }
-        here-map > route-selector {
-            position: absolute;
-            right: 2px;
-            top: 2px;
-            z-index: 10;
-            background-color: rgba(255, 255, 255, .8);
-        }
     </style>
 </head>
 <body>
     <h3>HERE transit routing</h3>
+    <p>It uses HERE Transit routing API to request public transit routes. Drag'n'drop the markers!</p>
     <maps-example>
-        <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+        <here-platform app-id="${localStorage.getItem('HERE_APP_ID')}" app-code="${localStorage.getItem('HERE_APP_CODE')}"></here-platform>
+
+        <here-transit-router id="here-router" platform="here-platform" name="here/transit"></here-transit-router>
 
         <demo-router id="router"
             name="demo"
-            base="../responses/here-transit-"
+            fallback-router="#here-router"
+            ba_se="../assets/responses/here-transit-"
             start="A"
-            dest="B"
-            time="2018-12-22T19:17:07">
+            dest="B">
         </demo-router>
 
-        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
             <!-- picker is the input tool -->
             <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
             <!-- visualize router's routes -->
             <here-map-routes router="#router" styler="#route-selector"></here-map-routes>
-
-            <route-selector id="route-selector" router="#router"></route-selector>
         </here-map>
     </maps-example>
 </body>

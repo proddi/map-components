@@ -1,4 +1,5 @@
 import {findRootElement} from '../generics.js';
+import {MapboxMap3d} from './map3d.js';
 
 
 function mergeColor(color, merging, weight) {
@@ -61,7 +62,7 @@ class MapboxMap3dRoutes extends HTMLElement {
     }
 
     connectedCallback() {
-        let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("mapbox3d-map"));
+        let mapComp = findRootElement(this, this.getAttribute("map"), MapboxMap3d);
         let router = document.querySelector(this.getAttribute("router"));
 
         mapComp.whenReady.then(({L, map, mapboxgl}) => {

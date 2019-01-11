@@ -2,10 +2,10 @@
 <html>
 <head>
     <title>route-selector - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/maps/example.js"></script>
-    <script type="module" src="../../src/route-link.js"></script>
-    <script type="module" src="../../src/dev/mockup-router.js"></script>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
     <script type="module" src="../../src/maps/route-selector.js"></script>
     <style>
         body {
@@ -16,28 +16,18 @@
 <body>
     <h3>RouteSelector - map-components</h3>
 
-    <route-link router="#router" start="13.30,52.54,A" dest="13.45,52.42,B">route1</route-link>
-    <route-link router="#router" start="13.447128295898438,52.512864781394114,foo" dest="13.383270263671875,52.46101698509508,bar">route2</route-link>
-    <route-link router="#router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511">Berlin-Halle</route-link>
-    <route-link router="#router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658">Belgium</route-link>
-    <route-link router="#router" start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777">London</route-link>
-
     <maps-example>
-        <mockup-router id="router" src="../responses/here-transit-{start}-{dest}.json"
-            name="mock"
+        <demo-router id="router" base="../assets/responses/here-transit-"
+            name="demo"
             start="A"
             dest="B">
-        </mockup-router>
-        <route-selector router="mockup-router"></route-selector>
+        </demo-router>
+        <route-selector router="#router"></route-selector>
         <script>
             document.querySelector("route-selector")
-                .addEventListener("selected", (ev) => {
-                    console.log("selected:", ev.detail);
-                });
+                .addEventListener("selected", (ev) => console.log("selected:", ev.detail));
             document.querySelector("route-selector")
-                .addEventListener("unselected", (ev) => {
-                    console.log("unselected:", ev.detail);
-                });
+                .addEventListener("unselected", (ev) => console.log("unselected:", ev.detail));
         </script>
     </maps-example>
 </body>

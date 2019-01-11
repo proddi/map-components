@@ -1,19 +1,6 @@
 import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString, findRootElement} from '../generics.js';
 
 
-const LOCATIONS = {
-    A:          new Address({lng:13.31709, lat:52.54441, name:"A"}),
-    B:          new Address({lng:13.56, lat:52.41, name:"B"}),
-    BERLIN:     new Address({lng:13.447128295898438, lat:52.512864781394114, name:"Berlin"}),
-    HALLE:      new Address({lng:11.973157884785905, lat:51.48050248106511, name:"Halle"}),
-    UTRECHT:    new Address({lng:5.134984018513933, lat:52.07354489152308, name:"Utrecht"}),
-    DORDRECHT:  new Address({lng:4.658216001698747, lat:51.80320799021636, name:"Dordrecht"}),
-    LONDON_A:   new Address({lng:-0.38328552246099434, lat:51.53735345562071, name:"LONDON_A"}),
-    LONDON_B:   new Address({lng:0.21958923339838066, lat:51.44329522308777, name:"LONDON_B"}),
-}
-
-
-
 class MockupRouter extends BaseRouter {
     constructor() {
         super();
@@ -28,7 +15,7 @@ class MockupRouter extends BaseRouter {
         /**
          * A reference to the mocked response. It can contain placeholders
          * (e.g. `src="../responses/here-transit-{start}-{dest}.json"`).
-         * @type {string}
+         * @type {string|undefined}
          */
         this.src = this.getAttribute("src");
 
@@ -48,15 +35,16 @@ class MockupRouter extends BaseRouter {
     }
 
     buildRequest(start, dest, time) {
-        let startLoc = LOCATIONS[start];
-        let destLoc = LOCATIONS[dest];
-        if (!(startLoc && destLoc)) {
-            if (this.fallbackRouter) return this.fallbackRouter.buildRequest(start, dest, time);
+        let startLoc = this.locations[start];
+        let destLoc = this.locations[dest];
+        if (!(startLoc && destLoc && this.src)) {
+            if (this.fallbackRouter) return this.fallbackRouter.buildRequest(startLoc || start, destLoc || dest, time);
             return super.buildRequest(startLoc || "1,1", destLoc || "2,2", time).setError(
-                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}"`);
+                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (or src: "${this.src}")`);
         }
         return super.buildRequest(startLoc, destLoc, time, {
                 src: this.src.replace("{start}", start).replace("{dest}", dest),
+                fallbackRouter: this.fallbackRouter,
             });
     }
 
@@ -67,9 +55,7 @@ class MockupRouter extends BaseRouter {
      * @returns {Promise<Response, Error>} - route response
      */
     async route(request) {
-//        if (request.router !== this) return request.router.route(request);
         let response = new Response(request);
-//        if (request.error) return Promise.resolve(response.setError(request.error));
         return fetch(request.src).then(res => res.json()).then(data => {
             let routes = data.routes.map(data => new Route(
                 data.id,
@@ -90,7 +76,18 @@ class MockupRouter extends BaseRouter {
                 ))
             ));
             return response.setRoutes(routes).setError(data.error);
-        }, error => response.setError(error));
+        }, error => {
+            console.trace("demo req failed:", error);
+            if (request.fallbackRouter) {
+                return request.fallbackRouter.route(
+                        request.fallbackRouter.buildRequest(request.start, request.dest, request.time)
+                    ).then(response => {
+                        console.log("fallback-response:", response);
+                        return response;
+                    });
+            }
+            return response.setError(error)
+        });
     }
 
 }

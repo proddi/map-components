@@ -54,7 +54,8 @@ class DemoRouter extends MockupRouter {
     constructor() {
         super();
 
-        this.src = this.getAttribute("base") + "{start}-{dest}.json";
+        let base = this.getAttribute("base");
+        this.src = base ? base + "{start}-{dest}.json" : this.src;
 
         this.locations = {
             A:          new Address({lng:13.31709, lat:52.54441, name:"A"}),
@@ -65,6 +66,8 @@ class DemoRouter extends MockupRouter {
             DORDRECHT:  new Address({lng:4.658216001698747, lat:51.80320799021636, name:"Dordrecht"}),
             LONDON_A:   new Address({lng:-0.38328552246099434, lat:51.53735345562071, name:"LONDON_A"}),
             LONDON_B:   new Address({lng:0.21958923339838066, lat:51.44329522308777, name:"LONDON_B"}),
+            PELHAM:     new Address({lng:-73.80951026774704, lat:40.9111206612218, name:"Pelham, NYC"}),
+            JFK:        new Address({lng:-73.7893817794975, lat:40.64110273169828, name:"JFK Airport"}),
         }
 
         this.routes = {
@@ -72,6 +75,7 @@ class DemoRouter extends MockupRouter {
             "Ger:Berlin->Halle": ["BERLIN", "HALLE"],
             "Ned:Utrecht->Dordrecht": ["UTRECHT", "DORDRECHT"],
             "London:A->B": ["LONDON_A", "LONDON_B"],
+            "NYC:Pelham->JFK": ["PELHAM", "JFK"],
         };
 
         this.attachShadow({mode: 'open'});
