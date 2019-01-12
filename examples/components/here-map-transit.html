@@ -5,11 +5,11 @@
     <link href="../assets/examples.css" rel="stylesheet">
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/mapui/example.js"></script>
-    <script type="module" src="../../src/here/platform.js"></script>
-    <script type="module" src="../../src/here/map.js"></script>
+    <script type="module" src="../../src/vendor-here/platform.js"></script>
+    <script type="module" src="../../src/vendor-here/map.js"></script>
     <script type="module" src="../../src/dev/demo-router.js"></script>
-    <script type="module" src="../../src/here/map-route-picker.js"></script>
-    <script type="module" src="../../src/here/map-routes.js"></script>
+    <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
+    <script type="module" src="../../src/vendor-here/map-routes.js"></script>
     <script type="module" src="../../src/route-selector.js"></script>
     <style>
         here-map {
@@ -29,7 +29,7 @@
 <body>
     <h3>HERE transit routing</h3>
     <maps-example>
-        <here-platform id="here-platform" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+        <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
         <demo-router id="router"
             name="demo"
@@ -39,7 +39,7 @@
             time="2018-12-22T19:17:07">
         </demo-router>
 
-        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="#here-platform">
+        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
             <!-- picker is the input tool -->
             <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
             <!-- visualize router's routes -->

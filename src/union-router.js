@@ -1,4 +1,4 @@
-import {BaseRouter, Request, Response} from './generics.js';
+import {BaseRouter, RouteResponse} from './generics.js';
 
 
 /**
@@ -15,9 +15,7 @@ import {BaseRouter, Request, Response} from './generics.js';
  * </union-router>
  */
 class UnionRouter extends BaseRouter {
-    /**
-     * create instance.
-     */
+    /** @private */
     constructor() {
         super();
 
@@ -47,17 +45,17 @@ class UnionRouter extends BaseRouter {
     }
 
     buildRequest(start, dest, time=undefined) {
-        return new Request(this, start, dest, time, { routers: this.routers, });
+        return super.buildRequest(start, dest, time, { routers: this.routers, });
     }
 
     /**
      * Perform a route request.
      * @async
-     * @param {Request} request - route request.
-     * @returns {Promise<Response, Error>} - route response
+     * @param {RouteRequest} request - route request.
+     * @returns {Promise<RouteResponse, Error>} - route response
      */
     async route(request) {
-        let response = new Response(request);
+        let response = new RouteResponse(request);
         return Promise.all(
             request.routers.map(router => router.route(router.buildRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
         ).then(responses => {

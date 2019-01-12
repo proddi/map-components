@@ -56,13 +56,23 @@ class BaseRouter extends HTMLElement {
     }
 
     buildRequest(start, dest, time, others={}) {
-        return new Request(
+        return new RouteRequest(
                 this,
                 parseCoordString(start),
                 parseCoordString(dest),
                 parseTimeString(time),
                 others
             );
+    }
+
+    /**
+     * Performs a route request
+     * @param {Request} routeRequest
+     * @returns {Promise<Response>}
+     */
+    async route(routeRequest) {
+        console.warn("NOT IMPLEMENTED");
+        throw "abstract / implement in subclass";
     }
 
     /**
@@ -82,7 +92,7 @@ class BaseRouter extends HTMLElement {
                 this.currentResponse = this.response = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
                 return (request.error ? Promise.reject(request.error) : request.router.route(request)).catch(error => {
-                    return new Response(request).setError(error);
+                    return new RouteResponse(request).setError(error);
                 }).then(response => {
                     this.currentResponse = this.response = response;
                     this.currentRoutes = this.routes = response.routes;
@@ -95,6 +105,17 @@ class BaseRouter extends HTMLElement {
             }
         }
     }
+
+    async board(location, time=undefined) {
+    }
+
+    buildBoardRequest(location, time=undefined) {
+    }
+
+    async execBoardRequest(boardRequest) {
+    }
+
+
 /*
     static get observedAttributes() { return ["start", "dest", "time"]; }
 
@@ -136,6 +157,16 @@ class Request {
 }
 
 
+class RouteRequest extends Request {
+    get type() { return "route"; }
+}
+
+
+class BoardRequest extends Request {
+    get type() { return "board"; }
+}
+
+
 /**
  * Router Response class.
  */
@@ -174,6 +205,16 @@ class Response {
         this.error = error;
         return this;
     }
+}
+
+
+class RouteResponse extends Response {
+    get type() { return "route"; }
+}
+
+
+class BoardResponse extends Response {
+    get type() { return "board"; }
 }
 
 
@@ -558,7 +599,10 @@ function loadStyle(...hrefs) {
 
 export {
     BaseRouter,
-    Request, Response, Route, Leg, Transport, Address, Stop,
+    Request, Response,
+    RouteRequest, RouteResponse,
+    BoardRequest, BoardResponse,
+    Route, Leg, Transport, Address, Stop,
     parseCoordString, parseTimeString, findRootElement, buildURI, deferredPromise, parseString, createUID,
     loadScript, loadStyle
 }
