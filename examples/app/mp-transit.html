@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HERE transit routing - demo - maps web components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="text/javascript" src="../credentials.js"></script>
+    <script type="module" src="../../src/here/platform.js"></script>
+    <script type="module" src="../../src/here/map.js"></script>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/here/map-route-picker.js"></script>
+    <script type="module" src="../../src/here/map-routes.js"></script>
+    <script type="module" src="../../src/mapui/route-selector.js"></script>
+    <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
+    <script type="module" src="./comps/route-details-pane.js"></script>
+    <script>
+        function getClosest(el, selector) {
+            while (el) {
+                if (el.matches && el.matches(selector)) return el;
+                el = el.parentNode || el.host;
+            }
+        };
+
+    </script>
+    <style>
+        here-map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        here-map > route-selector {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            width: 300px;
+            z-index: 10;
+            background: white;
+            border: 0.1rem solid #f1f1f2;
+        }
+        here-map > demo-router {
+            position: absolute;
+            bottom: 10px;
+            left: 330px;
+            right: 10px;
+            z-index: 10;
+            padding: 10px;
+            background: rgba(255, 255, 255, .85);
+        }
+    </style>
+</head>
+<body>
+    <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+    <here-map center="13.5,52.5" zoom="11" platform="here-platform">
+        <demo-router id="router"
+            name="demo"
+            base="../assets/responses/here-transit-"
+            start="A"
+            dest="B"
+            time="2018-12-22T19:17:07">
+        </demo-router>
+
+        <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
+        <here-map-routes router="#router" styler="#route-selector"></here-map-routes>
+
+        <route-selector id="route-selector" router="#router"></route-selector>
+
+        <route-details-pane selector="route-selector" role="fade-right">
+            <template role="header" args-as="route">
+                <paper-icon-item>
+                    <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
+                    <paper-item-body two-line>
+                      <div>${route.duration}</div>
+                      <div secondary>
+                          secondary
+                      </div>
+                    </paper-item-body>
+                    <a tabindex=-1 onclick="getClosest(this, 'route-details-pane').clear()">
+                        <paper-icon-button icon="close" alt="close"></paper-icon-button>
+                    </a>
+                </paper-icon-item>
+            </template>
+            <template role="content" args-as="route">
+                <route-details selector="route-selector"></route-details>
+            </template>
+        </route-details-pane>
+    </here-map>
+</body>
+</html>

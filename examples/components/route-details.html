@@ -3,15 +3,24 @@
 <head>
     <title>route-details - map components</title>
     <link href="../assets/examples.css" rel="stylesheet">
-    <script type="module" src="../../src/maps/example.js"></script>
+    <script type="module" src="../../src/mapui/example.js"></script>
 
     <script type="module" src="../../src/dev/demo-router.js"></script>
 
-    <script type="module" src="../../src/maps/route-selector.js"></script>
-    <script type="module" src="../../src/maps/route-details.js"></script>
+    <script type="module" src="../../src/mapui/route-selector.js"></script>
+    <script type="module" src="../../src/mapui/route-details.js"></script>
     <script type="module" src="../../src/union-router.js"></script>
     <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
 
+    <script type="module">
+        window.getClosest = function(el, selector) {
+            while (el) {
+                if (el.matches && el.matches(selector)) return el;
+                el = el.parentNode || el.host;
+            }
+        };
+
+    </script>
 </head>
 <body>
     <h3>RouteDetails - map-components</h3>
@@ -24,72 +33,12 @@
         time="2019-01-09T05:15:07">
     </demo-router>
 
-    <div id="foo" hidden2>
-        <paper-icon-item class="header">
-            <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
-            <paper-item-body two-line>
-              <div>${route.duration}</div>
-              <div secondary>
-                  secondary
-              </div>
-            </paper-item-body>
-            <paper-icon-button icon="close" alt="close">
-            </paper-icon-button>
-        </paper-icon-item>
-
-        <route-details router="#router"></route-details>
-    </div>
-
-    <style>
-        #foo {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            bottom: 10px;
-            width: 300px;
-            background: white;
-            border: 0.1rem solid #f1f1f2;
-            z-index: 10;
-            opacity: 1;
-            transition: opacity .3s ease, right .3s ease;
-        }
-        #foo[hidden2] {
-            right: -30px;
-            opacity: 0;
-            pointer-events: none;
-        }
-        #foo .header {
-            border-bottom: 1px solid #f1f1f2;
-        }
-        #foo route-details {
-            height: calc(100% - 74px);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-    </style>
-
     <maps-example style="float:right; width:38%; margin-left:0">
-        <route-details router="#router"></route-details>
+        <route-details selector="route-selector"></route-details>
     </maps-example>
 
     <maps-example style="width:38%; margin-right:0">
         <route-selector router="#router"></route-selector>
-        <script>
-            let selector = document.querySelector("route-selector");
-            let details = document.querySelector("maps-example route-details");
-            let foo = document.querySelector("#foo")
-            let details2 = document.querySelector("#foo route-details");
-            selector.addEventListener("selected", (ev) => {
-                details.showRoute(ev.detail);
-                details2.showRoute(ev.detail);
-                foo.removeAttribute("hidden2");
-            });
-            selector.addEventListener("unselected", (ev) => {
-                details.clear();
-//                details2.clear();
-                foo.setAttribute("hidden2", "");
-            });
-        </script>
     </maps-example>
 </body>
 </html>

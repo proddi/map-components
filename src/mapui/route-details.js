@@ -1,6 +1,6 @@
-import {html, render} from 'https://unpkg.com/lit-html?module';
-import {repeat} from "https://unpkg.com/lit-html/directives/repeat?module";
+import {html, render, repeat} from '../map/lit-html.js';
 import {BaseRouter} from '../generics.js';
+import {SelectedMixin} from '../map/mixins.js';
 
 import 'https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module';
 import 'https://unpkg.com/@polymer/paper-item/paper-item-body.js?module';
@@ -16,19 +16,24 @@ import 'https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module';
  *
  * <route-details router="#router"></route-details>
  *
- * @listens {BaseRouter#request} to clear the list (loading state).
- * @listens {BaseRouter#response} to update the list.
- * @emits {RouteSelector#RouteLegSelected} when a route gets selected.
- * @emits {RouteSelector#RouteLegUnselected} when a route gets selected.
+ * @extends {SelectedMixin}
+ * @extends {HTMLElement}
+ * @implements {SelectedMixin}
  *
  **/
-class RouteDetails extends HTMLElement {
-
+class RouteDetails extends SelectedMixin(HTMLElement) {
+    /** @private */
     constructor() {
         super();
 
+        /**
+         * contains the {@link Route} to display.
+         * @type {Route}
+         */
+        this.selected = undefined;
+
         // get templates
-        this._baseRenderer  = getBaseRenderer(this);
+        this._baseRenderer  = baseRenderer;
 
         let defaultRenderer = getDefaultRenderer(this);
         let transitRenderer = getTransitRenderer(this);
@@ -54,13 +59,6 @@ class RouteDetails extends HTMLElement {
         // prepare root
         this.attachShadow({mode: 'open'});
         this.clear();
-
-        this._routeRequestHandler  = (ev) => this.showLoading(ev.detail);
-        this._routeResponseHandler = (ev) => this.showResponse(ev.detail);
-    }
-
-    connectedCallback() {
-        if (this.router === undefined) this.setRouter(this.getAttribute("router"));
     }
 
     showLoading(request) {
@@ -79,33 +77,12 @@ class RouteDetails extends HTMLElement {
         render(this._baseRenderer({}), this.shadowRoot);
     }
 
-    /**
-     * sets a new router source
-     * @param {BaseRouter|DOMSelector} router - The new routes source
-     */
-    setRouter(router) {
-        // ensure a BaseRouter instance
-        if (!(router instanceof BaseRouter)) router = document.querySelector(router);
+    onSelected(route) {
+        this.showRoute(route);
+    }
 
-        // unregister events @old router
-        if (this.router) {
-            this.router.removeEventListener("request", this._routeRequestHandler);
-            this.router.removeEventListener("response", this._routeResponseHandler);
-            this.clear();
-        }
-
-        this.router = router;
-
-        // register events @new router
-        if (this.router) {
-            this.router.addEventListener("request", this._routeRequestHandler);
-            this.router.addEventListener("response", this._routeResponseHandler);
-        // set current state
-//          this.showLoading(router.currentRequest);
-            router.currentResponse && this.showResponse(router.currentResponse);
-//            router.currentRoutes && this.addRoutes(router.currentRoutes);
-//            router.currentError && this.showError(router.currentError);
-        }
+    onUnselected(route) {
+        this.clear();
     }
 }
 
@@ -120,8 +97,8 @@ function bar(route) {
 }
 
 
-function getBaseRenderer() {
-    return (route, legTemplate) => html`
+function baseRenderer(route, legTemplate) {
+    return html`
     <style>
         :host {
             display: block;
@@ -156,7 +133,7 @@ function getBaseRenderer() {
 }
 
 
-import {formatDuration, formatTime, formatDistance} from './tools.js';
+import {formatDuration, formatTime, formatDistance} from '../map/tools.js';
 
 
 function getTransitRenderer(self) {

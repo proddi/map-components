@@ -1,4 +1,4 @@
-import {html, render} from 'https://unpkg.com/lit-html?module';
+import {html, render} from './lit-html.js';
 
 
 /**
@@ -84,9 +84,11 @@ function elementTemplate(node) {
     let markup = node.innerHTML.trim();
 //    console.log(markup);
 //    markup = markup.replace(/=&gt;/g, "=>");
+//    markup = markup.replace(/&quot;/g, '"');
 //    console.log(markup);
     node.parentNode.removeChild(node);
     let fn = Function.apply(null, ["html"].concat(argNames).concat([`return html\`${markup}\`;`]));
+//    console.log(fn);
     return (...args) => fn(html, ...args);
 }
 

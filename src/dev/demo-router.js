@@ -1,8 +1,7 @@
 import {Address} from '../generics.js';
-import {html, render} from 'https://unpkg.com/lit-html?module';
-import {repeat} from "https://unpkg.com/lit-html/directives/repeat?module";
+import {html, render, repeat} from '../map/lit-html.js';
 import {MockupRouter} from './mockup-router.js';
-import {elementTemplate} from '../maps/tools.js';
+import {elementTemplate} from '../map/tools.js';
 
 
 

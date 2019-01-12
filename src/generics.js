@@ -5,8 +5,7 @@
  * @abstract
  */
 class BaseRouter extends HTMLElement {
-//    static getType() { return "abstract"; };
-
+    /** @private */
     constructor() {
         super();
         /**
@@ -27,6 +26,18 @@ class BaseRouter extends HTMLElement {
         this.dest   = this.getAttribute("dest");
         /** @type {Date} */
         this.time   = this.getAttribute("time");
+
+        /**
+         * The current request.
+         * @type {Request|undefined}
+         */
+        this.request = undefined;
+
+        /**
+         * The current response.
+         * @type {Response|undefined}
+         */
+        this.response = undefined;
 
         /** @type {Request|undefined} */
         this.currentRequest = undefined;
@@ -59,29 +70,25 @@ class BaseRouter extends HTMLElement {
      * @fires GenericRouter#response
      */
     update({start, dest, time}={}) {
-        if (start) this.start = start; //Address.enforce(start);
-        if (dest) this.dest = dest; //Address.enforce(dest);
+        if (start) this.start = start;
+        if (dest) this.dest = dest;
         if (time) this.time = time;
 
         // perform request if possivle
         if (this.start || this.dest || this.time) {
             if (this.start && this.dest) {
                 let request = this.buildRequest(this.start, this.dest, this.time || new Date());
-                this.currentRequest = request;
-                this.currentResponse = undefined;
+                this.currentRequest = this.request = request;
+                this.currentResponse = this.response = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
-                return (request.error ? Promise.reject(request.error) : request.router.route(request)).then(response => {
-                    this.currentResponse = response;
-                    this.currentRoutes = response.routes;
+                return (request.error ? Promise.reject(request.error) : request.router.route(request)).catch(error => {
+                    return new Response(request).setError(error);
+                }).then(response => {
+                    this.currentResponse = this.response = response;
+                    this.currentRoutes = this.routes = response.routes;
                     this.currentError = undefined;
                     this.dispatchEvent(new CustomEvent('response', { detail: response }));
                     this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
-                }, error => {
-                    this.currentRoutes = undefined;
-                    this.currentError = error;
-//                        this.dispatchEvent(new CustomEvent('response', { detail: response }));
-                    this.dispatchEvent(new CustomEvent('error', { detail: error }));
-                    throw error;
                 });
             } else {
                 console.warn(this, "doesn't have all request data");

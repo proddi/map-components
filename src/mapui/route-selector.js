@@ -1,7 +1,7 @@
-import {html, render} from 'https://unpkg.com/lit-html?module';
-import {repeat} from "https://unpkg.com/lit-html/directives/repeat?module";
+import {html, render, repeat} from '../map/lit-html.js';
 import {BaseRouter} from '../generics.js';
-import {elementTemplate} from './tools.js';
+import {elementTemplate} from '../map/tools.js';
+import {SelectorMixin, RouterMixin} from '../map/mixins.js';
 
 import 'https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module';
 import 'https://unpkg.com/@polymer/paper-item/paper-item-body.js?module';
@@ -17,16 +17,19 @@ import 'https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module';
  *
  * <route-selector router="#router"></route-selector>
  *
- * @listens {BaseRouter#request} to clear the list (loading state).
- * @listens {BaseRouter#response} to update the list.
- * @emits {RouteSelector#RouteSelected} when a route gets selected.
- * @emits {RouteSelector#RouteUnselected} when a route gets selected.
- * @emits {RouteSelector#RouteLegSelected} when a route gets selected.
- * @emits {RouteSelector#RouteLegUnselected} when a route gets selected.
+ * @extends {HTMLElement}
+ * @implements {SelectorMixin}
+ * @implements {RouterMixin}
+ * @l_istens {BaseRouter#request} to clear the list (loading state).
+ * @l_istens {BaseRouter#response} to update the list.
+ * @e_mits {RouteSelector#RouteSelected} when a route gets selected.
+ * @e_mits {RouteSelector#RouteUnselected} when a route gets selected.
+ * @e_mits {RouteSelector#RouteLegSelected} when a route gets selected.
+ * @e_mits {RouteSelector#RouteLegUnselected} when a route gets selected.
  *
  **/
-class RouteSelector extends HTMLElement {
-
+class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
+    /** @private */
     constructor() {
         super();
 
@@ -36,78 +39,52 @@ class RouteSelector extends HTMLElement {
 
         // prepare root
         this.attachShadow({mode: 'open'});
-        this.clearRoutes();
+//        this.clearRoutes();
 
         /** @type {Response|undefined} */
-        this.response = undefined;
-
-        /** @type {Route|undefined} */
-        this.selectedRoute = undefined;
+//        this.response = undefined;
 
         // router event handler
-        this._routeRequestHandler  = (ev) => this.showLoading(ev.detail);
-        this._routeResponseHandler = (ev) => this.showResponse(ev.detail);
-        this._routeRoutesHandler   = (ev) => this.addRoutes(ev.detail.routes);
-        this._routeErrorHandler    = (ev) => this.showError(ev.detail);
+//        this._routeRequestHandler  = (ev) => this.showLoading(ev.detail);
+//        this._routeResponseHandler = (ev) => this.showResponse(ev.detail);
+//        this._routeRoutesHandler   = (ev) => this.addRoutes(ev.detail.routes);
+//        this._routeErrorHandler    = (ev) => this.showError(ev.detail);
     }
 
-    connectedCallback() {
-        if (this.router === undefined) this.setRouter(this.getAttribute("router"));
+//    connectedCallback() {
+//        if (this.router === undefined) this.setRouter(this.getAttribute("router"));
+//    }
+
+    onRequest(request) {
+        this.showLoading(request);
+        this.clearItems();
+    }
+
+    onResponse(response) {
+        this.showResponse(response);
+        this.setItems(response.routes);
     }
 
     clearRoutes() {
         render(this._baseRenderer(this, {}, this._routeRenderer), this.shadowRoot);
     }
 
-    addRoutes(routes) {
-        console.warn("NOT IMPLEMENTED");
-    }
+//    addRoutes(routes) {
+//        console.warn("NOT IMPLEMENTED");
+//    }
 
     showLoading(request) {
         this.clearRoutes();
     }
 
     showResponse(response) {
+        this.unselect();
         render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
     }
 
-    showError(error) {
-        console.trace("NOT IMPLEMENTED");
-    }
-
-    /**
-     * sets a new router source
-     * @param {BaseRouter|DOMSelector} router - The new routes source
-     */
-    setRouter(router) {
-        // ensure a BaseRouter instance
-        if (!(router instanceof BaseRouter)) router = document.querySelector(router);
-
-        // unregister events @old router
-        if (this.router) {
-            this.router.removeEventListener("request", this._routeRequestHandler);
-            this.router.removeEventListener("response", this._routeResponseHandler);
-            this.router.removeEventListener("routes", this._routeRoutesHandler);
-            this.router.removeEventListener("error", this._routeErrorHandler);
-            this.clearRoutes();
-        }
-
-        this.router = router;
-
-        // register events @new router
-        if (this.router) {
-            this.router.addEventListener("request", this._routeRequestHandler);
-            this.router.addEventListener("response", this._routeResponseHandler);
-            this.router.addEventListener("routes", this._routeRoutesHandler);
-            this.router.addEventListener("error", this._routeErrorHandler);
-        // set current state
-//          this.showLoading(router.currentRequest);
-            router.currentResponse && this.showResponse(router.currentResponse);
-//            router.currentRoutes && this.addRoutes(router.currentRoutes);
-//            router.currentError && this.showError(router.currentError);
-        }
-    }
-
+//    showError(error) {
+//        console.trace("NOT IMPLEMENTED");
+//    }
     highlightRoute(route) {
         this.dispatchEvent(new CustomEvent('highlighted', { detail: route }));
     }
@@ -116,16 +93,10 @@ class RouteSelector extends HTMLElement {
         this.dispatchEvent(new CustomEvent('unhighlighted', { detail: route }));
     }
 
-    selectRoute(route) {
-        if (route === this.selectedRoute) return;
-        this.selectedRoute && this.dispatchEvent(new CustomEvent('unselected', { detail: this.selectedRoute }));
-        this.selectedRoute = route;
-        this.selectedRoute && this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedRoute }));
-    }
-
-    toggleSelectedRoute(route) {
-        this.selectRoute(route === this.selectedRoute ? undefined : route);
-    }
+//    selectRoute(route) {
+//        if (route === this.selected) return;
+//        this.select(route);
+//    }
 }
 
 
@@ -191,7 +162,7 @@ function baseRenderer(self, response, routeTemplate) {
 function routeRenderer(self, route, response) {
     return html`
       <paper-icon-item data-route="${route.uid}"
-            @click=${_ => self.toggleSelectedRoute(route)}
+            @click=${_ => self.toggleSelect(route)}
             @mouseenter=${_ => self.highlightRoute(route)}
             @mouseleave=${_ => self.unhighlightRoute(route)}>
         <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
