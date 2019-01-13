@@ -41,26 +41,14 @@ class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
         this.attachShadow({mode: 'open'});
 //        this.clearRoutes();
 
-        /** @type {Response|undefined} */
-//        this.response = undefined;
-
-        // router event handler
-//        this._routeRequestHandler  = (ev) => this.showLoading(ev.detail);
-//        this._routeResponseHandler = (ev) => this.showResponse(ev.detail);
-//        this._routeRoutesHandler   = (ev) => this.addRoutes(ev.detail.routes);
-//        this._routeErrorHandler    = (ev) => this.showError(ev.detail);
     }
 
-//    connectedCallback() {
-//        if (this.router === undefined) this.setRouter(this.getAttribute("router"));
-//    }
-
-    onRequest(request) {
+    onRouteRequest(request) {
         this.showLoading(request);
         this.clearItems();
     }
 
-    onResponse(response) {
+    onRouteResponse(response) {
         this.showResponse(response);
         this.setItems(response.routes);
     }
@@ -74,11 +62,11 @@ class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
 //    }
 
     showLoading(request) {
+        this.clearItems();
         this.clearRoutes();
     }
 
     showResponse(response) {
-        this.unselect();
         render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
     }
 
@@ -92,11 +80,6 @@ class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
     unhighlightRoute(route) {
         this.dispatchEvent(new CustomEvent('unhighlighted', { detail: route }));
     }
-
-//    selectRoute(route) {
-//        if (route === this.selected) return;
-//        this.select(route);
-//    }
 }
 
 
@@ -162,9 +145,9 @@ function baseRenderer(self, response, routeTemplate) {
 function routeRenderer(self, route, response) {
     return html`
       <paper-icon-item data-route="${route.uid}"
-            @click=${_ => self.toggleSelect(route)}
-            @mouseenter=${_ => self.highlightRoute(route)}
-            @mouseleave=${_ => self.unhighlightRoute(route)}>
+            @click=${_ => self.selectItem(route)}
+            @mouseenter=${_ => self.emphasizeItem(route, "highlighted")}
+            @mouseleave=${_ => self.emphasizeItem(route)}>
         <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
         <paper-item-body three-line>
           <div>${route.duration}</div>

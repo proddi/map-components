@@ -12,7 +12,7 @@
     <script type="module" src="../src/vendor-google/platform.js"></script>
     <script type="module" src="../src/vendor-google/router.js"></script>
 
-    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <style>
@@ -39,7 +39,7 @@
 
         <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
             <here-map-route-picker router="#google-router"></here-map-route-picker>
-            <here-map-routes router="#google-router" styler="#route-selector"></here-map-routes>
+            <here-map-routes selector="#route-selector"></here-map-routes>
         </here-map>
 
         <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">

@@ -10,7 +10,7 @@
     <script type="module" src="../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <style>
@@ -43,9 +43,9 @@
             <!-- picker is the input tool -->
             <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
             <!-- visualize router's routes -->
-            <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
+            <here-map-routes selector="#route-selector"></here-map-routes>
 
-            <route-selector id="route-selector" router="#here-router"></route-selector>
+            <route-selector id="route-selector" router="#here-router" toggle></route-selector>
         </here-map>
     </maps-example>
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>

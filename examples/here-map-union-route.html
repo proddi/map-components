@@ -13,7 +13,7 @@
     <script type="module" src="../src/vendor-google/platform.js"></script>
     <script type="module" src="../src/vendor-google/router.js"></script>
 
-    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/union-router.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
@@ -50,7 +50,7 @@
             <here-map-route-picker id="picker" router="#union-router"></here-map-route-picker>
 
             <!-- visualize router's routes -->
-            <here-map-routes router="#union-router" styler="route-selector"></here-map-routes>
+            <here-map-routes selector="route-selector"></here-map-routes>
         </here-map>
 
         <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">

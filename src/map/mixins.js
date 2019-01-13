@@ -22,6 +22,9 @@ class SelectedMixin {
     onItems(items) {}
     onSelected(selected) {}
     onUnselected(selected) {}
+
+    onEmphasizedItem(item, accent, isSelected) {}
+
 }
 
 /**
@@ -32,13 +35,14 @@ let SelectedMixinImpl = Base => class extends Base {
     constructor() {
         super();
         this._itemsHandler      = (ev) => this.onItems(ev.detail);
-        this._selectedHandler   = (ev) => this.onSelected(ev.detail);
-        this._unselectedHandler = (ev) => this.onUnselected(ev.detail);
+        this._selectedHandler   = (ev) => this.onItemSelected(ev.detail);
+        this._deselectedHandler = (ev) => this.onItemDeselected(ev.detail);
+        this._emphasizedHandler = (ev) => this.onEmphasizedItem(ev.detail.item, ev.detail.accent, ev.detail.isSelected);
     }
 
     connectedCallback() {
+        this.setSelector(this.getAttribute("selector"));
         super.connectedCallback && super.connectedCallback();
-        this.selector = this.setSelector(this.getAttribute("selector"));
     }
 
     /**
@@ -46,6 +50,7 @@ let SelectedMixinImpl = Base => class extends Base {
      * @param {BaseSelector|DOMSelector} selector - The new selector source
      */
     setSelector(selector) {
+        let oldSelector = this.selector;
         // ensure a BaseRouter instance
         if (!(selector instanceof HTMLElement)) selector = document.querySelector(selector);
 
@@ -53,8 +58,9 @@ let SelectedMixinImpl = Base => class extends Base {
         if (this.selector) {
             this.selector.removeEventListener("items", this._itemsHandler);
             this.selector.removeEventListener("selected", this._selectedHandler);
-            this.selector.removeEventListener("unselected", this._unselectedHandler);
-            this.selector.selected && this._unselectedHandler({ detail: this.selector.selected });
+            this.selector.removeEventListener("unselected", this._deselectedHandler);
+            this.selector.removeEventListener("emphasize-item", this._emphasizedHandler);
+            this.selector.selectedItem && this._deselectedHandler({ detail: this.selector.selectedItem });
         }
 
         this.selector = selector;
@@ -63,35 +69,36 @@ let SelectedMixinImpl = Base => class extends Base {
         if (this.selector) {
             this.selector.addEventListener("items", this._itemsHandler);
             this.selector.addEventListener("selected", this._selectedHandler);
-            this.selector.addEventListener("unselected", this._unselectedHandler);
-            this._itemsHandler({ detail: this.selector.items });
-            this.selector.selected && this._selectedHandler({ detail: this.selector.selected });
+            this.selector.addEventListener("unselected", this._deselectedHandler);
+            this.selector.addEventListener("emphasize-item", this._emphasizedHandler);
+            if (this.selector.hasOwnProperty("items")) {
+                this._itemsHandler({ detail: this.selector.items });
+                this.selector.selectedItem && this._selectedHandler({ detail: this.selector.selectedItem });
+            }
         }
 
-        return this.selector;
+        return oldSelector;
     }
 
     /**
      * @abstract
      */
-    onItems(items) {
-//        console.warn("onItems() not implemented", this);
-    }
+    onItems(items) {}
 
     /**
      * @abstract
      */
-    onSelected(selected) {
-//        console.warn("onSelected() not implemented", this);
-    }
+    onItemSelected(item) {}
 
     /**
      * @abstract
      */
-    onUnselected(selected) {
-//        console.warn("onUnselected() not implemented", this);
-    }
+    onItemDeselected(item) {}
 
+    /**
+     * @abstract
+     */
+    onEmphasizedItem(item, accent, isSelected) {}
 };
 
 
@@ -104,10 +111,20 @@ class SelectorMixin {
     /** @private */
     constructor() {
         /**
-         * The selected item or undefined
+         * The selected item or null
          * @type {*|null}
          */
-        this.selected = undefined;
+        this.selected = null;
+        /**
+         * The selected item or null
+         * @type {*|null}
+         */
+        this.selectedItem = null;
+        /**
+         * Defines th behavior of selectItem()
+         * @type {boolean}
+         */
+        this.toggleSelection = false;
         /**
          * The available items.
          * @type {Array<*>}
@@ -123,9 +140,23 @@ class SelectorMixin {
 
     /**
      * @param {*} selected - The selected data
+     * @deprecated
      */
     select(selected) {}
+
+    /**
+     * Selects the given item, it toggles selection when `toggle` is true.
+     * @param {*} item
+     */
+    selectItem(item) {}
+
+    /** @deprecated */
     unselect(selected) {}
+    deselectItem(item=null) {}
+
+    /** @deprecated */
+    toggleSelect(item) {}
+
 }
 
 
@@ -138,10 +169,19 @@ let SelectorMixinImpl = Base => class extends Base {
     /** @private */
     constructor() {
         super();
+        this.items = [];
         this.selected = null;
+        this.selectedItem = null;
+        this.toggleSelection = false;
+    }
+
+    connectedCallback() {
+        this.toggleSelection = this.hasAttribute("toggle");
+        super.connectedCallback && super.connectedCallback();
     }
 
     setItems(items) {
+        this.deselectItem();
         this.items = items || [];
         this.dispatchEvent(new CustomEvent('items', { detail: this.items }));
     }
@@ -151,22 +191,36 @@ let SelectorMixinImpl = Base => class extends Base {
     }
 
     select(selected) {
-        if (selected !== this.selected) {
+        return this.selectItem(selected);
+    }
+
+    selectItem(selected) {
+        if (selected !== this.selectedItem) {
             this.unselect();
-            this.selected = selected;
-            this.dispatchEvent(new CustomEvent('selected', { detail: this.selected }));
+            this.selectedItem = this.selected = selected;
+            this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }));
+        } else {
+            if (this.toggleSelection) this.deselectItem(selected);
         }
     }
 
     unselect(selected=null) {
-        if (this.selected) {
-            this.dispatchEvent(new CustomEvent('unselected', { detail: this.selected }));
-            this.selected = null;
+        return this.deselectItem(selected);
+    }
+
+    deselectItem(selected=null) {
+        if (this.selectedItem) {
+            this.dispatchEvent(new CustomEvent('unselected', { detail: this.selectedItem }));
+            this.selectedItem = this.selected = null;
         }
     }
 
-    toggleSelect(selected) {
-        this.selected === selected ? this.unselect(selected) : this.select(selected);
+    emphasizeItem(item, accent=null) {
+        this.dispatchEvent(new CustomEvent('emphasize-item', { detail: {
+                item: item,
+                accent: accent,
+                isSelected: item === this.selectedItem,
+            }}));
     }
 };
 
@@ -189,15 +243,15 @@ class RouterMixin {
 
     /**
      * Callback when new request is initiated.
-     * @param {Request} request
+     * @param {RouteRequest} request
      */
-    onRequest(request) {}
+    onRouteRequest(request) {}
 
     /**
      * Callback when new response is available.
-     * @param {Response} response
+     * @param {RouteResponse} response
      */
-    onResponse(response) {}
+    onRouteResponse(response) {}
 
     /**
      * Callback when the response has an error.
@@ -218,13 +272,13 @@ let RouterMixinImpl = Base => class extends Base {
         super();
         this.router = undefined;
 
-        this._requestHandler  = (ev) => this.onRequest(ev.detail);
-        this._responseHandler = (ev) => this.onResponse(ev.detail);
+        this._routeRequestHandler  = (ev) => this.onRouteRequest(ev.detail);
+        this._routeResponseHandler = (ev) => this.onRouteResponse(ev.detail);
     }
 
     connectedCallback() {
-        super.connectedCallback && super.connectedCallback();
         if (this.router === undefined) this.setRouter(this.getAttribute("router"));
+        super.connectedCallback && super.connectedCallback();
     }
 
     /**
@@ -237,27 +291,19 @@ let RouterMixinImpl = Base => class extends Base {
 
         // unregister events @old router
         if (this.router) {
-            this.router.removeEventListener("request", this._requestHandler);
-            this.router.removeEventListener("response", this._responseHandler);
-//            this.router.removeEventListener("routes", this._routeRoutesHandler);
-//            this.router.removeEventListener("error", this._routeErrorHandler);
-            this._requestHandler({});
-            this._responseHandler({});
+            this.router.removeEventListener("request", this._routeRequestHandler);
+            this.router.removeEventListener("response", this._routeResponseHandler);
+            this._routeRequestHandler({});
+            this._routeResponseHandler({});
         }
 
         this.router = router;
 
         // register events @new router
         if (this.router) {
-            this.router.addEventListener("request", this._requestHandler);
-            this.router.addEventListener("response", this._responseHandler);
-//            this.router.addEventListener("routes", this._routeRoutesHandler);
-//            this.router.addEventListener("error", this._routeErrorHandler);
-        // set current state
-//          this.showLoading(router.currentRequest);
-            router.response && this._responseHandler({ detail:router.response });
-//            router.currentRoutes && this.addRoutes(router.currentRoutes);
-//            router.currentError && this.showError(router.currentError);
+            this.router.addEventListener("request", this._routeRequestHandler);
+            this.router.addEventListener("response", this._routeResponseHandler);
+            router.routeResponse && this._routeResponseHandler({ detail:router.routeResponse });
         }
 
         return this.router;
@@ -266,14 +312,14 @@ let RouterMixinImpl = Base => class extends Base {
     /**
      * @abstract
      */
-    onRequest(request) {
+    onRouteRequest(request) {
 //        console.warn("onRequest() isn't implemented", this);
     }
 
     /**
      * @abstract
      */
-    onResponse(response) {
+    onRouteResponse(response) {
 //        console.warn("onResponse() isn't implemented", this);
     }
 

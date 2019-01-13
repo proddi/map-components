@@ -9,7 +9,7 @@
     <script type="module" src="../src/vendor-here/router.js"></script>
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../src/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <style>
@@ -38,7 +38,7 @@
             <!-- picker is the input tool -->
             <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
             <!-- visualize router's routes -->
-            <here-map-routes router="#here-router" styler="#route-selector"></here-map-routes>
+            <here-map-routes selector="#route-selector"></here-map-routes>
 
         </here-map>
 

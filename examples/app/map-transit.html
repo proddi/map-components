@@ -4,11 +4,11 @@
     <title>HERE transit routing - demo - maps web components</title>
     <link href="../assets/examples.css" rel="stylesheet">
     <script type="text/javascript" src="../credentials.js"></script>
-    <script type="module" src="../../src/here/platform.js"></script>
-    <script type="module" src="../../src/here/map.js"></script>
+    <script type="module" src="../../src/vendor-here/platform.js"></script>
+    <script type="module" src="../../src/vendor-here/map.js"></script>
     <script type="module" src="../../src/dev/demo-router.js"></script>
-    <script type="module" src="../../src/here/map-route-picker.js"></script>
-    <script type="module" src="../../src/here/map-routes.js"></script>
+    <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
+    <script type="module" src="../../src/vendor-here/map-routes.js"></script>
     <script type="module" src="../../src/mapui/route-selector.js"></script>
     <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
     <script type="module" src="./comps/route-details-pane.js"></script>
@@ -51,7 +51,7 @@
 </head>
 <body>
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-    <here-map center="13.5,52.5" zoom="11" platform="here-platform">
+    <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 20 20 300">
         <demo-router id="router"
             name="demo"
             base="../assets/responses/here-transit-"
@@ -61,9 +61,9 @@
         </demo-router>
 
         <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
-        <here-map-routes router="#router" styler="#route-selector"></here-map-routes>
+        <here-map-routes selector="#route-selector" styler="#route-selector"></here-map-routes>
 
-        <route-selector id="route-selector" router="#router"></route-selector>
+        <route-selector id="route-selector" router="#router" toggle></route-selector>
 
         <route-details-pane selector="route-selector" role="fade-right">
             <template role="header" args-as="route">
@@ -75,7 +75,7 @@
                           secondary
                       </div>
                     </paper-item-body>
-                    <a tabindex=-1 onclick="getClosest(this, 'route-details-pane').clear()">
+                    <a tabindex=-1 onclick="getClosest(this, 'route-details-pane').selector.deselectItem()">
                         <paper-icon-button icon="close" alt="close"></paper-icon-button>
                     </a>
                 </paper-icon-item>

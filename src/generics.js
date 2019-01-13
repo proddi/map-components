@@ -29,15 +29,15 @@ class BaseRouter extends HTMLElement {
 
         /**
          * The current request.
-         * @type {Request|undefined}
+         * @type {RouteRequest|undefined}
          */
-        this.request = undefined;
+        this.routeRequest = undefined;
 
         /**
          * The current response.
-         * @type {Response|undefined}
+         * @type {RouteResponse|undefined}
          */
-        this.response = undefined;
+        this.routeResponse = undefined;
 
         /** @type {Request|undefined} */
         this.currentRequest = undefined;
@@ -88,13 +88,13 @@ class BaseRouter extends HTMLElement {
         if (this.start || this.dest || this.time) {
             if (this.start && this.dest) {
                 let request = this.buildRequest(this.start, this.dest, this.time || new Date());
-                this.currentRequest = this.request = request;
-                this.currentResponse = this.response = undefined;
+                this.currentRequest = this.routeRequest = request;
+                this.currentResponse = this.routeResponse = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
                 return (request.error ? Promise.reject(request.error) : request.router.route(request)).catch(error => {
                     return new RouteResponse(request).setError(error);
                 }).then(response => {
-                    this.currentResponse = this.response = response;
+                    this.currentResponse = this.routeResponse = response;
                     this.currentRoutes = this.routes = response.routes;
                     this.currentError = undefined;
                     this.dispatchEvent(new CustomEvent('response', { detail: response }));
@@ -106,6 +106,8 @@ class BaseRouter extends HTMLElement {
         }
     }
 
+
+
     async board(location, time=undefined) {
     }
 
@@ -114,6 +116,25 @@ class BaseRouter extends HTMLElement {
 
     async execBoardRequest(boardRequest) {
     }
+
+
+
+    async multiboard(location, time=undefined) {
+        let request = this.buildMultiboardRequest(location, time);
+        return (request.error ? Promise.reject(request.error) : request.router.execMultiboardRequest(request)).catch(error => {
+            return new MultiboardResponse(request).setError(error);
+        });
+    }
+
+    buildMultiboardRequest(center, time=null, others={}) {
+        return new MultiboardRequest(this, parseCoordString(center), parseTimeString(time) || new Date(), others);
+    }
+
+    async execMultiboardRequest(request) {
+    }
+
+
+
 
 
 /*
@@ -146,8 +167,6 @@ class Request {
         /** @type {Date} */
         this.time = time;
         Object.assign(this, others);
-
-        this._constructTime = new Date();
     }
 
     setError(error) {
@@ -164,6 +183,24 @@ class RouteRequest extends Request {
 
 class BoardRequest extends Request {
     get type() { return "board"; }
+}
+
+
+class MultiboardRequest extends Request {
+    get type() { return "multiboard"; }
+
+    /**
+     * create instance.
+     * @param {{center:Location, time:Date, others:Object}} options - xxx
+     **/
+    constructor(router, center, time, others={}) {
+        super(router);
+        /** @type {Location} */
+        this.center = center;
+        /** @type {Date} */
+        this.time = time;
+        Object.assign(this, others);
+    }
 }
 
 
@@ -215,6 +252,24 @@ class RouteResponse extends Response {
 
 class BoardResponse extends Response {
     get type() { return "board"; }
+}
+
+
+class MultiboardResponse extends Response {
+    get type() { return "multiboard"; }
+
+    constructor(request) {
+        super(request)
+        /** @type {Array<DepartureStop>} */
+        this.stops = [];
+    }
+
+    // success
+    setStops(stops) {
+        this.elapsed = (new Date() - this._constructTime) / 1000;
+        this.stops = stops;
+        return this;
+    }
 }
 
 
@@ -602,6 +657,7 @@ export {
     Request, Response,
     RouteRequest, RouteResponse,
     BoardRequest, BoardResponse,
+    MultiboardRequest, MultiboardResponse,
     Route, Leg, Transport, Address, Stop,
     parseCoordString, parseTimeString, findRootElement, buildURI, deferredPromise, parseString, createUID,
     loadScript, loadStyle

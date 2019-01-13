@@ -1,4 +1,4 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString, findRootElement, buildURI, createUID} from '../generics.js';
+import {BaseRouter, RouteResponse, MultiboardResponse, Route, Leg, Transport, Address, Stop, parseString, findRootElement, buildURI, createUID} from '../generics.js';
 import {HerePlatform} from './platform.js';
 
 
@@ -61,7 +61,7 @@ class HereTransitRouter extends BaseRouter {
             });
 
 
-        let response = new Response(request);
+        let response = new RouteResponse(request);
         return fetch(url).then(res => res.json()).then(res => {
                 if (res.Res.Message) {
                     throw res.Res.Message.text;
@@ -85,9 +85,40 @@ class HereTransitRouter extends BaseRouter {
                     return new Route(createUID("h-t-route-{uid}-{salt}", conn.id), this, departure, arrival, legs);
                 });
                 return response.setRoutes(routes);
-            }).catch(error => response.setError(error));
+            });
     }
 
+
+
+    buildMultiboardRequest(center, time) {
+        return super.buildMultiboardRequest(center, time, {
+                server: this.server,
+            });
+    }
+
+    async execMultiboardRequest(request) {
+        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+
+        let url = buildURI(`${request.server}/v3/multiboard/by_geocoord.json`, {
+                center:     `${request.center.lat},${request.center.lng}`,
+                time:       request.time.toISOString(),
+                app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
+                app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
+            });
+
+
+        let response = new MultiboardResponse(request);
+        return fetch(url).then(res => res.json()).then(res => {
+            let stops = res.Res.MultiNextDepartures.MultiNextDeparture.map(multinext => {
+                let stop = buildLocation(multinext);
+                console.log(multinext);
+                console.info(stop);
+                return stop;
+            });
+
+            return response.setStops(stops);
+        });
+    }
 }
 
 

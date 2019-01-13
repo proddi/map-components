@@ -57,6 +57,14 @@ class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
         render(this.baseRenderer(), this.shadowRoot);
     }
 
+    onItemSelected(route) {
+        this.showRoute(route);
+    }
+
+    onItemDeselected() {
+        this.clear();
+    }
+
     showRoute(route) {
         render(this._headerRenderer(route), this.shadowRoot.querySelector("header"));
         render(this._contentRenderer(route), this.shadowRoot.querySelector("content"));
@@ -67,14 +75,6 @@ class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
     clear() {
         this.removeAttribute("visible");
         this.unselect();
-    }
-
-    onSelected(route) {
-        this.showRoute(route);
-    }
-
-    onUnselected() {
-        this.clear();
     }
 }
 

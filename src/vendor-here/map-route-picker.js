@@ -58,12 +58,12 @@ class HereMapRoutePicker extends HTMLElement {
                 let request = ev.detail;
                 startMarker.setPosition(request.start);
                 destMarker.setPosition(request.dest);
-                map.setViewBounds(draggableLayer.getBounds());
+                map.setViewBounds(draggableLayer.getBounds(), true);
             });
-            if (router.currentRequest) {
-                startMarker.setPosition(router.currentRequest.start);
-                destMarker.setPosition(router.currentRequest.dest);
-                map.setViewBounds(draggableLayer.getBounds());
+            if (router.routeRequest) {
+                startMarker.setPosition(router.routeRequest.start);
+                destMarker.setPosition(router.routeRequest.dest);
+                map.setViewBounds(draggableLayer.getBounds(), true);
             }
         });
     }

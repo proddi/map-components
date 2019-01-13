@@ -30,7 +30,7 @@ class RouteDetails extends SelectedMixin(HTMLElement) {
          * contains the {@link Route} to display.
          * @type {Route}
          */
-        this.selected = undefined;
+        this.selectedItem = undefined;
 
         // get templates
         this._baseRenderer  = baseRenderer;
@@ -61,6 +61,14 @@ class RouteDetails extends SelectedMixin(HTMLElement) {
         this.clear();
     }
 
+    onItemSelected(route) {
+        this.showRoute(route);
+    }
+
+    onItemDeselected(route) {
+        this.clear();
+    }
+
     showLoading(request) {
         this.clear();
     }
@@ -75,14 +83,6 @@ class RouteDetails extends SelectedMixin(HTMLElement) {
 
     clear() {
         render(this._baseRenderer({}), this.shadowRoot);
-    }
-
-    onSelected(route) {
-        this.showRoute(route);
-    }
-
-    onUnselected(route) {
-        this.clear();
     }
 }
 

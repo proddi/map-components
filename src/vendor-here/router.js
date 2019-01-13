@@ -90,18 +90,15 @@ class HereRouter extends BaseRouter {
                     type: "addr",
                     time: new Date(),
                 });
-                let legs = route.leg[0].maneuver.filter(leg => leg.shape.length > 1).map((leg, index) => {
+                let arr = arrival;
+                let legs = route.leg[0].maneuver.filter(leg => leg.shape.length > 1).reverse().map((leg, index) => {
                     let geometry = route.shape.slice(1).map(s => s.split(",").map(v => parseFloat(v)));
                     let departure = buildLocation(leg);
-                    leg = new Leg(departure, arrival, buildTransport(leg, lines[leg.line]), geometry);
+                    leg = new Leg(departure, arr, buildTransport(leg, lines[leg.line]), geometry, {duration: leg.travelTime, distance:leg.length, summary:leg.instruction});
                     leg.id = index;
+                    arr = departure;
                     return leg;
-                });
-                // fix arrivals
-                legs.reduce((prev, curr) => {
-                    prev.arrival = curr.departure;
-                    return curr;
-                });
+                }).reverse();
                 return new Route(createUID("h-route-{uid}"), this, departure, arrival, legs);
             });
             return response.setRoutes(routes);
