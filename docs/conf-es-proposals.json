@@ -1,7 +1,0 @@
-{
-  "source": "./comp",
-  "destination": "./docs/build",
-  "plugins": [
-    {"name": "esdoc-ecmascript-proposal-plugin", "option": {}}
-  ]
-}

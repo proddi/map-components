@@ -28,9 +28,9 @@ class RouteDetails extends SelectedMixin(HTMLElement) {
 
         /**
          * contains the {@link Route} to display.
-         * @type {Route}
+         * @type {Route|null}
          */
-        this.selectedItem = undefined;
+        this.selectedItem = null;
 
         // get templates
         this._baseRenderer  = baseRenderer;
@@ -136,14 +136,32 @@ function baseRenderer(route, legTemplate) {
 import {formatDuration, formatTime, formatDistance} from '../map/tools.js';
 
 
+function getDefaultRenderer(self) {
+    return (leg, route) => html`
+      <paper-icon-item data-leg="${route.uid}">
+        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
+        <paper-item-body two-line>
+          <div>
+            <span style="float:right">${leg.departure.timeString}</span>${leg.summary}
+          </div>
+          <div secondary>
+            <div class="leg-details">
+                type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}
+            </div>
+          </div>
+        </paper-item-body>
+      </paper-icon-item>
+`;
+}
+
+
 function getTransitRenderer(self) {
     return (leg, route) => html`
       <paper-icon-item data-leg="${leg.id}">
         <iron-icon icon="${foo(leg)}" slot="item-icon" style="fill:${leg.transport.color}"></iron-icon>
         <paper-item-body>
           <div>
-            <span style="float:right">${leg.departure.timeString}</span>
-            <div>${leg.departure.name}</div>
+            <span style="float:right">${leg.departure.timeString}</span>${leg.departure.name}
           </div>
         </paper-item-body>
       </paper-icon-item>
@@ -152,8 +170,8 @@ function getTransitRenderer(self) {
         <div class="line ${leg.transport.type}" style="border-color: ${leg.transport.color}"></div>
         <paper-item-body two-line>
           <div>
-            <div class="leg-details" style="color:${leg.transport.color}">
-                ${leg.transport.name} → ${leg.transport.headsign}<br>
+            <div class="leg-details" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color:${leg.transport.color}">
+                ${leg.transport.name} → ${leg.transport.headsign}
             </div>
           </div>
           <div secondary>
@@ -171,35 +189,12 @@ function getTransitRenderer(self) {
 }
 
 
-function getDefaultRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${route.uid}">
-        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
-        <paper-item-body two-line>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>
-            <div>${leg.summary}</div>
-          </div>
-          <div secondary>
-            <div class="leg-details">
-                type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}
-            </div>
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
-`;
-}
-
-
 function getWalkRenderer(self) {
     return (leg, route) => html`
       <paper-icon-item data-leg="${leg.id}">
         <iron-icon icon="maps:directions-walk" slot="item-icon" style="fill:rgb(44, 72, 161);"></iron-icon>
         <paper-item-body>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>
-            <div>${leg.summary}</div>
-          </div>
+          <div title="${leg.summary}"><span style="float:right;padding-left:5px;">${leg.departure.timeString}</span>${leg.summary}</div>
         </paper-item-body>
       </paper-icon-item>
 
@@ -220,8 +215,7 @@ function getCarRenderer(self) {
         <iron-icon icon="maps:directions-car" slot="item-icon"></iron-icon>
         <paper-item-body two-line>
           <div>
-            <span style="float:right">${leg.departure.timeString}</span>
-            <div>Drive from at ${leg.departure.name}</div>
+            <span style="float:right">${leg.departure.timeString}</span>Start at ${leg.departure.name}
           </div>
           <div secondary><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
           <div secondary>Manuevers: ${leg.steps.length}</div>
@@ -234,8 +228,7 @@ function getCarRenderer(self) {
         <iron-icon icon="maps:near-me" slot="item-icon"></iron-icon>
         <paper-item-body>
           <div secondary>
-            <span style="float:right">${formatTime(leg.departure.time)}</span>
-            <div>${step.name}</div>
+            <span style="float:right">${formatTime(leg.departure.time)}</span>${step.name}
           </div>
         </paper-item-body>
       </paper-icon-item>
@@ -251,8 +244,7 @@ function getArrivalRenderer(self) {
         <iron-icon icon="maps:place" slot="item-icon"></iron-icon>
         <paper-item-body>
           <div>
-            <span style="float:right">${formatTime(leg.arrival.time)}</span>
-            <div>Arrive at ${leg.arrival.name}</div>
+            <span style="float:right">${formatTime(leg.arrival.time)}</span>Arrive at ${leg.arrival.name}
           </div>
         </paper-item-body>
       </paper-icon-item>

@@ -1,5 +1,6 @@
-import {findRootElement} from '../generics.js';
 import {MapboxMap3d} from './map3d.js';
+import {findRootElement} from '../generics.js';
+import {SelectedMixin} from '../map/mixins.js'
 
 
 function mergeColor(color, merging, weight) {
@@ -54,10 +55,12 @@ const _ROUTE_ZINDICES = {
     "highlighed": 5,
 }
 
-class MapboxMap3dRoutes extends HTMLElement {
+class MapboxMap3dRoutes extends SelectedMixin(HTMLElement) {
     constructor() {
         super();
-        this._routeUi = {}
+        this._routes = [];
+        this._uiElements = [];
+        this._map;
         this._legId = 0;
     }
 
@@ -66,6 +69,8 @@ class MapboxMap3dRoutes extends HTMLElement {
         let router = document.querySelector(this.getAttribute("router"));
 
         mapComp.whenReady.then(({L, map, mapboxgl}) => {
+            this._map = map;
+/*
             router.addEventListener("request", (ev) => {
                 this.clearRoutes(map);
             });
@@ -80,36 +85,60 @@ class MapboxMap3dRoutes extends HTMLElement {
             });
 
             router.currentRoutes && this.addRoutes(map, router.currentRoutes);
+*/
+            this._routes && this.onItems(this._routes);
         });
         this._router = router;
+        super.connectedCallback && super.connectedCallback();
     }
 
-    clearRoutes(map) {
-        for (let route_id in this._routeUi) {
-            for (let id of this._routeUi[route_id]) {
-                map.removeLayer(id);
-            }
+    _getUiForRoute(route) {
+        return this._uiElements[this._routes.indexOf(route)];
+    }
+
+    onItems(routes) {
+        if (!this._map) {
+            this._routes = routes;
+            return;
         }
-        this._routeUi = {};
+        // remove old elements
+        this._uiElements.forEach(routeIds => routeIds.forEach(id => this._map.removeLayer(id)));
+        // set new scenario
+        this._routes = routes;
+        this._uiElements = routes.map(route => this.addRoute(route));
     }
 
-    addRoutes(map, routes, style=undefined) {
-        for (let route of routes) {
-            this.addRoute(map, route, style);
+    onItemSelected(route) {
+        if (!this._map) {
+            this._selectedRoute = route;
+            return;
         }
+        this._applyRouteStyleUi(route, this._getUiForRoute(route), "selected");
     }
 
-    addRoute(map, route, styles=undefined) {
-//        let ui = new H.map.Group();
-        let ids = this._routeUi[route.uid] = [];
+    onItemDeselected(route) {
+        if (!this._map) {
+            this._selectedRoute = null;
+            return;
+        }
+        this._applyRouteStyleUi(route, this._getUiForRoute(route));
+    }
+
+    onEmphasizedItem(route, accent, isSelected) {
+        if (!this._map) return;
+        if (isSelected) return;
+        this._applyRouteStyleUi(route, this._getUiForRoute(route), accent);
+    }
+
+    addRoute(route, styles=undefined) {
+        let ids = [];
         for (let leg of route.legs) {
             let layer = this._buildLeg(leg);
             ids.push(layer.id);
-            map.addLayer(layer);
+            this._map.addLayer(layer);
         }
-//        this._routeUi[route.uid] = ui;
 //        this._applyRouteStyleUi(ui, styles);
-//        map.addObject(ui);
+        return ids;
     }
 
     _buildLeg(leg) {
@@ -139,11 +168,7 @@ class MapboxMap3dRoutes extends HTMLElement {
             }
         };
     }
-
-    _applyRouteStyle(route, styleName) {
-        this._applyRouteStyleUi(this._routeUi[route.uid], styleName);
-    }
-
+/*
     _applyRouteStyleUi(uiRoot, styleNames) {
         styleNames = ["passive"].concat(styleNames || []);
         let zIndex = styleNames.map(name => _ROUTE_ZINDICES[name]).reduce((prev, val) => Math.max(prev, val), 0);
@@ -172,7 +197,7 @@ class MapboxMap3dRoutes extends HTMLElement {
         }
         return result;
     }
-
+*/
 }
 
 

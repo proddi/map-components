@@ -3,65 +3,13 @@ import {findRootElement} from '../generics.js';
 import {SelectedMixin} from '../map/mixins.js'
 
 
-/*
-function adoptColor(color, delta) {
-    if (!color.startsWith("#")) return color;
-    return "#" +  [1,3,5].map(ofs => color.slice(ofs, ofs+2))               // hex pieces
-                         .map(hex => parseInt(hex, 16) + delta)             // to dec and add delta
-                         .map(val => Math.min(255, Math.max(0, val)))       // apply limits
-                         .map(val => ("0" + val.toString(16)).slice(-2))    // to hex
-                         .join("");
-}
-
-function addToColor(delta) {
-    return (color) => adoptColor(color, delta);
-}
-
-
-const _ROUTE_STYLES_OUTLINE = {
-    name:           "outline",
-    selected: {
-        default:    { strokeColor: "#777777", lineWidth: 8 },
-    },
-    passive: {
-        default:    { strokeColor: "#888888", lineWidth: 7 },
-        walk:       { strokeColor: "#888888", lineWidth: 7, lineDash: [3, 10] },
-        bus:        { strokeColor: "#804080", lineWidth: 7 },
-    },
-    highlighted: {
-        default:    { strokeColor: "#666666", lineWidth: 8 },
-//        default:    mergeColor("strokeColor", "#222222", .5, { lineWidth: 8 }),
-//        default:    addToColor("strokeColor", -16, { strokeColor: addToColor(-16), lineWidth: 8 },
-    },
-}
-
-const _ROUTE_STYLES = {
-    name:           "line",
-    selected: {
-        default:    { strokeColor: "#dddddd", lineWidth: 5, x:1 },
-//        default:    foo({ strokeColor: "#dddddd", lineWidth: 5, x:1 }),
-//        metro:      { strokeColor: "red",    lineWidth: 5, x:1 },
-    },
-    passive: {
-        default:    { strokeColor: "#cccccc", lineWidth: 5 },
-//        walk:       { strokeColor: "#cccccc", lineWidth: 5, lineDash: [3, 10] },
-//        bus:        { strokeColor: "#a36aa3", lineWidth: 5 },
-    },
-    highlighted: {
-        default:    { strokeColor: "#dddddd", l_ineWidth: 4 },
-    },
-}
-*/
-
-
 class HereMapRoutes extends SelectedMixin(HTMLElement) {
     /** @private */
     constructor() {
         super();
-        this._routeUi = {}
         this._routes = [];
         this._uiElements = [];
-        this._map;
+        this._map = null;
     }
 
     /** @private */
@@ -104,7 +52,7 @@ class HereMapRoutes extends SelectedMixin(HTMLElement) {
             return;
         }
         // remove old elements
-        this._uiElements.forEach(obj => this._map.removeObject(obj))
+        this._uiElements.forEach(obj => this._map.removeObject(obj));
         // set new scenario
         this._routes = routes;
         this._uiElements = routes.map(route => this.addRoute(route));
@@ -137,7 +85,6 @@ class HereMapRoutes extends SelectedMixin(HTMLElement) {
         for (let leg of route.legs) {
             this._addLegUI(ui, leg);
         }
-        this._routeUi[route.uid] = ui;
         this._applyRouteStyleUi(ui);
         this._map.addObject(ui);
         return ui;

@@ -9,13 +9,14 @@ class SelectedMixin {
     constructor() {
         /**
          * The source of selection. Will be set automatically when attribute `selector="#dom-selector"` is specified.
-         * @type {SelectorMixin}
+         * @type {SelectorMixin|null}
          */
-        this.selector = undefined;
+        this.selector = null;
     }
     /**
      * Updates the {@link SelectorMixin} to watch.
-     * @param {SelectorMixin|DOMSelector} selector
+     * @param {SelectorMixin|DOMSelector} selector - The new selector to be watched.
+     * @returns {SelectorMixin|null} - The old selector.
      */
     setSelector(selector) {}
 
@@ -23,8 +24,13 @@ class SelectedMixin {
     onSelected(selected) {}
     onUnselected(selected) {}
 
+    /**
+     * Callback when an item gets emphasized.
+     * @param {*} item - The related item.
+     * @param {string|null} accent - An accent as identificator.
+     * @param {boolean} isSelected - True when the relatd item is currently selected.
+     */
     onEmphasizedItem(item, accent, isSelected) {}
-
 }
 
 /**
@@ -114,11 +120,6 @@ class SelectorMixin {
          * The selected item or null
          * @type {*|null}
          */
-        this.selected = null;
-        /**
-         * The selected item or null
-         * @type {*|null}
-         */
         this.selectedItem = null;
         /**
          * Defines th behavior of selectItem()
@@ -139,24 +140,17 @@ class SelectorMixin {
     clearItems() {}
 
     /**
-     * @param {*} selected - The selected data
-     * @deprecated
-     */
-    select(selected) {}
-
-    /**
-     * Selects the given item, it toggles selection when `toggle` is true.
+     * Selects the given item, it toggles selection when {@link SelectorMixin#toggleSelection} (attribute `toggle`) is true.
      * @param {*} item
      */
     selectItem(item) {}
 
-    /** @deprecated */
-    unselect(selected) {}
     deselectItem(item=null) {}
 
-    /** @deprecated */
-    toggleSelect(item) {}
-
+    /**
+     * Marks the item
+     */
+    emphasizeItem(item, accent=null) {}
 }
 
 
@@ -190,22 +184,14 @@ let SelectorMixinImpl = Base => class extends Base {
         this.setItems([]);
     }
 
-    select(selected) {
-        return this.selectItem(selected);
-    }
-
     selectItem(selected) {
         if (selected !== this.selectedItem) {
-            this.unselect();
+            this.deselectItem(this.selectedItem);
             this.selectedItem = this.selected = selected;
             this.dispatchEvent(new CustomEvent('selected', { detail: this.selectedItem }));
         } else {
             if (this.toggleSelection) this.deselectItem(selected);
         }
-    }
-
-    unselect(selected=null) {
-        return this.deselectItem(selected);
     }
 
     deselectItem(selected=null) {

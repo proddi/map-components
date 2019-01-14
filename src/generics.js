@@ -39,14 +39,18 @@ class BaseRouter extends HTMLElement {
          */
         this.routeResponse = undefined;
 
-        /** @type {Request|undefined} */
+        /**
+         * @deprecated
+         * @type {Request|undefined} */
         this.currentRequest = undefined;
-        /** @type {Response|undefined} */
+        /**
+         * @deprecated
+         * @type {Response|undefined} */
         this.currentResponse = undefined;
-        /** @type {Route[]|undefined} */
+        /**
+         * @deprecated
+         * @type {Route[]|undefined} */
         this.currentRoutes  = undefined;
-        /** @type {Error|undefined} */
-        this.currentError   = undefined;
     }
 
     connectedCallback() {
@@ -55,7 +59,11 @@ class BaseRouter extends HTMLElement {
         }, 50);
     }
 
-    buildRequest(start, dest, time, others={}) {
+    /**
+     * Creates a route request
+     * @returns {RouteRequest}
+     */
+    buildRouteRequest(start, dest, time, others={}) {
         return new RouteRequest(
                 this,
                 parseCoordString(start),
@@ -67,11 +75,11 @@ class BaseRouter extends HTMLElement {
 
     /**
      * Performs a route request
-     * @param {Request} routeRequest
-     * @returns {Promise<Response>}
+     * @abstract
+     * @param {RouteRequest} request
+     * @returns {Promise<RouteResponse>}
      */
-    async route(routeRequest) {
-        console.warn("NOT IMPLEMENTED");
+    async execRouteRequest(request) {
         throw "abstract / implement in subclass";
     }
 
@@ -87,11 +95,11 @@ class BaseRouter extends HTMLElement {
         // perform request if possivle
         if (this.start || this.dest || this.time) {
             if (this.start && this.dest) {
-                let request = this.buildRequest(this.start, this.dest, this.time || new Date());
+                let request = this.buildRouteRequest(this.start, this.dest, this.time || new Date());
                 this.currentRequest = this.routeRequest = request;
                 this.currentResponse = this.routeResponse = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
-                return (request.error ? Promise.reject(request.error) : request.router.route(request)).catch(error => {
+                return (request.error ? Promise.reject(request.error) : request.router.execRouteRequest(request)).catch(error => {
                     return new RouteResponse(request).setError(error);
                 }).then(response => {
                     this.currentResponse = this.routeResponse = response;
@@ -116,7 +124,6 @@ class BaseRouter extends HTMLElement {
 
     async execBoardRequest(boardRequest) {
     }
-
 
 
     async multiboard(location, time=undefined) {
@@ -157,15 +164,10 @@ class Request {
      * create instance.
      * @param {{start:Location, dest:Location, time:Date, others:Object}} options - xxx
      **/
-    constructor(router, start, dest, time, others={}) {
+    constructor(router, others={}) {
         /** @type {BaseRouter} */
         this.router = router;
-        /** @type {Location} */
-        this.start = start;
-        /** @type {Location} */
-        this.dest = dest;
-        /** @type {Date} */
-        this.time = time;
+        this.error = null;
         Object.assign(this, others);
     }
 
@@ -178,6 +180,20 @@ class Request {
 
 class RouteRequest extends Request {
     get type() { return "route"; }
+
+    /**
+     * create instance.
+     * @param {{start:Location, dest:Location, time:Date, others:Object}} options - xxx
+     **/
+    constructor(router, start, dest, time, others={}) {
+        super(router, others);
+        /** @type {Location} */
+        this.start = start;
+        /** @type {Location} */
+        this.dest = dest;
+        /** @type {Date} */
+        this.time = time;
+    }
 }
 
 
@@ -194,12 +210,11 @@ class MultiboardRequest extends Request {
      * @param {{center:Location, time:Date, others:Object}} options - xxx
      **/
     constructor(router, center, time, others={}) {
-        super(router);
+        super(router, others);
         /** @type {Location} */
         this.center = center;
         /** @type {Date} */
         this.time = time;
-        Object.assign(this, others);
     }
 }
 
@@ -211,13 +226,10 @@ class Response {
     /**
      * create instance.
      * @param {Request} request - related request.
-     * @param {Array<Route>} routes - response routes
      */
-    constructor(request, ...routes) {
+    constructor(request) {
         /** @type {Request} */
         this.request = request;
-        /** @type {Array<Route>} */
-        this.routes = routes;
         /** @type {Object} */
         this.error = undefined;
         /**
@@ -229,17 +241,20 @@ class Response {
         this._constructTime = new Date();
     }
 
-    // success
-    setRoutes(routes) {
+    // error
+    setError(error) {
+        return this.fail(error);
+    }
+
+    fail(error) {
         this.elapsed = (new Date() - this._constructTime) / 1000;
-        this.routes = routes;
+        this.error = error;
         return this;
     }
 
-    // error
-    setError(error) {
+    resolve(payload={}) {
         this.elapsed = (new Date() - this._constructTime) / 1000;
-        this.error = error;
+        Object.assign(this, payload);
         return this;
     }
 }
@@ -247,6 +262,27 @@ class Response {
 
 class RouteResponse extends Response {
     get type() { return "route"; }
+
+    /**
+     * create instance.
+     * @param {Request} request - related request.
+     */
+    constructor(request) {
+        super(request);
+        /** @type {Array<Route>} */
+        this.routes = [];
+    }
+
+    /**
+     * Marks the response as finish and assigns routes.
+     * @param {Array<Route>} routes
+     * @returns {RouteResponse}
+     */
+    setRoutes(routes) {
+        return this.resolve({
+                routes: routes,
+            });
+    }
 }
 
 
@@ -258,17 +294,22 @@ class BoardResponse extends Response {
 class MultiboardResponse extends Response {
     get type() { return "multiboard"; }
 
+    /** @private */
     constructor(request) {
         super(request)
         /** @type {Array<DepartureStop>} */
         this.stops = [];
     }
 
-    // success
+    /**
+     * Marks the response as finish and assigns stops.
+     * @param {Array<DepartureStop>} stops
+     * @returns {MultiboardResponse}
+     */
     setStops(stops) {
-        this.elapsed = (new Date() - this._constructTime) / 1000;
-        this.stops = stops;
-        return this;
+        return this.resolve({
+                stops: stops,
+            });
     }
 }
 
@@ -320,7 +361,7 @@ class Address extends Location {
 
         this.type = "address";
 
-        this._name = name;
+        this.name = name;
         /** @type {Date} */
         this.time = time;
     }
@@ -329,7 +370,7 @@ class Address extends Location {
      * Returns {name} or Address.
      * @type {string}
      */
-    get name() { return this._name || [this.lat, this.lon].map(val => Math.round(val, 2)).join(","); }
+    get title() { return this.name || [this.lat, this.lon].map(val => Math.round(val, 2)).join(","); }
 
     /**
      * Returns the date as HH:MM
@@ -470,6 +511,25 @@ class Leg {
 //        this.steps = this.steps.conat([other.departure]).concat(other.steps);
     }
 }
+
+
+class Departure {
+    constructor({time, platform, transport}={}) {
+        this.time = time;
+        this.platform = platform;
+        this.transport = transport;
+    }
+}
+
+
+class DepartureStop extends Stop {
+    constructor(data) {
+        super(data);
+        this.departures;
+        this.router;
+    }
+}
+
 
 /**
  * @typedef {[lat:float, lng:float]} CoordinatePair
@@ -658,7 +718,7 @@ export {
     RouteRequest, RouteResponse,
     BoardRequest, BoardResponse,
     MultiboardRequest, MultiboardResponse,
-    Route, Leg, Transport, Address, Stop,
+    Route, Leg, Transport, Address, Stop, Departure, DepartureStop,
     parseCoordString, parseTimeString, findRootElement, buildURI, deferredPromise, parseString, createUID,
     loadScript, loadStyle
 }

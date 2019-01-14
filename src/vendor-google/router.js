@@ -1,4 +1,4 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, findRootElement, parseString, buildURI, createUID} from '../generics.js';
+import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, findRootElement, parseString, buildURI, createUID} from '../generics.js';
 import {GooglePlatform} from './platform.js';
 
 
@@ -31,10 +31,10 @@ class GoogleDirectionsRouter extends BaseRouter {
 
     /**
      * returns a Request object
-     * @return {Request}
+     * @return {RouteRequest}
      */
-    buildRequest(start, dest, time) {
-        return super.buildRequest(start, dest, time, {
+    buildRouteRequest(start, dest, time) {
+        return super.buildRouteRequest(start, dest, time, {
                 mode: this.getAttribute("mode") || "DRIVING",
                 alternatives: Boolean(this.getAttribute("max")),
             });
@@ -43,11 +43,11 @@ class GoogleDirectionsRouter extends BaseRouter {
     /**
      * Perform a route request.
      * @async
-     * @param {Request} request - route request.
-     * @return {Promise<Response|Error>} - route response
+     * @param {RouteRequest} request - route request.
+     * @return {Promise<RouteResponse|Error>} - route response
      */
-    async route(request) {
-        let response = new Response(request);
+    async execRouteRequest(request) {
+        let response = new RouteResponse(request);
         return this.platform.whenReady.then(({ service }) => {
             return new Promise((resolve, reject) => {
                 service.route({

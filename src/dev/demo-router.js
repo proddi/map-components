@@ -16,6 +16,7 @@ class DemoRouter extends MockupRouter {
                     display: block;
                     margin-top: .5em;
                     margin-bottom: .5em;
+                    line-height: 1.5em;
                 }
                 :host span {
                     border: 1px solid rgba(128, 128, 128, .5);
@@ -25,6 +26,7 @@ class DemoRouter extends MockupRouter {
                     cursor: pointer;
                     margin-left: 5px;
                     margin-right: 5px;
+                    white-space: nowrap;
                 }
                 :host span:hover {
                     background-color: rgba(128, 128, 128, .15);

@@ -1,4 +1,4 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString, findRootElement} from '../generics.js';
+import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString, findRootElement} from '../generics.js';
 
 
 class MockupRouter extends BaseRouter {
@@ -34,15 +34,15 @@ class MockupRouter extends BaseRouter {
         this.fallbackRouter = document.querySelector(this.getAttribute("fallback-router"));
     }
 
-    buildRequest(start, dest, time) {
+    buildRouteRequest(start, dest, time) {
         let startLoc = this.locations[start];
         let destLoc = this.locations[dest];
         if (!(startLoc && destLoc && this.src)) {
-            if (this.fallbackRouter) return this.fallbackRouter.buildRequest(startLoc || start, destLoc || dest, time);
-            return super.buildRequest(startLoc || "1,1", destLoc || "2,2", time).setError(
-                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (or src: "${this.src}")`);
+            if (this.fallbackRouter) return this.fallbackRouter.buildRouteRequest(startLoc || start, destLoc || dest, time);
+            return super.buildRouteRequest(startLoc || start || "1,1", destLoc || dest || "2,2", time).setError(
+                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (for src: "${this.src}")`);
         }
-        return super.buildRequest(startLoc, destLoc, time, {
+        return super.buildRouteRequest(startLoc, destLoc, time, {
                 src: this.src.replace("{start}", start).replace("{dest}", dest),
                 fallbackRouter: this.fallbackRouter,
             });
@@ -51,11 +51,11 @@ class MockupRouter extends BaseRouter {
     /**
      * Perform a route request.
      * @async
-     * @param {Request} request - route request.
-     * @returns {Promise<Response, Error>} - route response
+     * @param {RouteRequest} request - route request.
+     * @returns {Promise<RouteResponse, Error>} - route response
      */
-    async route(request) {
-        let response = new Response(request);
+    async execRouteRequest(request) {
+        let response = new RouteResponse(request);
         return fetch(request.src).then(res => res.json()).then(data => {
             let routes = data.routes.map(data => new Route(
                 data.id,
@@ -79,8 +79,8 @@ class MockupRouter extends BaseRouter {
         }, error => {
             console.trace("demo req failed:", error);
             if (request.fallbackRouter) {
-                return request.fallbackRouter.route(
-                        request.fallbackRouter.buildRequest(request.start, request.dest, request.time)
+                return request.fallbackRouter.execRouteRequest(
+                        request.fallbackRouter.buildRouteRequest(request.start, request.dest, request.time)
                     ).then(response => {
                         console.log("fallback-response:", response);
                         return response;

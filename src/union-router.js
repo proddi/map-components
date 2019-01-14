@@ -44,8 +44,8 @@ class UnionRouter extends BaseRouter {
                 }).map(([selector, router]) => router);
     }
 
-    buildRequest(start, dest, time=undefined) {
-        return super.buildRequest(start, dest, time, { routers: this.routers, });
+    buildRouteRequest(start, dest, time=undefined) {
+        return super.buildRouteRequest(start, dest, time, { routers: this.routers, });
     }
 
     /**
@@ -54,10 +54,10 @@ class UnionRouter extends BaseRouter {
      * @param {RouteRequest} request - route request.
      * @returns {Promise<RouteResponse, Error>} - route response
      */
-    async route(request) {
+    async execRouteRequest(request) {
         let response = new RouteResponse(request);
         return Promise.all(
-            request.routers.map(router => router.route(router.buildRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
+            request.routers.map(router => router.execRouteRequest(router.buildRouteRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
         ).then(responses => {
             let errors = responses.filter(response => response.error).map(response => response.error);
             let routes = responses.map(response => response.routes).reduce((prev, curr) => prev.concat(curr), []);

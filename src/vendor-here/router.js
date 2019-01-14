@@ -1,4 +1,4 @@
-import {BaseRouter, Request, Response, Route, Leg, Transport, Address, Stop, parseString, findRootElement, createUID, buildURI} from '../generics.js';
+import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseString, findRootElement, createUID, buildURI} from '../generics.js';
 import {HerePlatform} from './platform.js';
 
 
@@ -36,11 +36,11 @@ class HereRouter extends BaseRouter {
     }
 
     /**
-     * returns a Request object
-     * @returns {Request}
+     * Creates an request object.
+     * @returns {RouteRequest}
      */
-    buildRequest(start, dest, time) {
-        return super.buildRequest(start, dest, time, {
+    buildRouteRequest(start, dest, time) {
+        return super.buildRouteRequest(start, dest, time, {
                 modes: (this.getAttribute("modes") || "transit").split(",").map(mode => REQ_MODES[mode] || mode),
                 max: this.getAttribute("max"),
             });
@@ -49,10 +49,10 @@ class HereRouter extends BaseRouter {
     /**
      * Perform a route request.
      * @async
-     * @param {Request} request - route request.
-     * @returns {Promise<Response, Error>} - route response
+     * @param {RouteRequest} request - route request.
+     * @returns {Promise<RouteResponse, Error>} - route response
      */
-    async route(request) {
+    async execRouteRequest(request) {
         let url = buildURI("https://route.api.here.com/routing/7.2/calculateroute.json", {
                 waypoint0:          `geo!${request.start.lat},${request.start.lng}`,
                 waypoint1:          `geo!${request.dest.lat},${request.dest.lng}`,
@@ -66,7 +66,7 @@ class HereRouter extends BaseRouter {
                 app_id:             this.app_id,
                 app_code:           this.app_code,
             });
-        let response = new Response(request);
+        let response = new RouteResponse(request);
 
         return fetch(url).then(res => res.json()).then(res => {
             if (res.details) return Promise.reject(res.details);

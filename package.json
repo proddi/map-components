@@ -11,13 +11,12 @@
     "scripts": {
         "build": "./node_modules/.bin/webpack --config webpack.config.js",
         "build:prod": "NODE_ENV=production npm run build",
-        "build:docs": "rm -rf build/docs; ./node_modules/.bin/esdoc -c docs/conf.json",
+        "build:docs": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc.json",
         "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\""
     },
     "dependencies": {},
     "devDependencies": {
         "esdoc": "^1.1.0",
-        "esdoc-ecmascript-proposal-plugin": "^1.0.0",
         "esdoc-standard-plugin": "^1.0.0",
         "webpack": "^4.28.3",
         "webpack-cli": "^3.2.0"

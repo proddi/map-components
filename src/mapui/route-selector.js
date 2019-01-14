@@ -1,5 +1,5 @@
 import {html, render, repeat} from '../map/lit-html.js';
-import {BaseRouter} from '../generics.js';
+// import {BaseRouter} from '../generics.js';
 import {elementTemplate} from '../map/tools.js';
 import {SelectorMixin, RouterMixin} from '../map/mixins.js';
 
@@ -39,8 +39,6 @@ class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
 
         // prepare root
         this.attachShadow({mode: 'open'});
-//        this.clearRoutes();
-
     }
 
     onRouteRequest(request) {
@@ -102,6 +100,8 @@ function baseRenderer(self, response, routeTemplate) {
     <style>
         :host {
             display: block;
+            overflow-y: hidden;
+            overflow-y: auto;
         }
         :host .route-lines {
             background-color: #f0f0f0;

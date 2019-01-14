@@ -8,7 +8,7 @@
     <script type="module" src="../../src/vendor-mapbox/map.js"></script>
     <script type="module" src="../../src/vendor-mapbox/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-mapbox/map-routes.js"></script>
-    <script type="module" src="../../src/route-selector.js"></script>
+    <script type="module" src="../../src/mapui/route-selector.js"></script>
     <script type="module" src="../../src/route-debug.js"></script>
     <style>
         /* component base styles */
@@ -32,7 +32,7 @@
 
         <mapbox-map center="13.5,52.5" zoom="11" style="height:700px" platform="mapbox-platform">
             <mapbox-map-route-picker router="#here-router"></mapbox-map-route-picker>
-            <mapbox-map-routes router="#here-router" styler="#route-selector"></mapbox-map-routes>
+            <mapbox-map-routes selector="#route-selector"></mapbox-map-routes>
         </mapbox-map>
 
         <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">

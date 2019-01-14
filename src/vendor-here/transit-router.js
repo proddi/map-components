@@ -1,4 +1,8 @@
-import {BaseRouter, RouteResponse, MultiboardResponse, Route, Leg, Transport, Address, Stop, parseString, findRootElement, buildURI, createUID} from '../generics.js';
+import {
+    BaseRouter, RouteResponse, MultiboardResponse,
+    Route, Leg, Transport, Address, Stop, Departure, DepartureStop,
+    parseString, findRootElement, buildURI, createUID,
+} from '../generics.js';
 import {HerePlatform} from './platform.js';
 
 
@@ -19,6 +23,7 @@ import {HerePlatform} from './platform.js';
  * @see https://developer.here.com/documentation/transit/
  */
 class HereTransitRouter extends BaseRouter {
+    /** @private */
     constructor() {
         super();
         /**
@@ -31,8 +36,8 @@ class HereTransitRouter extends BaseRouter {
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
     }
 
-    buildRequest(start, dest, time) {
-        return super.buildRequest(start, dest, time, {
+    buildRouteRequest(start, dest, time) {
+        return super.buildRouteRequest(start, dest, time, {
                 server: this.server,
                 modes: this.getAttribute("modes"),
                 max: this.getAttribute("max"),
@@ -42,10 +47,10 @@ class HereTransitRouter extends BaseRouter {
     /**
      * Perform a route request.
      * @async
-     * @param {Request} request - route request.
-     * @returns {Promise<Response, Error>} - route response
+     * @param {RouteRequest} request - route request.
+     * @returns {Promise<RouteResponse, Error>} - route response
      */
-    async route(request) {
+    async execRouteRequest(request) {
         let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
 
         let url = buildURI(`${request.server}/v3/route.json`, {
@@ -89,30 +94,42 @@ class HereTransitRouter extends BaseRouter {
     }
 
 
-
     buildMultiboardRequest(center, time) {
         return super.buildMultiboardRequest(center, time, {
                 server: this.server,
             });
     }
 
+    /**
+     * Perform a multi board request.
+     * @async
+     * @param {MultiboardRequest} request - multi board request.
+     * @returns {Promise<MultiboardResponse, Error>} - multi board response
+     */
     async execMultiboardRequest(request) {
         let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
 
         let url = buildURI(`${request.server}/v3/multiboard/by_geocoord.json`, {
                 center:     `${request.center.lat},${request.center.lng}`,
                 time:       request.time.toISOString(),
+                details:    1,
                 app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
                 app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
             });
-
 
         let response = new MultiboardResponse(request);
         return fetch(url).then(res => res.json()).then(res => {
             let stops = res.Res.MultiNextDepartures.MultiNextDeparture.map(multinext => {
                 let stop = buildLocation(multinext);
-                console.log(multinext);
-                console.info(stop);
+                stop.router = this;
+                let departures = multinext.NextDepartures.Dep.map(dep => {
+                    return new Departure({
+                        platform:  dep.platform,
+                        time:      new Date(dep.time),
+                        transport: buildTransport(dep.Transport),
+                    });
+                });
+                stop.departures = departures;
                 return stop;
             });
 

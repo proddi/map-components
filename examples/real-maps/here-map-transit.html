@@ -9,6 +9,7 @@
     <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-here/map-routes.js"></script>
+    <script type="module" src="../../src/mapui/departure-list.js"></script>
     <style>
         here-map {
             position: relative;
@@ -20,6 +21,7 @@
 <body>
     <h3>HERE transit routing</h3>
     <p>It uses HERE Transit routing API to request public transit routes. Drag'n'drop the markers!</p>
+    <departure-list></departure-list>
     <maps-example>
         <here-platform app-id="${localStorage.getItem('HERE_APP_ID')}" app-code="${localStorage.getItem('HERE_APP_CODE')}"></here-platform>
 

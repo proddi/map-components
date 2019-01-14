@@ -69,12 +69,12 @@ class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
         render(this._headerRenderer(route), this.shadowRoot.querySelector("header"));
         render(this._contentRenderer(route), this.shadowRoot.querySelector("content"));
         this.setAttribute("visible", "");
-        this.select(route);
+        this.selectItem(route);
     }
 
     clear() {
         this.removeAttribute("visible");
-        this.unselect();
+        this.deselectItem();
     }
 }
 

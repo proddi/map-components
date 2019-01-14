@@ -1,18 +1,24 @@
+import {MapboxMap} from './map.js';
 import {findRootElement} from '../generics.js';
+import {SelectedMixin} from '../map/mixins.js'
 
 
-class MapboxMapRoutes extends HTMLElement {
+class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
     constructor() {
         super();
-        this._routes = {}
+        this._routes = [];
+        this._uiElements = [];
+        this._map;
     }
 
     connectedCallback() {
-        let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("mapbox-map"));
+        let mapComp = findRootElement(this, this.getAttribute("map"), MapboxMap);
         let router = document.querySelector(this.getAttribute("router"));
         let styler = document.querySelector(this.getAttribute("styler"));
 
         mapComp.whenReady.then(({L, map}) => {
+            this._map = map;
+/*
             router.addEventListener("request", (ev) => {
                 this.clearRoutes(map);
             });
@@ -29,30 +35,55 @@ class MapboxMapRoutes extends HTMLElement {
                 });
             }
             router.currentRoutes && this.addRoutes(map, router.currentRoutes);
+            */
+            this._routes && this.onItems(this._routes);
         });
-        this._router = router;
+//        this._router = router;
+        super.connectedCallback && super.connectedCallback();
     }
 
-    clearRoutes(map) {
-        for (let route_id in this._routes) {
-            for (let uiPair of this._routes[route_id][1]) {
-                uiPair.forEach(ui => map.removeLayer(ui));
-            }
+    _getUiForRoute(route) {
+        return this._uiElements[this._routes.indexOf(route)];
+    }
+
+    onItems(routes) {
+        if (!this._map) {
+            this._routes = routes;
+            return;
         }
-        this._routes = {};
+        // remove old elements
+        this._uiElements.forEach(routeUIs => routeUIs.forEach(LegUIs => LegUIs.forEach(ui => this._map.removeLayer(ui))));
+        // set new scenario
+        this._routes = routes;
+        this._uiElements = routes.map(route => this.addRoute(route));
     }
 
-    addRoutes(map, routes, style=undefined) {
-        for (let route of routes) {
-            this.addRoute(map, route, style);
+    onItemSelected(route) {
+        if (!this._map) {
+            this._selectedRoute = route;
+            return;
         }
+        this._applyRouteStyleUi(route, this._getUiForRoute(route), "selected");
     }
 
-    addRoute(map, route, styles=undefined) {
-        console.log(route);
+    onItemDeselected(route) {
+        if (!this._map) {
+            this._selectedRoute = null;
+            return;
+        }
+        this._applyRouteStyleUi(route, this._getUiForRoute(route));
+    }
+
+    onEmphasizedItem(route, accent, isSelected) {
+        if (!this._map) return;
+        if (isSelected) return;
+        this._applyRouteStyleUi(route, this._getUiForRoute(route), accent);
+    }
+
+    addRoute(route, state=null) {
         let uis = route.legs.map(leg => this._buildLeg(leg));
-        for (let uipair of uis) uipair.forEach(ui => ui.addTo(map));
-        this._routes[route.uid] = [route, uis];
+        for (let uipair of uis) uipair.forEach(ui => ui.addTo(this._map));
+        return uis;
     }
 
     _buildLeg(leg) {
@@ -64,11 +95,7 @@ class MapboxMapRoutes extends HTMLElement {
         ];
     }
 
-//    _applyRouteStyle(route, styleName) {
-//        this._applyRouteStyleUi(this._routes[route.uid], styleName);
-//    }
-
-    _applyRouteStyleUi([route, uis], state) {
+    _applyRouteStyleUi(route, uis, state) {
         route.legs.forEach((leg, index) => {
             let transport = leg.transport;
             let [uiOutline, uiInline] = uis[index];
