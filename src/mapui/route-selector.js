@@ -20,10 +20,10 @@ import 'https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module';
  * @extends {HTMLElement}
  * @implements {SelectorMixin}
  * @implements {RouterMixin}
- * @l_istens {BaseRouter#request} to clear the list (loading state).
- * @l_istens {BaseRouter#response} to update the list.
- * @e_mits {RouteSelector#RouteSelected} when a route gets selected.
- * @e_mits {RouteSelector#RouteUnselected} when a route gets selected.
+ * @listens {BaseRouter#request} to clear the list (loading state).
+ * @listens {BaseRouter#response} to update the list.
+ * @emits {RouteSelector#RouteSelected} when a route gets selected.
+ * @emits {RouteSelector#RouteUnselected} when a route gets selected.
  * @e_mits {RouteSelector#RouteLegSelected} when a route gets selected.
  * @e_mits {RouteSelector#RouteLegUnselected} when a route gets selected.
  *

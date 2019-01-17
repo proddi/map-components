@@ -23,7 +23,6 @@ import {HerePlatform} from './platform.js';
  * @see https://developer.here.com/documentation/transit/
  */
 class HereTransitRouter extends BaseRouter {
-    /** @private */
     constructor() {
         super();
         /**
@@ -69,7 +68,7 @@ class HereTransitRouter extends BaseRouter {
         let response = new RouteResponse(request);
         return fetch(url).then(res => res.json()).then(res => {
                 if (res.Res.Message) {
-                    throw res.Res.Message.text;
+                    throw new Error(res.Res.Message.text);
                 }
                 let routes = res.Res.Connections.Connection.map((conn) => {
                     let departure = buildLocation(conn.Dep);
@@ -89,7 +88,7 @@ class HereTransitRouter extends BaseRouter {
                     });
                     return new Route(createUID("h-t-route-{uid}-{salt}", conn.id), this, departure, arrival, legs);
                 });
-                return response.setRoutes(routes);
+                return response.resolve(routes);
             });
     }
 
@@ -104,7 +103,7 @@ class HereTransitRouter extends BaseRouter {
      * Perform a multi board request.
      * @async
      * @param {MultiboardRequest} request - multi board request.
-     * @returns {Promise<MultiboardResponse, Error>} - multi board response
+     * @returns {Promise<MultiboardRequest, Error>} - multi board response
      */
     async execMultiboardRequest(request) {
         let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
@@ -132,8 +131,7 @@ class HereTransitRouter extends BaseRouter {
                 stop.departures = departures;
                 return stop;
             });
-
-            return response.setStops(stops);
+            return response.resolve(stops);
         });
     }
 }

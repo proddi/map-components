@@ -1,0 +1,18 @@
+<template id="navigation" args-as="docs">
+    <div class="backpane"></div>
+    <ul>${listModules().map(module => render("navigation-module", module)).join("")}</ul>
+</template>
+
+<template id="navigation-module" args-as="module">
+    <li>
+        <a href="file/${module}-new.html">${module}</a>
+        <ul>${listModuleObjects(module).map(doc => render("navigation-item", doc)).join("")}</ul>
+    </li>
+</template>
+
+<template id="navigation-item" args-as="doc">
+    <li>
+        <span class="kind kind-${doc.kind}">${(doc.kind || "UNDEFINED").toUpperCase()[0]}</span>
+        <span>${self.docLink(doc)}</span>
+    </li>
+</template>

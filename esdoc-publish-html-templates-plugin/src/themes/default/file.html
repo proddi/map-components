@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <base href="${self.getBaseUrl(doc)}">
+    <title>${self.getTitle(doc)}</title>
+    <link type="text/css" rel="stylesheet" href="assets/prettify-tomorrow.css"/>
+    <link type="text/css" rel="stylesheet" href="assets/styles.css"/>
+    <script src="assets/script/prettify/prettify.js"></script>
+
+</head>
+<html>
+<body>
+    <header>
+        <a href="">map-components</a>
+    </header>
+    <nav>${render("navigation", docs)}</nav>
+    <main>
+        <small><pre>${self.escapeHTML(JSON.stringify(doc, null, 2))}</pre></small>
+        <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">${doc.content}</code></pre>
+    </main>
+
+    <script src="assets/script/pretty-print.js"></script>
+    <script src="assets/script/inner-link.js"></script>
+    <script src="assets/script/patch-for-local.js"></script>
+</body>
+</html>

@@ -6,5 +6,7 @@
     "option": {
       "accessor": {"access": ["public"], "autoPrivate": true}
     }
+  },{
+    "name": "esdoc-publish-html-templates-plugin"
   }]
 }

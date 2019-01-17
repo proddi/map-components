@@ -1,4 +1,6 @@
 "use strict";
+
+import {BaseMap} from '../mc/base-map.js';
 import {parseCoordString, findRootElement, deferredPromise} from '../generics.js';
 import {HerePlatform} from './platform.js';
 
@@ -7,7 +9,7 @@ import {HerePlatform} from './platform.js';
  * Shows HERE map. This is the base canvas for other visualisation elements.
  * It requires a {@link HerePlatform} component to handle credentials.
  *
- * @example
+ * @example <caption>This is caption</caption>
  * <here-platform app-id="..." app-code="..."></here-platform>
  *
  * <here-map platform="here-platform" center="13.5,52.5" zoom="11">
@@ -15,7 +17,7 @@ import {HerePlatform} from './platform.js';
  *
  * @see https://developer.here.com/documentation/maps/
  **/
-class HereMap extends HTMLElement {
+class HereMap extends BaseMap {
     /** @private */
     constructor() {
         super();
@@ -33,17 +35,19 @@ class HereMap extends HTMLElement {
         this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform);
         /** @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
         this.whenReady = deferredPromise();
+
+        this.history = document.querySelector(this.getAttribute("history") || 'mc-history');
     }
 
     /** @private */
     connectedCallback() {
         this.platform.whenReady.then(({platform, maptypes}) => {
-            let map = new H.Map(this, maptypes.terrain.map, {
-                center: this.center,
-                zoom: this.zoom,
-                margin: 150,
+//            console.log("maptypes", maptypes);
+            let {location, zoom} = decodeMapPosition(this.history && this.history.get('map'), {location:this.center,zoom:this.zoom});
+            let map = this._map = new H.Map(this, maptypes.terrain.map, {
+                center: location,
+                zoom: zoom,
                 renderBaseBackground: {lower: 1, higher: 1},
-    //            pixelRatio: pixelRatio
             });
 
             // add view-padding support
@@ -64,6 +68,13 @@ class HereMap extends HTMLElement {
             let mapevents = new H.mapevents.MapEvents(map);
             let behavior = new H.mapevents.Behavior(mapevents);
 
+            map.addEventListener('mapviewchangeend', ev => {
+                this.history && this.history.replace({
+                        map: encodeMapPosition(map.getCenter(), map.getZoom()),
+                        });
+                this._viewLock = false;
+            });
+
             // add resize support
             window.addEventListener('resize', function() { map.getViewPort().resize(); });
 
@@ -71,7 +82,30 @@ class HereMap extends HTMLElement {
 
             this.whenReady.resolve({map:map, behavior:behavior, platform:platform, maptypes:maptypes});
         }).catch(error => this.whenReady.reject(error));
+
+        super.connectedCallback && super.connectedCallback();
     }
+
+    setViewBounds(bounds) {
+        this._map && this._map.setViewBounds(bounds, true);
+    }
+}
+
+
+function decodeMapPosition(s, default_={location:null, zoom:null}) {
+    if (!s) return default_;
+    let pieces = s.split(",");
+    return {
+        location: {
+            lng: parseFloat(pieces[0]),
+            lat: parseFloat(pieces[1]),
+        },
+        zoom: parseInt(pieces[2]),
+    };
+}
+
+function encodeMapPosition(location, zoom) {
+    return [location.lng.toPrecision(7), location.lat.toPrecision(7), zoom].join(",");
 }
 
 

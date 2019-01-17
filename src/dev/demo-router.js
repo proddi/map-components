@@ -58,6 +58,10 @@ class DemoRouter extends MockupRouter {
         let base = this.getAttribute("base");
         this.src = base ? base + "{start}-{dest}.json" : this.src;
 
+        /**
+         * The available locations to lookup.
+         * @type {Object}
+         */
         this.locations = {
             A:          new Address({lng:13.31709, lat:52.54441, name:"A"}),
             B:          new Address({lng:13.56, lat:52.41, name:"B"}),

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <base href="${self.getBaseUrl(doc)}">
+    <title>${self.getTitle(doc)}</title>
+    <link type="text/css" rel="stylesheet" href="assets/prettify-tomorrow.css"/>
+    <link type="text/css" rel="stylesheet" href="assets/styles.css"/>
+    <script src="assets/script/prettify/prettify.js"></script>
+    <style>
+        main article .deprecated,
+        .e_________xperimental,
+        .i_________nstance-docs {
+            border-left: solid 5px orange;
+            padding-left: 9px;
+            margin: 4px 0;
+            line-height: 2em;
+        }
+        main .inheritedFrom {
+            font-style: italic;
+            margin: 6px 0 0 0;
+        }
+        main .details {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        main .details code {
+            background-color: #eee;
+            border-radius: 3px;
+            padding: 4px 6px;
+        }
+        main .signature a.name {
+            font-weight: bold;
+            color: black;
+        }
+        main .signature .source {
+            float: right;
+        }
+        main .signature .source a {
+            color: #999;
+            font-size: .7em;
+            padding-left: 0.7em;
+        }
+        main .signature .return {
+            color: #666;
+        }
+
+        .example pre {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            overflow-x: auto;
+            padding: 12px 24px;
+            word-wrap: break-word;
+        }
+
+        .object {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            overflow-x: auto;
+            padding: 12px 24px;
+            word-wrap: break-word;
+            font-size: 0.8em;
+        }
+
+        .object.hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <a href="">map-components</a>
+    </header>
+    <nav>${render("navigation", docs)}</nav>
+    <main>
+        ${render("import", doc)}
+        <h1>${doc.name}</h1>
+
+        <p class="inheritedFrom">Defined in: <a href="${sourceUrl(doc)}">${sourceOf(doc).name}</a></p>
+        ${render("class-relations", doc, listExtends(doc), "Extends:", " → ")}
+        ${render("class-relations", doc, extendedBy(doc), "Extended by:", ", ")}
+        ${render("class-relations", doc, listImplements(doc), "Implements:", ", ")}
+        ${render("class-relations", doc, implementedIn(doc), "Implemented by:", ", ")}
+        <!--
+        $ {doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
+        $ {doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
+        -->
+        ${doc.description ? render("description", doc.description) : ""}
+        ${doc.examples ? doc.examples.map(example => render("example", example)).join("") : ""}
+        <small><pre>${self.escapeHTML(JSON.stringify(doc, null, 2))}</pre></small>
+        ${render("class-properties", doc)}
+        ${render("class-methods", doc)}
+        ${render("class-events", doc)}
+    </main>
+
+    <script src="assets/script/pretty-print.js"></script>
+    <script src="assets/script/inner-link.js"></script>
+    <script src="assets/script/patch-for-local.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+    <script>
+        $().ready(function() {
+            $(".toggle").on("click", function() {
+                let selector = $(this).attr("toggle");
+                let target = $(selector);
+                target.toggleClass("hidden");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 import {findRootElement} from '../generics.js';
-
+import {SetRouteMixin} from '../map/mixins.js';
 
 /**
  * Adds start+stop map-marker to map and bind them to the router. When markers dragged the router gets updated.
- *
+ * @extends {HTMLElement}
+ * @implements {SetRouteMixin}
  * @example
  * <here-platform app-id="..." app-code="..."></here-platform>
  * <router id="router"></router>
@@ -12,16 +13,17 @@ import {findRootElement} from '../generics.js';
  *   <here-map-route-picker router="#router"></here-map-route-picker>
  * </here-map>
  **/
-class HereMapRoutePicker extends HTMLElement {
+class HereMapRoutePicker extends SetRouteMixin(HTMLElement) {
     /**
      * create instance
      */
     constructor() {
         super();
         let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("here-map"));
-        let router = document.querySelector(this.getAttribute("router"));
 
-        mapComp.whenReady.then(({map, behavior}) => {
+        this.history = document.querySelector(this.getAttribute("history") || 'mc-history');
+
+        this.whenReady = mapComp.whenReady.then(({map, behavior}) => {
             let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
             startMarker.draggable = true;
             let destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(21, 50)})});
@@ -31,12 +33,12 @@ class HereMapRoutePicker extends HTMLElement {
                 behavior.disable();
             }
 
-            function _dragEndHandler(ev) {
+            let _dragEndHandler = ev => {
                 let target = ev.target,
                     data = target.getData(),
                     position = target.getPosition();
                 behavior.enable();
-                router.update({start: startMarker.getPosition(), dest: destMarker.getPosition(),});
+                this.setRoute(startMarker.getPosition(), destMarker.getPosition());
             }
 
             function _dragHandler(ev) {
@@ -53,20 +55,76 @@ class HereMapRoutePicker extends HTMLElement {
             draggableLayer.addObjects([startMarker, destMarker]);
             map.addObject(draggableLayer);
 
-            // Router
-            router.addEventListener("request", ev => {
-                let request = ev.detail;
-                startMarker.setPosition(request.start);
-                destMarker.setPosition(request.dest);
-                map.setViewBounds(draggableLayer.getBounds(), true);
-            });
-            if (router.routeRequest) {
-                startMarker.setPosition(router.routeRequest.start);
-                destMarker.setPosition(router.routeRequest.dest);
-                map.setViewBounds(draggableLayer.getBounds(), true);
-            }
+            return {
+                    map: map,
+                    startMarker: startMarker,
+                    destMarker: destMarker,
+                }
         });
     }
+
+    initRoute() {
+        let route = this.history && this.history.get("route");
+        if (route) {
+            let {start, dest, time} = decodeRoute(route);
+            this.start = start;
+            this.dest = dest;
+            this.time = time;
+        } else {
+            super.initRoute();
+        }
+    }
+
+    setRouteRequest(request) {
+        super.setRouteRequest(...arguments);
+
+        // update markers
+        this.whenReady.then(({map, startMarker, destMarker}) => {
+            startMarker.setPosition(request.start);
+            destMarker.setPosition(request.dest);
+            map.setViewBounds(startMarker.getParentGroup().getBounds(), true);
+        });
+
+        // update history
+        this.history && this.history.push({
+                    route: encodeRoute(request.start, request.dest, request.time),
+                });
+    }
+}
+
+
+function decodeRoute(s) {
+    let pieces = s.split(":");
+    return {
+        start: decodeLocation(pieces[0]),
+        dest:  decodeLocation(pieces[1]),
+        time:  pieces[2] && new Date(pieces.slice(2).join(":")),
+    };
+}
+
+
+function encodeRoute(start, dest, time) {
+    return [
+            encodeLocation(start),
+            encodeLocation(dest),
+        ].concat(
+            time ? time.toISOString() : []
+        ).join(":");
+}
+
+
+function decodeLocation(s, default_=null) {
+    let pieces = s.split(",", 3);
+    return {
+        lng: parseFloat(pieces[0]),
+        lat: parseFloat(pieces[1]),
+        name: pieces[2],
+    };
+}
+
+
+function encodeLocation(location) {
+    return [location.lng.toPrecision(7), location.lat.toPrecision(7)].concat(location.name ? [location.name] : []).join(",");
 }
 
 

@@ -1,0 +1,144 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,700);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400italic,600,700);
+
+/****************************************
+ *   BASE STYLES
+ ****************************************/
+body {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 0.9em;
+    color: #222;
+}
+
+a {
+    color: #1565c0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+body, h1, h2, h3, h4 {
+    -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+
+header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 60px;
+    line-height: 60px;
+    background-color: #FFF;
+    box-shadow: 2px 0 8px black;
+    z-index: 1;
+    font-size: 1.2em;
+    padding: 0 0 0 2em;
+}
+:target { background-color: red; }
+/* NAV */
+nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 250px;
+    padding: 40px 4pc 2em 10px;
+    margin-top: 1em;
+    overflow-x: hidden;
+}
+nav .backpane {
+    z-index: -1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    background: #f4f5f6;
+    box-shadow: rgba(255, 255, 255, 1) -1px 0 0 inset;
+    border-right: 1px solid #ddd;
+}
+nav ul {
+    padding: 0;
+}
+nav li {
+    line-height: 1.3em;
+    list-style: none;
+    margin: 4px 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+nav li a {
+    color: #555;
+}
+
+/* MAIN */
+main {
+    margin-top: 50px;
+    margin-left: 250px;
+    padding: 10px 50px 10px 20px;
+}
+main h4 {
+    margin: 10px 0 7px 0;
+    padding: 0;
+}
+main article {
+    padding: 12px 16px;
+    border-top: 1px dashed #e8e8e8;
+}
+
+
+
+
+/* FOOTER */
+
+
+
+
+
+
+
+/* KINDS */
+.kind {
+    margin-left: 0.75em;
+    width: 1.2em;
+    height: 1.2em;
+    display: inline-block;
+    text-align: center;
+    border-radius: 0.2em;
+    margin-right: 0.2em;
+    font-weight: bold;
+    line-height: 1.2em;
+}
+.kind-class {
+    color: #009800;
+    background-color: #bfe5bf;
+}
+
+.kind-interface {
+    color: #fbca04;
+    background-color: #fef2c0;
+}
+
+.kind-function {
+    color: #6b0090;
+    background-color: #d6bdde;
+}
+
+.kind-variable {
+    color: #eb6420;
+    background-color: #fad8c7;
+}
+
+.kind-typedef {
+    color: #db001e;
+    background-color: #edbec3;
+}
+
+.kind-external {
+    color: #0738c3;
+    background-color: #bbcbea;
+}

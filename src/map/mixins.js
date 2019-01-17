@@ -1,4 +1,4 @@
-import {Response} from '../generics.js';
+import {BaseRouter, RouteResponse, findRootElement} from '../generics.js';
 
 
 /**
@@ -218,14 +218,36 @@ let SelectorMixinImpl = Base => class extends Base {
  * @listens {BaseRouter#response} - When a new response is available.
  */
 class RouterMixin {
-    /** @private */
+    /** @protected */
     constructor() {
         /**
          * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
-         * @type {BaseRouter|undefined}
+         * @type {BaseRouter|null}
          */
-        this.router = undefined;
+        this.router = null;
     }
+
+    /** @protected */
+    connectedCallback() {}
+
+    /**
+     * Sets a new router source.
+     * @param {BaseRouter|DOMSelector|null} router - The new routes source
+     * @return {BaseRouter|null} - The previous router instance.
+     */
+    setRouter(router) {}
+
+    /**
+     * Returns the current route request if available.
+     * @return {RouteRequest|null}
+     */
+    getRouteRequest() {}
+
+    /**
+     * Returns the current route response if available.
+     * @return {RouteResponse|null}
+     */
+    getRouteResponse() {}
 
     /**
      * Callback when new request is initiated.
@@ -240,12 +262,20 @@ class RouterMixin {
     onRouteResponse(response) {}
 
     /**
+     * Callback when the current request have a intermediate response is available.
+     * @param {RouteResponse} response
+     */
+    onIntermediateRouteResponse(response) {}
+
+    /**
      * Callback when the response has an error.
+     * @deprecated
      */
     onResponseError(error) {}
 
     /**
      * Callback when the response has routes.
+     * @deprecated
      */
     onRoutes(routes) {}
 }
@@ -253,25 +283,23 @@ class RouterMixin {
 
 // real implementation, no doc
 let RouterMixinImpl = Base => class extends Base {
-    /** @private */
     constructor() {
         super();
-        this.router = undefined;
+        this.router = null;
 
-        this._routeRequestHandler  = (ev) => this.onRouteRequest(ev.detail);
-        this._routeResponseHandler = (ev) => this.onRouteResponse(ev.detail);
+        this._routeRequestHandler              = (ev) => this.onRouteRequest(ev.detail);
+        this._routeResponseHandler             = (ev) => this.onRouteResponse(ev.detail);
+        this._intermediateRouteResponseHandler = (ev) => this.onIntermediateRouteResponse(ev.detail);
     }
 
     connectedCallback() {
-        if (this.router === undefined) this.setRouter(this.getAttribute("router"));
+        if (this.router === null) this.setRouter(this.getAttribute("router"));
         super.connectedCallback && super.connectedCallback();
     }
 
-    /**
-     * sets a new router source
-     * @param {BaseRouter|DOMSelector} router - The new routes source
-     */
     setRouter(router) {
+        let oldRouter = this.router;
+
         // ensure a BaseRouter instance
         if (!(router instanceof HTMLElement)) router = document.querySelector(router);
 
@@ -279,6 +307,7 @@ let RouterMixinImpl = Base => class extends Base {
         if (this.router) {
             this.router.removeEventListener("request", this._routeRequestHandler);
             this.router.removeEventListener("response", this._routeResponseHandler);
+            this.router.removeEventListener("route-response-intermediate", this._intermediateRouteResponseHandler);
             this._routeRequestHandler({});
             this._routeResponseHandler({});
         }
@@ -289,40 +318,145 @@ let RouterMixinImpl = Base => class extends Base {
         if (this.router) {
             this.router.addEventListener("request", this._routeRequestHandler);
             this.router.addEventListener("response", this._routeResponseHandler);
+            this.router.addEventListener("route-response-intermediate", this._intermediateRouteResponseHandler);
             router.routeResponse && this._routeResponseHandler({ detail:router.routeResponse });
         }
 
-        return this.router;
+        return oldRouter;
     }
 
-    /**
-     * @abstract
-     */
-    onRouteRequest(request) {
-//        console.warn("onRequest() isn't implemented", this);
-    }
+    getRouteRequest() { return this.router && this.router.routeRequest; }
+
+    getRouteResponse() { return this.router && this.router.routeResponse; }
+
+    onRouteRequest(request) {}
+
+    onRouteResponse(response) {}
+
+    onIntermediateRouteResponse(response) {}
+
+
+
 
     /**
+     * @deprecated
      * @abstract
      */
-    onRouteResponse(response) {
-//        console.warn("onResponse() isn't implemented", this);
-    }
+    onResponseError(error) {}
 
     /**
+     * @deprecated
      * @abstract
      */
-    onResponseError(error) {
-//        console.warn("onResponseError() isn't implemented", this);
-    }
-
-    /**
-     * @abstract
-     */
-    onRoutes(routes) {
-//        console.warn("onRoutes() isn't implemented", this);
-    }
+    onRoutes(routes) {}
 };
 
 
-export {SelectorMixinImpl as SelectorMixin, SelectedMixinImpl as SelectedMixin, RouterMixinImpl as RouterMixin}
+/**
+ * @interface
+ */
+class SetRouteMixin {
+    constructor() {
+        /** @type {Address|null} */
+        this.start = null;
+        /** @type {Address|null} */
+        this.dest = null;
+        /** @type {Date|null} */
+        this.time = null;
+        /**
+         * The current route request.
+         * @type {RouteRequest|null}
+         */
+        this.routeRequest = null;
+        /**
+         * The current route response.
+         * @type {RouteResponse|null}
+         */
+        this.routeResponse = null;
+        /**
+         * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
+         * @type {BaseRouter|null}
+         */
+        this.router;
+    }
+    initRoute() {}
+    setRoute(start, dest, time=null) {}
+    setRouteRequest(request) {}
+    setRouteResponse(response) {}
+}
+
+
+let SetRouteMixinImpl = Base => class extends Base {
+    constructor() {
+        super();
+
+        /**
+         * The current route request.
+         * @type {RouteRequest|null}
+         */
+        this.routeRequest = null;
+
+        /**
+         * The current route response.
+         * @type {RouteResponse|null}
+         */
+        this.routeResponse = null;
+
+        /**
+         * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
+         * @type {BaseRouter|null}
+         */
+        this.router = findRootElement(this, this.getAttribute("router"), BaseRouter);
+
+        setTimeout(_ => {
+            this.initRoute();
+
+            if (this.start && this.dest) {
+                this.setRoute(this.start, this.dest, this.time);
+            }
+        });
+    }
+
+    initRoute() {
+        /** @type {Address|null} */
+        this.start  = this.getAttribute("start");
+        /** @type {Address|null} */
+        this.dest   = this.getAttribute("dest");
+        /** @type {Date|null} */
+        this.time   = this.getAttribute("time");
+    }
+
+    setRoute(start, dest, time=null) {
+        this.start = start;
+        this.dest = dest;
+        this.time = time === undefined ? this.time : time;
+        if (this.router && this.start && this.dest) {
+            let request = this.router.buildRouteRequest(this.start, this.dest, this.time);
+            this.setRouteRequest(request);
+            let progress = (response) => this.setRouteResponse(response, true);
+            (request.error ? Promise.reject(request.error) : request.router.execRouteRequest(request, progress))
+                .catch(error => new RouteResponse(request).fail(error))
+                .then(response => this.setRouteResponse(response));
+            return request;
+        }
+    }
+
+    setRouteRequest(request) {
+        this.routeRequest = request;
+        this.routeResponse = null;
+        this.dispatchEvent(new CustomEvent('request', { detail: request }));
+    }
+
+    setRouteResponse(response, intermediate=false) {
+        this.routeResponse = response;
+        let eventName = intermediate ? 'route-response-intermediate' : 'response';
+        this.dispatchEvent(new CustomEvent(eventName, { detail: response }));
+    }
+}
+
+export {
+    SelectorMixinImpl as SelectorMixin, SelectedMixinImpl as SelectedMixin,
+    RouterMixinImpl as RouterMixin,
+    RouterMixinImpl as OnRouteMixin,
+    SetRouteMixinImpl as SetRouteMixin,
+}

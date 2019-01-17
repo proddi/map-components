@@ -17,9 +17,7 @@ const hereResources = loadScript(
 /**
  * The platform element is required to handle credentials for HERE services.
  *
- * Attributes:
- * - app_id - credentials
- * - app_code - credentials
+ * _Hint: To have a working map you'll have to provide the attributes `app_id="..."` and `app_code="..."`._
  *
  * @example
  * <here-platform app-id="..." app-code="..."></here-platform>

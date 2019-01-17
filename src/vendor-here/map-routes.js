@@ -1,9 +1,14 @@
 import {HereMap} from './map.js';
 import {findRootElement} from '../generics.js';
-import {SelectedMixin} from '../map/mixins.js'
+import {SelectedMixin, RouterMixin} from '../map/mixins.js'
 
 
-class HereMapRoutes extends SelectedMixin(HTMLElement) {
+/**
+ * @extends {HTMLElement}
+ * @implements {RouterMixin}
+ * @implements {SelectedMixin}
+ */
+class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
     /** @private */
     constructor() {
         super();
@@ -15,8 +20,6 @@ class HereMapRoutes extends SelectedMixin(HTMLElement) {
     /** @private */
     connectedCallback() {
         let mapComp = findRootElement(this, this.getAttribute("map"), HereMap);
-        let router = document.querySelector(this.getAttribute("router"));
-        let styler = document.querySelector(this.getAttribute("styler"));
 
         mapComp.whenReady.then(({map}) => {
             this._map = map;
@@ -38,12 +41,19 @@ class HereMapRoutes extends SelectedMixin(HTMLElement) {
             */
             this._routes && this.onItems(this._routes);
         });
-        this._router = router;
         super.connectedCallback && super.connectedCallback();
     }
 
     _getUiForRoute(route) {
         return this._uiElements[this._routes.indexOf(route)];
+    }
+
+    onRouteRequest(request) {
+        this.onItems([]);
+    }
+
+    onRouteResponse(response) {
+        this.onItems(response.routes);
     }
 
     onItems(routes) {

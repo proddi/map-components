@@ -16,7 +16,6 @@ import 'https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module';
  *
  * <route-details router="#router"></route-details>
  *
- * @extends {SelectedMixin}
  * @extends {HTMLElement}
  * @implements {SelectedMixin}
  *

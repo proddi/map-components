@@ -15,17 +15,21 @@ class MockupRouter extends BaseRouter {
         /**
          * A reference to the mocked response. It can contain placeholders
          * (e.g. `src="../responses/here-transit-{start}-{dest}.json"`).
-         * @type {string|undefined}
+         * @type {string|null}
          */
         this.src = this.getAttribute("src");
 
         /**
          * If a fallback router is specified (`fallback-router="#other-router"`), all non matching routes
          * will be forwarded to this router
-         * @type {BaseRouter|undefined}
+         * @type {BaseRouter|null}
          */
-        this.fallbackRouter = undefined;
+        this.fallbackRouter = null;
 
+        /**
+         * The available locations to lookup.
+         * @type {Object}
+         */
         this.locations = {}
     }
 
@@ -75,7 +79,7 @@ class MockupRouter extends BaseRouter {
                         }
                 ))
             ));
-            return response.setRoutes(routes).setError(data.error);
+            return response.resolve(routes).fail(data.error);
         }, error => {
             console.trace("demo req failed:", error);
             if (request.fallbackRouter) {
@@ -86,7 +90,7 @@ class MockupRouter extends BaseRouter {
                         return response;
                     });
             }
-            return response.setError(error)
+            return response.fail(error);
         });
     }
 

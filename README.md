@@ -1,7 +1,8 @@
-MAPS Web Components
-===================
+Web Components for Maps
+=======================
 
-This is a prototype to use maps out there in an easy and declarative way.
+This is a prototype to use the advantage of [Web Components](https://developer.mozilla.org/en/docs/Web/Web_Components)
+to easily build maps without enforcing the usage of a specific framework.
 
 - [examples](examples/)
 
@@ -65,3 +66,9 @@ Build docs:
 Clean workspace:
 
     make clean
+
+
+Ideas
+=====
+
+- [HistoryLocation](https://emberjs.com/api/ember/3.2/classes/HistoryLocation) component that works with Maps, Routers[, slectors]

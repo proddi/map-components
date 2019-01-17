@@ -12,11 +12,13 @@
         "build": "./node_modules/.bin/webpack --config webpack.config.js",
         "build:prod": "NODE_ENV=production npm run build",
         "build:docs": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc.json",
+        "build:docs-templates": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc-templates.json",
         "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\""
     },
     "dependencies": {},
     "devDependencies": {
         "esdoc": "^1.1.0",
+        "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
         "webpack": "^4.28.3",
         "webpack-cli": "^3.2.0"
