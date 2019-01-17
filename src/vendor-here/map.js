@@ -9,6 +9,12 @@ import {HerePlatform} from './platform.js';
  * Shows HERE map. This is the base canvas for other visualisation elements.
  * It requires a {@link HerePlatform} component to handle credentials.
  *
+ * | Tables   |      Are      |  Cool |
+ * |----------|:-------------:|------:|
+ * | col 1 is |  left-aligned | $1600 |
+ * | col 2 is |    centered   |   $12 |
+ * | col 3 is | right-aligned |    $1 |
+ *
  * @example <caption>This is caption</caption>
  * <here-platform app-id="..." app-code="..."></here-platform>
  *

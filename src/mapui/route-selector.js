@@ -3,10 +3,10 @@ import {html, render, repeat} from '../map/lit-html.js';
 import {elementTemplate} from '../map/tools.js';
 import {SelectorMixin, RouterMixin} from '../map/mixins.js';
 
-import 'https://unpkg.com/@polymer/paper-item/paper-icon-item.js?module';
-import 'https://unpkg.com/@polymer/paper-item/paper-item-body.js?module';
-import 'https://unpkg.com/@polymer/iron-icons@3.0.1/iron-icons.js?module';
-import 'https://unpkg.com/@polymer/iron-icons@3.0.1/maps-icons.js?module';
+import '/node_modules/@polymer/paper-item/paper-icon-item.js';
+import '/node_modules/@polymer/paper-item/paper-item-body.js';
+import '/node_modules/@polymer/iron-icons/iron-icons.js';
+import '/node_modules/@polymer/iron-icons/maps-icons.js';
 
 
 /**

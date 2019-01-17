@@ -15,12 +15,19 @@
         "build:docs-templates": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc-templates.json",
         "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\""
     },
-    "dependencies": {},
+    "dependencies": {
+        "@polymer/iron-icons": "^3.0.1",
+        "@polymer/paper-icon-button": "^3.0.2",
+        "@polymer/paper-item": "^3.0.1",
+        "lit-html": "^1.0.0-rc.2"
+    },
     "devDependencies": {
         "esdoc": "^1.1.0",
         "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
         "webpack": "^4.28.3",
-        "webpack-cli": "^3.2.0"
+        "webpack-cli": "^3.2.0",
+        "polymer-cli": "^1.9.5",
+        "bower": "^1.8.6"
     }
 }
