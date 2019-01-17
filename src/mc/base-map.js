@@ -3,6 +3,11 @@
 import {parseCoordString, findRootElement} from '../generics.js';
 
 
+/**
+ * Abstract Map Component to have common integration features (e.g. History)
+ *
+ * @abstract
+ */
 class BaseMap extends HTMLElement {
     constructor() {
         super();

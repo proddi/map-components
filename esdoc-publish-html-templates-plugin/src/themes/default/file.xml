@@ -1,0 +1,8 @@
+<template id="file.html" args-as="file,tags">
+    ${render("debug-toggle", file)}
+    <h1>File ${file.name}</h1>
+    ${render("debug-info", file)}
+
+    <h2>Members:</h2>
+    ${tags.filter(tag => tag.memberof === file.name).map(item => render("item", item)).join("")}
+</template>

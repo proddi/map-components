@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>route-details - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="module" src="../../src/mapui/example.js"></script>
+
+    <script type="module">
+/*
+function findElement({select, lookup, lookdown, tag, is}) {
+    let found = [];
+    let tests = (tag ? [n=>n.tagName === tag] : []).concat(is ? [n=>n.getAttribute("is")===is] : []);
+    console.assert(tests.length, "No node spec given");
+    console.log("tests", tests);
+    let validateNode = n => !tests.find(test=>!test(n));
+
+    // 1. selector
+    if (select) {
+        console.log("select<", select);
+        found = found.concat(Array.prototype.slice.call(document.querySelectorAll(select)));
+        console.log("select:", found);
+        found = found.filter(validateNode);
+        console.log("select>", found);
+        if (found.length) return found[0];
+    }
+
+    // 2. lookup
+    if (lookup) {
+        console.log("lookup<", lookup);
+        let node = lookup;
+        while (node = node.parentNode) {
+            try {
+                if (validateNode(node)) {
+                    found.push(node);
+                    break
+                }
+            } catch { break; }
+        }
+        console.log("lookup>", found);
+        if (found.length) return found[0];
+    }
+
+    // 3. lookdown
+    let query = (tag ? [tag] : []).concat(is ? [`[is="${is}"]`] : []).join("");
+    if (lookdown) {
+        console.log("lookdown<", lookdown, query);
+        found = found.concat(Array.prototype.slice.call(lookdown.querySelectorAll(query)));
+        console.log("lookdown:", found);
+        found = found.filter(validateNode);
+        console.log("lookdown>", found);
+        if (found.length) return found[0];
+    }
+
+    // 3. global-selector
+    if (query) {
+        console.log("global<", "q=", query);
+        found = found.concat(Array.prototype.slice.call(document.querySelectorAll(query)));
+        console.log("global:", found);
+        found = found.filter(validateNode);
+        console.log("global>", found);
+        if (found.length) return found[0];
+    }
+}
+*/
+
+
+        class Router extends HTMLElement {
+            static get tag() { return 'base-router'; }
+            get name() { return "base-router"; }
+            set foo(val) { console.log(`<${this.tagName}>.foo = "${val}"`); }
+            constructor() {
+                super();
+                console.log(`Router<${this.name}>.constructor()`, this);
+                this.innerHTML = `!!! ${this.name} !!!`;
+            }
+        }
+        customElements.define("x-router", Router);
+
+        class HereRouter extends Router {
+            static get tag() { return 'here-router'; }
+            get name() { return "here-router"; }
+        }
+        customElements.define(HereRouter.tag, HereRouter);
+
+        class GoogleRouter extends Router {
+            static get tag() { return 'google-router'; }
+            get name() { return "google-router"; }
+        }
+        customElements.define(GoogleRouter.tag, GoogleRouter);
+
+
+        import {findElement} from '../../src/mc/utils.js';
+        class Foo extends HTMLElement {
+            constructor() {
+                super();
+                this.router = findElement({
+                        select: this.getAttribute("router"),
+                        lookup: this,
+                        is:     "router",
+                    });
+                console.log("ATTACHED to", this.router);
+                window.router = this.router;
+            }
+        }
+        customElements.define("x-foo", Foo);
+
+
+
+
+    </script>
+</head>
+<body>
+
+    <route-debug>
+        <x-foo></x-foo>
+        <div>
+            <p id="nested">nested start point</p>
+        </div>
+        <here-router></here-router>
+        <google-router name="ped"></google-router>
+        <google-router is="router" name="transit"></google-router>
+        <google-router name="car"></google-router>
+        <google-router name="flight"></google-router>
+    </route-debug>
+
+
+
+</body>
+</html>

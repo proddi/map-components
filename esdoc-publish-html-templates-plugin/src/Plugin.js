@@ -10,39 +10,7 @@ const _escapeHTML = require('escape-html');
 
 const _util = require('./utils.js');
 
-
-function templateFromMarkup(markup, argNames=[], globals={}, name="unnamed") {
-    const code = [
-//            `console.log(">>> ${name}>")`,
-            'try {',
-        ]
-        .concat(Object.keys(globals).map(key => `let ${key}=globals.${key}`))
-        .concat([
-            'const result = `'+markup+'`',
-//            `console.log("<<< ${name}")`,
-            'return result',
-            `} catch (e) { if (!(e instanceof Error)) e = new Error(e); e.message += ' (...in template ${name})'; throw e; }`,
-        ]);
-    const fn = Function.apply(null, ["globals"].concat(argNames).concat(code.join("; "))).bind(null, globals);
-    fn.toSource = _ => `template<${name}>(${argNames.join(", ")}):\n` + markup.split('\n').map((line, index) => `   ${index}: ${line}`).join("\n");
-    fn.toString = _ => `template<${name}>(${argNames.join(", ")})`;
-    return fn;
-}
-
-
-function templateFromFile(file, argNames=[], globals={}) {
-    return templateFromMarkup(_fs.readFileSync(file, { encoding: 'utf-8' }), argNames, globals, file);
-}
-
-
-function templateFromElement(node, globals={}, name="unnamed node") {
-    let argNames = (node.getAttribute("args-as") || "data").split(",");
-    let markup = node.innerHTML.trim();
-    markup = markup.replace(/=&gt;/g, "=>")
-                   .replace(/&amp;&amp;/g, "&&");
-    return templateFromMarkup(markup, argNames, globals, name);
-}
-
+const templatizer = require('./templatizer.js');
 
 // filters
 function nameIs(name) { (tag) => tag.name === name; }
@@ -54,41 +22,64 @@ class Plugin {
 //    }
 
     onHandleDocs(ev) {
-        this._docs = ev.data.docs;
+        this._docs = this._enrichModules(ev.data.docs);
     }
 
     onPublish(ev) {
         this._option = ev.data.option || {};
 
-        this._templates = {}
         this._themeDir = _path.resolve(__dirname, './themes/default');
 
         this._renderGlobals = this._buildRenderGlobals(this._docs);
-        this._loadTemplates(this._themeDir, this._renderGlobals);
+        this._templates = this._loadTemplates(this._themeDir, this._renderGlobals);
 
         this._exec(this._docs, ev.data.writeFile, ev.data.copyDir, ev.data.readFile);
     }
 
     _exec(tags, writeFile, copyDir, readFile) {
-        this._createClasses(tags, writeFile, copyDir);
-        this._createFiles(tags, writeFile, copyDir);
+        const buildersDir = _path.resolve(__dirname, './builders');
+        const builders = _fs.readdirSync(buildersDir)
+            .filter(fileName => fileName.endsWith("Builder.js"))
+            .map(fileName => {
+                return require(_path.resolve(buildersDir, fileName)).builder;
+            });
+
+        const options = {
+            writeFile: writeFile,
+            copyDir: copyDir,
+            readFile: readFile,
+            docs: tags,
+            theme: this._themeDir,
+            globals: this._renderGlobals,
+            fileTemplate: (type, fields=[]) => {
+                return templatizer.fromFile(_path.resolve(this._themeDir, "layout.html"), ["type"].concat(fields), this._renderGlobals, type).bind(null, type);
+            },
+        }
+
+        builders.forEach(builder => {
+            builder(options);
+        });
+
+
+        this._createCodeFiles(tags, writeFile, copyDir);
+        this._createModules(tags, writeFile, copyDir);
         this._createStatic(this._themeDir, writeFile, copyDir);
     }
 
-    _createClasses(tags, writeFile, copyDir) {
-        const docs = tags.filter(tag => tag.kind === 'class');
+    _createCodeFiles(tags, writeFile, copyDir) {
+        const docs = tags.filter(tag => tag.kind === 'file');
         for (const doc of docs) {
-            const fileName = this.docUrl(doc);
-            const content = templateFromFile(_path.resolve(this._themeDir, "class.html"), ["doc", "docs"], this._renderGlobals, "class.html")(doc, tags)
+            const fileName = this.docSourceUrl(doc);
+            const content = templatizer.fromFile(_path.resolve(this._themeDir, "code.html"), ["doc", "docs"], this._renderGlobals, "code.html")(doc, tags)
             writeFile(fileName, content);
         }
     }
 
-    _createFiles(tags, writeFile, copyDir) {
-        const docs = tags.filter(tag => tag.kind === 'file');
+    _createModules(tags, writeFile, copyDir) {
+        const docs = tags.filter(tag => tag.kind === 'module');
         for (const doc of docs) {
-            const fileName = this.docSourceUrl(doc);
-            const content = templateFromFile(_path.resolve(this._themeDir, "file.html"), ["doc", "docs"], this._renderGlobals, "file.html")(doc, tags)
+            const fileName = this.docUrl(doc);
+            const content = templatizer.fromFile(_path.resolve(this._themeDir, "layout.html"), ["type", "doc", "docs"], this._renderGlobals, "layout.html")("module", doc, tags)
             writeFile(fileName, content);
         }
     }
@@ -100,29 +91,26 @@ class Plugin {
     }
 
     _loadTemplates(path, globals={}) {
+        let templates = {};
         _fs.readdirSync(path).filter(name => name.endsWith(".xml")).forEach(name => {
             let fileName = _path.resolve(path, name);
             const xml = _fs.readFileSync(fileName, { encoding: 'utf-8' });
             const dom = _jsdom.jsdom(xml);
             Object.values(dom.querySelectorAll("template")).map(node => {
                 let id = node.getAttribute("id");
-                this._templates[id] = templateFromElement(node, globals, `${name}#${id}`);
+                templates[id] = templatizer.fromElement(node, globals, `${name}#${id}`);
             });
         });
+        return templates;
     }
 
     render(id, ...args) {
         let template = this._templates[id];
         try {
-            if (!template) {
-//                console.trace();
-//                console.log(">>>", id, "<<<");
-                throw `render(): No template "${id}"`;
-            }
-            return template(...args);//.call(this, this._templateRenderer, ...args);
+            if (!template) throw new Error(`No template "${id}" available.`);
+            return template(...args);
         } catch (e) {
-            console.dir(String(template));
-            if (e instanceof Error) e.message = `${e.message} (...in template ${template.displayName})`;
+            if (e instanceof Error) e.message = `${e.message} (...in template ${template})`;
             else console.error(`${e.message} in template`, template);
             throw e;
         }
@@ -172,9 +160,12 @@ class Plugin {
             case 'file':
                 return `file/${doc.name}-new.html`;
             case 'typedef':
-                return `(${doc.kind})`;
             case 'function':
-                return `(${doc.kind})`;
+                return `file/${doc.memberof}-new.html#${doc.name}`;
+            case 'module':
+                return `module/${doc.name}-new.html`;
+            case 'index':
+                return `index-new.html`;
             default:
                 console.warn(`Could not construct url for "${doc.longname || doc.name}" (${doc.kind}).`);
                 return `(${doc.kind})`;
@@ -184,7 +175,7 @@ class Plugin {
     docSourceUrl(doc) {
         switch (doc.kind) {
             case 'class':
-                return `file/${doc.longname}-new.html` + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : "");
+                return `source/${doc.longname}-new.html` + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : "");
             case 'member':
             case 'method':
             case 'constructor':
@@ -192,25 +183,21 @@ class Plugin {
             case 'get':
                 return this.docSourceUrl(this.getParentDoc(doc)) + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : "");
             case 'external':
-                return 'external/index-new.html';
             case 'typedef':
-                return 'typedef/index-new.html';
+                return `source/${doc.memberof}-new.html`;
             case 'file':
-                return `file/${doc.name}-new.html`;
+                return `source/${doc.name}-new.html`;
+            case 'variable':
+            case 'function':
+                return `source/${doc.name}-new.html#lineNumber${doc.lineNumber}`;
             default:
-                console.log(doc);
-                throw new Error(`Couldn't build file-path for type "${doc.kind}".`);
+                console.log("FAILED --->", doc);
+                throw new Error(`No source-url available for type "${doc.kind}".`);
         }
     }
 
     docLink(doc) {
         return `<span><a href="${this.docUrl(doc)}">${doc.name}</a></span>`;
-
-//        if (doc.kind === 'file' || doc.kind === 'testFile') {
-//            return `<span><a href="${this._getURL(doc)}">${text}</a></span>`;
-//        } else {
-//            return `<span><a href="${this._getURL(doc)}#lineNumber${doc.lineNumber}">${text}</a></span>`;
-//        }
     }
 
     docSourceLink(doc, text=null) {
@@ -226,30 +213,20 @@ class Plugin {
         });
 
         let returnSignature = ((doc.return || {}).types || []).map(type => {
-            return type;
+            let typeDoc = this.getDocByName(type, null, null);
+            return typeDoc ? this.docLink(typeDoc) : type;
         }).join(' | ');
 
         return `(${callSignatures.join(', ')}): ${returnSignature || "void"}`;
     }
 
     buildPropertySignature(doc) {
-        let returnSignature = (doc.type.types || []).map(type => {
+        let returnSignature = ((doc.type || {}).types || []).map(type => {
             let typeDoc = this.getDocByName(type, null, null);
             return typeDoc ? this.docLink(typeDoc) : type;
         }).join(' | ');
 
         return `: ${returnSignature || "void"}`;
-    }
-
-    getNavDocs(docs) {
-        const kinds = ['class', 'function', 'variable', 'typedef', 'external'];
-        return docs
-            .filter(doc => (doc.kind === 'class' && doc.export) ||
-                           (doc.kind === 'function' && doc.export) ||
-                           (doc.kind === 'variable' && doc.export) ||
-                           (doc.kind === "typedef") ||
-                           (doc.kind === "external" && !doc.builtinExternal)
-                    );
     }
 
     getParentDoc(doc) {
@@ -378,19 +355,27 @@ class Plugin {
     */
 
     _buildRenderGlobals(docs) {
+        function sortByKey(keyFn) {
+            return (a, b) => {
+                a = keyFn(a).toUpperCase();
+                b = keyFn(b).toUpperCase();
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return 0;
+            }
+        }
+
 
         const globals = {
             self: this,
             render: this.render.bind(this),
             escape: content => _escapeHTML(content),
             markdown: content => _util.markdown(content),
-//            listModules: _ => docs.filter(tag => !['method', 'member', 'constructor', 'file', 'index'].includes(tag.kind)).map(tag => tag.memberof).filter((tag, idx, list) => list.indexOf(tag) === idx),
-            listModules: _ => docs
-                    .filter(tag => tag.kind === 'file')
-                    .map(tag => tag.name)
-                    .filter((tag, idx, list) => list.indexOf(tag) === idx),
-//                    .map(name => [name, name.split("/").slice(1, -1).join("/")]),
-            listModuleObjects: module => docs.filter(tag => tag.memberof === module),
+            docUrl: this.docUrl.bind(this),
+            docLink: this.docLink.bind(this),
+            signature: doc => doc.kind === 'function' ? this.buildFunctionSignature(doc) : this.buildPropertySignature(doc),
+            listModules: _ => docs.filter(tag => tag.kind === 'module'),
+            listModuleObjects: module => docs.filter(tag => !tag.builtinExternal && module.files.includes(tag.memberof)).filter(tag => !tag.ignore).sort(sortByKey(tag => tag.name)),
             listExtends: doc => this._buildParentList(doc, "extends"),
             listImplements: doc => (doc.implements || []).map(doc => this.getDocByName(doc)),
             extendedBy: doc => docs.filter(tag => tag.kind === 'class' && (tag.extends || []).includes(doc.longname)),
@@ -399,6 +384,8 @@ class Plugin {
             sourceOf: doc => {
                     switch (doc.kind) {
                         case 'class':
+                        case 'function':
+                        case 'variable':
                             return docs.filter(tag => tag.kind === 'file' && tag.name === doc.memberof)[0];
                         case 'file':
                             return doc;
@@ -422,12 +409,34 @@ class Plugin {
         return (doc[prop] || [])
                 .map(tag => { tag = this.getDocByName(tag); return [tag].concat(this._buildParentList(tag, prop))})
                 .reduce((prev, curr) => prev.concat(curr), []);
+    }
 
-        let _extends = doc.extends || [];
-        if (_extends.length === 0) return [];
-        if (_extends.length !== 1) throw new Error(`Mutiple extends not supported! (${doc.longname})`);
-        let tag = this.getDocByName(_extends[0]);
-        return [tag].concat(globals.listExtends(tag));
+    _enrichModules(docs) {
+        // deduplicate
+        let names = docs.map(tag => tag.longname);
+        docs = docs.filter((tag, index) => names.indexOf(tag.longname) === index);
+
+        // generate modules
+        let moduleId = name => name.split("/").slice(0, -1).join("/")
+        let modules = {};
+        docs.filter(tag => tag.kind === 'file' && !tag.builtinExternal)
+            .forEach((tag, index) => {
+                let id = moduleId(tag.name);
+                modules[id] = modules[id] || {
+                    __docId__: `module-${index}`,
+                    kind: 'module',
+                    name: id,
+                    longname: tag.name,
+                    files: [],
+                }
+                modules[id].files.push(tag.name);
+            })
+
+        // merge everything together
+        return docs.concat(Object.values(modules))
+                .filter(tag => !(tag.kind === 'external' && tag.lineNumber))
+                .filter(tag => !tag.ignore)
+                ;
     }
 }
 

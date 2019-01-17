@@ -5,14 +5,17 @@
 
 <template id="navigation-module" args-as="module">
     <li>
-        <a href="file/${module}-new.html">${module}</a>
+        ${docLink(module)}
         <ul>${listModuleObjects(module).map(doc => render("navigation-item", doc)).join("")}</ul>
     </li>
 </template>
 
 <template id="navigation-item" args-as="doc">
-    <li>
-        <span class="kind kind-${doc.kind}">${(doc.kind || "UNDEFINED").toUpperCase()[0]}</span>
-        <span>${self.docLink(doc)}</span>
-    </li>
+    <li>${render("doc-icon", doc)}</li>
+</template>
+
+
+<template id="doc-icon" args-as="doc">${render("doc-icon-inline", doc, doc.kind === 'class' && doc.interface ? 'interface' : doc.kind)}</template>
+<template id="doc-icon-inline" args-as="doc,kind">
+    <span class="kind kind-${kind}">${(kind || "UNDEFINED").toUpperCase()[0]}</span><span>${self.docLink(doc)}</span>
 </template>

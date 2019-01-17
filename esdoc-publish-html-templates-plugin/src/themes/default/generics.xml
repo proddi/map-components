@@ -1,0 +1,44 @@
+<template id="attribute" args-as="klass,relations,caption,separator">
+    ${relations.length ? `<div class="attribute"><span class="attribute-label">${caption} </span><span class="attribute-value">${relations.map(doc => self.docLink(doc)).join(separator || ", ")}</span></div>` : ""}
+</template>
+
+
+<template id="item" args-as="item">
+    <article class="item">
+        <div class="signature">
+            <span class="source">${sourceLink(item, "source")}</span>
+            <span class="source toggle" toggle="#${item.kind}-${item.__docId__}"><a>debug</a></span>
+            <code class="access">${item.static ? "static" : ""}</code>
+            <code class="access">${item.access}</code>
+            <code class="access">${item.kind}</code>
+            <a name="${item.name}" class="name type-kind-${item.kind}" href="${docUrl(item)}">${item.name}</a><code class="return">${signature(item)}</code>
+        </div>
+        <div class="attributes">
+            <span class="attriute-label">Defined in:</span><span><a href="${sourceUrl(item)}">${sourceOf(item).name}</a></span>
+        </div>
+        ${render("deprecation", item, "this item was deprecated")}
+        <div class="object hidden" id="${item.kind}-${item.__docId__}"><pre>${escape(JSON.stringify(item, null, 2))}</pre></div>
+        ${render("description", item)}
+        ${render("examples", item)}
+    </article>
+</template>
+
+
+<template id="description" args-as="item">
+    ${item.description ? `<p class="description">${markdown(item.description)}</p>` : ""}
+</template>
+
+
+<template id="deprecation" args-as="item,text">
+    ${item.deprecated ? `<p class="deprecated">${text}${item.deprecated !== true ? ": " + item.deprecated : ""}.</p>` : ""}
+</template>
+
+
+<template id="debug-toggle" args-as="item">
+    <span class="toggle" toggle="#debug-${item.kind}-${item.__docId__}"><a>debug</a></span>
+</template>
+
+
+<template id="debug-info" args-as="item">
+    <div class="object hidden" id="debug-${item.kind}-${item.__docId__}"><pre>${escape(JSON.stringify(item, null, 2))}</pre></div>
+</template>

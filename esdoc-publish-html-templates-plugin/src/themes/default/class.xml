@@ -1,29 +1,27 @@
-<template id="renderPage" args-as="builder,doc">
-    <main>
-        <header></header>
-        <nav>${builder.renderNav(builder)}</nav>
-        <main>
-            ${builder.renderImport(builder, doc)}
-            <h1>Element ${doc.name}</h1>
-            ${doc._custom_extends_chains ? builder.renderExtends(builder, doc, doc._custom_extends_chains) : ""}
-            ${doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
-            ${doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
-            ${builder.renderPath(doc.importPath)}
-            ${doc.description ? builder.renderDescription(doc.description) : ""}
-            ${doc.examples ? doc.examples.map(example => builder.renderExample(builder, example)).join("") : ""}
-            <small><pre>${JSON.stringify(doc, null, 2)}</pre></small>
+<template id="class.html" args-as="doc,docs">
+    ${render("import", doc)}
+    <h1>${doc.name}</h1>
 
-            ${builder.renderMembers(builder, doc)}
-            ${builder.renderMethods(builder, doc.longname, doc._custom_extends_chains || [], builder.namesToLongnames(doc.implements || []))}
-        </main>
-    </main>
-</template>
-
-
-
-
-<template id="debug" args-as="doc">
-    <small><pre>${JSON.stringify(doc, null, 2)}</pre></small>
+    <p class="inheritedFrom">Defined in: <a href="${sourceUrl(doc)}">${sourceOf(doc).name}</a></p>
+    <div class="attributes">
+    ${render("attribute", doc, listExtends(doc), "Extends:", " → ")}
+    ${render("attribute", doc, extendedBy(doc), "Extended by:", ", ")}
+    ${render("attribute", doc, listImplements(doc), "Implements:", ", ")}
+    ${render("attribute", doc, implementedIn(doc), "Implemented by:", ", ")}
+    </div>
+    ${render("class-relations", doc, listExtends(doc), "Extends:", " → ")}
+    ${render("class-relations", doc, extendedBy(doc), "Extended by:", ", ")}
+    ${render("class-relations", doc, listImplements(doc), "Implements:", ", ")}
+    ${render("class-relations", doc, implementedIn(doc), "Implemented by:", ", ")}
+    <!--
+    $ {doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
+    $ {doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
+    -->
+    ${render("description", doc)}
+    ${doc.examples ? doc.examples.map(example => render("example", example)).join("") : ""}
+    ${render("class-properties", doc)}
+    ${render("class-methods", doc)}
+    ${render("class-events", doc)}
 </template>
 
 
@@ -42,8 +40,8 @@
 </template>
 
 
-<template id="description" args-as="description">
-    <div class="details">${self.formatMarkdown(description)}</div>
+<template id="examples" args-as="doc">
+    ${doc.examples ? doc.examples.map(example => render("example", example)).join("") : ""}
 </template>
 
 
@@ -57,14 +55,6 @@
 
 <template id="class-relations" args-as="klass,relations,caption,separator">
     ${relations.length ? `<p class="inheritedFrom">${caption} <code></code>${relations.map(doc => self.docLink(doc)).join(separator || ", ")}</code></p>` : ""}
-</template>
-
-
-<template id="class-extends_old" args-as="doc">
-    ${doc.extends ? `<div class="extends">
-        <h4>Extends:</h4>
-        ${doc.extends.map(name => self.docLink(self.getDocByName(name, doc))).join("→")} → ${doc.name}
-    </div>` : ""}
 </template>
 
 
@@ -88,7 +78,7 @@
         ${overrides.length ? overrides.map(target => render("class-method-override", target)) : ''}
         ${inherits ? render("class-method-inherits", self.getParentDoc(property)) : ''}
         ${render("class-deprecation", property, "this property was deprecated")}
-        <div class="details">${markdown(property.description || "")}</div>
+        ${render("description", property)}
     </article>
 </template>
 
@@ -115,7 +105,7 @@
         ${overrides.length ? overrides.map(target => render("class-method-override", target)) : ''}
         ${inherits ? render("class-method-inherits", self.getParentDoc(method)) : ''}
         ${render("class-deprecation", method, "this method was deprecated")}
-        <div class="details">${markdown(method.description || "")}</div>
+        ${render("description", method)}
     </article>
 </template>
 
@@ -145,7 +135,7 @@
         <div class="signature">
             <a name="${event.name}" class="name" title="${event.longname}">${event.name}</a><code type="return">${self.buildFunctionSignature(event)}</code>
         </div>
-        ${render("description", event.description)}
+        ${render("description", event)}
         <small><pre>${JSON.stringify(event, null, 2)}</pre></small>
     </article>
 </template>

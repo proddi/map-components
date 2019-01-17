@@ -265,11 +265,19 @@ class RouteRequest extends Request {
 }
 
 
+/**
+ * Data class for requesting transit board
+ * @see fooo
+ */
 class BoardRequest extends Request {
     get type() { return "board"; }
 }
 
 
+/**
+ * Data class for requesting transit board
+ * @see fooo
+ */
 class MultiboardRequest extends Request {
     get type() { return "multiboard"; }
 

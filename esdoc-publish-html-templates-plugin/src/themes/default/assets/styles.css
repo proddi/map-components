@@ -91,6 +91,19 @@ main article {
 }
 
 
+/** description code */
+.description {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+.description code {
+    background-color: #eee;
+    border-radius: 3px;
+    padding: 4px 6px;
+}
+.description pre > code {
+  display: block;
+}
 
 
 /* FOOTER */
@@ -103,15 +116,16 @@ main article {
 
 /* KINDS */
 .kind {
-    margin-left: 0.75em;
+    display: inline-block;
     width: 1.2em;
     height: 1.2em;
-    display: inline-block;
+    line-height: 1.2em;
     text-align: center;
     border-radius: 0.2em;
-    margin-right: 0.2em;
     font-weight: bold;
-    line-height: 1.2em;
+    padding: 2px 1px 0px 1px;
+    margin-left: 0.75em;
+    margin-right: 0.3em;
 }
 .kind-class {
     color: #009800;

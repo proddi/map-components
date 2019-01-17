@@ -8,10 +8,7 @@ import {BaseRouter, RouteResponse} from './generics.js';
  * <router1 id="router1"></router1>
  * <router2 id="router2"></router2>
  *
- * <union-router routers="#router1,#router2"
- *     start="lat,lon"
- *     dest="lat,lon"
- *     time="now">
+ * <union-router routers="#router1,#router2" start="lat,lon" dest="lat,lon">
  * </union-router>
  */
 class UnionRouter extends BaseRouter {
