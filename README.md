@@ -52,6 +52,66 @@ A fully functional map with transit route and drag'n'drop markers to change the 
     </body>
 
 
+Components:
+===========
+
+- `Router` - The worker of search and routing. Other components can use them for routing as well. The lib contains routers
+for `HERE` and `Google`. (`Mapbox` planned).
+
+- `Map` - The visualization continers. Other components use them to draw routes. The lib contains maps for `HERE`,
+`Google` and `Mapbox`
+
+- Common and vendor specific `UI` elements.
+
+
+Data flow
+=========
+
+- Simple:
+
+```
+    <Router:selector>                                           <Map>
+           ^                                                      ^
+           |                                                      |
+  (selector interface)                                        (draw on)
+           |                                                      |
+           +----------------- <map-routes:selectable> ------------+
+```
+
+- Advanced: (interface), [component]
+
+```
+    [Router:selector]         [map-routes:selectable] --> (draw) --> [Map]
+           ^                             |
+           |                    (selector interface)
+  (selector interface)                   |
+           |                             v
+           +----------- <route-selector:selectable:selector>
+                                         ^
+                                         +-- (selector intf) -- <route-details>
+```
+
+- Advanced: (selector=providing routes, selectable=listener)
+
+```
+               <Router#selector>                                 # provides routes (no selection)
+                      ^
+                      |
+      <route-selector#selectable#selector>                       # re-provides routes with selection feature
+                      ^
+                      |
+                +-----+-----------------+
+   <Map>        |                       |
+     <map-routes#selectable>       <route-details#selectable>    # visualizations incl. selection
+   </Map>
+
+```
+
+- RouteSource<SelectorMixin> + Request + Response
+
+- RouteObserver    (<map-routes routes-source="here-transit-router"></map-routes>)
+
+
 Usage
 =====
 

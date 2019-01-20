@@ -33,17 +33,22 @@
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-        <here-transit-router role="router" id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
-            start="13.31709,52.54441"
-            dest="13.56,52.41"
-            time="2019-01-22T19:17:07">
-        </here-transit-router>
+        <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-transit-router>
 
         <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <!-- picker is the input tool -->
-            <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
-            <!-- visualize router's routes -->
-            <here-map-routes router="#here-router"></here-map-routes>
+            <here-map-route-picker role="router" id="picker" router="#here-router"
+                    start="13.31709,52.54441"
+                    dest="13.56,52.41"
+                    time="2019-01-22T19:17:07">
+                <here-map-routes router="#pickder"></here-map-routes>
+            </here-map-route-picker>
+
+            <here-map-route-picker role="router" router="#here-router"
+                    start="13.31709,52.54441"
+                    dest="13.56,52.41"
+                    time="2019-01-22T19:17:07">
+                <here-map-routes></here-map-routes>
+            </here-map-route-picker>
         </here-map>
     </maps-example>
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>

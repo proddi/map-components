@@ -7,6 +7,9 @@
       "accessor": {"access": ["public"], "autoPrivate": true}
     }
   },{
-    "name": "esdoc-publish-html-templates-plugin"
+    "name": "esdoc-publish-html-templates-plugin",
+    "option": {
+        "path": "./new"
+    }
   }]
 }

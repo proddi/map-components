@@ -21,7 +21,7 @@ class DepartureList extends RouterMixin(SelectorMixin(HTMLElement)) {
 
     onMultiboardResponse(response) {
         this.showResponse(response);
-        this.setItems(response.routes);
+        this.setItems(response.routes, respose.request, response);
     }
 
     showResponse(response) {

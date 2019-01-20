@@ -28,7 +28,7 @@ class HereMap extends BaseMap {
         this.center = parseCoordString(this.getAttribute("center"));
         this.zoom = this.getAttribute("zoom");
         /**
-         * Defined padding when map is focusing on routes.
+         * Defined padding when map is focusing on routes. The format for the attribute is `view-padding="10 10 10 10"`.
          * @type{Array<top,right,bottom,left>}
          */
         this.viewPadding = (this.getAttribute("view-padding") || "0 0 0 0")
@@ -44,8 +44,8 @@ class HereMap extends BaseMap {
          *
          * @type {HerePlatform|null}
          */
-        this.platform = null; //findRootElement(this, this.getAttribute("platform"), HerePlatform);
-        whenElementReady(qs(this.getAttribute("platform")) || qp(this, "here-platform") || qs("here-platform"))
+        this.platform = null;
+        whenElementReady(qs(this.getAttribute("platform")) || qp(this, "here-platform"))
             .then(platform => this.setPlatform(platform))
             .catch(err => console.error("Unable to attach <here-platform>:", err))
             ;
@@ -54,7 +54,7 @@ class HereMap extends BaseMap {
          * (Optional) An reference to a {@link History} element if you wanna enable browsers history rewriting.
          * @type {History|null}
          */
-        this.history = null; //document.querySelector(this.getAttribute("history") || 'mc-history');
+        this.history = null;
         whenElementReady(qs(this.getAttribute("history")) || qs("mc-history"))
             .then(history => this.setHistory(history))
             .catch(_ => {})  // ignore errors

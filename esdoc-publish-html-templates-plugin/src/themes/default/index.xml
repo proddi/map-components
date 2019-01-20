@@ -1,5 +1,7 @@
 <template id="index.html" args-as="index">
     ${render("debug-toggle", index)}
     ${render("debug-info", index)}
-    <div data-ice="index" class="github-markdown">${markdown(index.content)}</div>
+    <article>
+        <div data-ice="index" class="github-markdown">${markdown(index.content)}</div>
+    </article>
 </template>

@@ -1,47 +1,33 @@
 import {HereMap} from './map.js';
-import {findRootElement} from '../generics.js';
-import {SelectedMixin, RouterMixin} from '../map/mixins.js'
-
+import {qs, qp, whenElementReady} from '../mc/utils.js';
+import {RouteObserver} from '../map/mixins.js'
 
 /**
- * @extends {RouterMixin}
- * @extends {SelectedMixin}
+ * @extends {RouteObserver}
  * @extends {HTMLElement}
  */
-class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
+class HereMapRoutes extends RouteObserver(HTMLElement) {
     /** @private */
     constructor() {
         super();
         this._routes = [];
         this._uiElements = [];
+
         this._map = null;
+        whenElementReady(qs(this.getAttribute("map")) || qp(this, "here-map"))
+            .then(hereMap => this.setHereMap(hereMap))
+            .catch(err => console.error("Unable to attach <here-map>:", err))
+            ;
     }
 
-    /** @private */
-    connectedCallback() {
-        let mapComp = findRootElement(this, this.getAttribute("map"), HereMap);
+    setHereMap(hereMap) {
+        console.assert(!this._map, "Changing map isn't supported yet.");
+        console.assert(hereMap instanceof HereMap);
 
-        mapComp.whenReady.then(({map}) => {
+        hereMap.whenReady.then(({map}) => {
             this._map = map;
-            /*
-            router.addEventListener("request", (ev) => {
-                this.clearRoutes(map);
-            });
-            router.addEventListener("routes", (ev) => {
-                this.addRoutes(map, ev.detail.routes);
-            });
-            if (styler) {
-                styler.addEventListener("styles", (ev) => {
-                    let styles = ev.detail;
-                    for (let id in styles) {
-                        this._applyRouteStyleUi(this._routeUi[id], styles[id]);
-                    }
-                });
-            }
-            */
             this._routes && this.onItems(this._routes);
         });
-        super.connectedCallback && super.connectedCallback();
     }
 
     _getUiForRoute(route) {
@@ -49,11 +35,15 @@ class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
     }
 
     onRouteRequest(request) {
-        this.onItems([]);
+        this.onRouteClear();
     }
 
     onRouteResponse(response) {
         this.onItems(response.routes);
+    }
+
+    onRouteClear() {
+        this.onItems([]);
     }
 
     onItems(routes) {
@@ -68,7 +58,7 @@ class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
         this._uiElements = routes.map(route => this.addRoute(route));
     }
 
-    onItemSelected(route) {
+    onRouteSelected(route) {
         if (!this._map) {
             this._selectedRoute = route;
             return;
@@ -76,7 +66,7 @@ class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
         this._applyRouteStyleUi(this._getUiForRoute(route), "selected");
     }
 
-    onItemDeselected(route) {
+    onRouteDeselected(route) {
         if (!this._map) {
             this._selectedRoute = null;
             return;
@@ -84,7 +74,7 @@ class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
         this._applyRouteStyleUi(this._getUiForRoute(route));
     }
 
-    onEmphasizedItem(route, accent, isSelected) {
+    onRouteEmphasized(route, accent, isSelected) {
         if (!this._map) return;
         if (isSelected) return;
         this._applyRouteStyleUi(this._getUiForRoute(route), accent);

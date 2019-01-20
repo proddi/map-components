@@ -128,7 +128,7 @@
 
 
 <template id="description" args-as="item">
-    ${item.description ? `<div class="description">${markdown(item.description)}</div>` : ""}
+    ${item.description ? `<div class="description">${resolveLink(markdown(item.description))}</div>` : ""}
     ${item.see ? render("sees", item.see) : ""}
     ${item.examples ? render("examples", item.examples) : ""}
 </template>
@@ -150,7 +150,7 @@
 </template>
 
 <template id="deprecation" args-as="item,text">
-    ${item.deprecated ? `<div class="deprecated">${text}${item.deprecated !== true ? ": " + item.deprecated : ""}.</div>` : ""}
+    ${item.deprecated ? `<div class="deprecated">${text}${item.deprecated !== true ? ": " + resolveLink(item.deprecated) : ""}.</div>` : ""}
 </template>
 
 

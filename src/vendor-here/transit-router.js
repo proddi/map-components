@@ -1,8 +1,9 @@
 import {
     BaseRouter, RouteResponse, MultiboardResponse,
     Route, Leg, Transport, Address, Stop, Departure, DepartureStop,
-    parseString, findRootElement, buildURI, createUID,
+    parseString, buildURI, createUID,
 } from '../generics.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 import {HerePlatform} from './platform.js';
 
 
@@ -33,6 +34,13 @@ class HereTransitRouter extends BaseRouter {
         this.type   = "here-transit";
         /** @type {string} */
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
+
+        this.platform = null;
+        whenElementReady(qs(this.getAttribute("platform")) || qp(this, "here-platform"))
+            .then(platform => this.platform = platform)
+            .catch(err => console.error("Unable to attach <here-platform>:", err))
+            ;
+
     }
 
     buildRouteRequest(start, dest, time) {
@@ -50,7 +58,8 @@ class HereTransitRouter extends BaseRouter {
      * @returns {Promise<RouteResponse, Error>} - route response
      */
     async execRouteRequest(request) {
-        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+//        let platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
+        let platform = this.platform;
 
         let url = buildURI(`${request.server}/v3/route.json`, {
                 dep:        `${request.start.lat},${request.start.lng}`,

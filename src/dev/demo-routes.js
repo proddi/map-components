@@ -1,6 +1,5 @@
 import {Address} from '../generics.js';
 import {html, render, repeat} from '../map/lit-html.js';
-import {MockupRouter} from './mockup-router.js';
 import {elementTemplate} from '../map/tools.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
 
@@ -8,15 +7,19 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
 /**
  * Provides recorded {Response}'s without a need for credentials.
  */
-class DemoRouter extends MockupRouter {
+class DemoRoutes extends HTMLElement {
     baseRenderer(routes, itemRenderer) {
         return html`
             <style>
                 :host {
                     display: block;
-                    margin-top: .5em;
-                    margin-bottom: .5em;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    right: 10px;
                     line-height: 1.5em;
+                    z-index: 10;
+                    background-color: rgba(255, 255, 255, .75);
                 }
                 :host span {
                     border: 1px solid rgba(128, 128, 128, .5);
@@ -48,7 +51,7 @@ class DemoRouter extends MockupRouter {
      */
     itemRenderer(router, name, start, dest) {
         return html`
-            <span @click=${_ => router.update({start:start, dest:dest})}>${name}</span>
+            <span @click=${_ => router.router.setRoute(start, dest)}>${name}</span>
         `
     }
 
@@ -56,7 +59,13 @@ class DemoRouter extends MockupRouter {
         super();
 
         let base = this.getAttribute("base");
-        this.src = base ? base + "{start}-{dest}.json" : this.src;
+
+        this.router = null;
+        whenElementReady(qs(this.getAttribute("router")) || qp(this, "[role=router]"))
+            .then(router => { this.router = router; })
+            .catch(err => console.warn("No attached router, use myself"))
+            ;
+
 
         /**
          * The available locations to lookup.
@@ -91,7 +100,7 @@ class DemoRouter extends MockupRouter {
 }
 
 
-customElements.define("demo-router", DemoRouter);
+customElements.define("demo-routes", DemoRoutes);
 
 
-export { DemoRouter }
+export { DemoRoutes }

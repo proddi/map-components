@@ -1,6 +1,6 @@
 import {html, render, repeat} from '../map/lit-html.js';
 import {elementTemplate} from '../map/tools.js';
-import {SelectorMixin, RouterMixin} from '../map/mixins.js';
+import {RouteObserver} from '../map/mixins.js';
 
 import '/node_modules/@polymer/paper-item/paper-icon-item.js';
 import '/node_modules/@polymer/paper-item/paper-item-body.js';
@@ -16,12 +16,11 @@ import '/node_modules/@polymer/iron-icons/maps-icons.js';
  *
  * <route-selector router="#router"></route-selector>
  *
- * @extends {RouterMixin}
- * @extends {SelectorMixin}
+ * @extends {RouteObserver}
  * @extends {HTMLElement}
  *
  **/
-class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
+class RouteSelector extends RouteObserver(HTMLElement) {
     constructor() {
         super();
 
@@ -35,40 +34,22 @@ class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
 
     onRouteRequest(request) {
         this.showLoading(request);
-        this.clearItems();
     }
 
     onRouteResponse(response) {
         this.showResponse(response);
-        this.setItems(response.routes);
     }
 
-    clearRoutes() {
+    onRouteClear() {
         render(this._baseRenderer(this, {}, this._routeRenderer), this.shadowRoot);
     }
 
-//    addRoutes(routes) {
-//        console.warn("NOT IMPLEMENTED");
-//    }
-
     showLoading(request) {
-        this.clearItems();
-        this.clearRoutes();
+        this.onRouteClear();
     }
 
     showResponse(response) {
         render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
-    }
-
-//    showError(error) {
-//        console.trace("NOT IMPLEMENTED");
-//    }
-    highlightRoute(route) {
-        this.dispatchEvent(new CustomEvent('highlighted', { detail: route }));
-    }
-
-    unhighlightRoute(route) {
-        this.dispatchEvent(new CustomEvent('unhighlighted', { detail: route }));
     }
 }
 
@@ -137,9 +118,9 @@ function baseRenderer(self, response, routeTemplate) {
 function routeRenderer(self, route, response) {
     return html`
       <paper-icon-item data-route="${route.uid}"
-            @click=${_ => self.selectItem(route)}
-            @mouseenter=${_ => self.emphasizeItem(route, "highlighted")}
-            @mouseleave=${_ => self.emphasizeItem(route)}>
+            @click=${_ => self.routeSource.selectRoute(route)}
+            @mouseenter=${_ => self.routeSource.emphasizeRoute(route, "highlighted")}
+            @mouseleave=${_ => self.routeSource.emphasizeRoute(route)}>
         <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>
         <paper-item-body three-line>
           <div>${route.duration}</div>

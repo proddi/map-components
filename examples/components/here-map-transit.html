@@ -5,9 +5,11 @@
     <link href="../assets/examples.css" rel="stylesheet">
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/mapui/example.js"></script>
+    <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-here/platform.js"></script>
     <script type="module" src="../../src/vendor-here/map.js"></script>
     <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/dev/demo-routes.js"></script>
     <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-here/map-routes.js"></script>
     <script type="module" src="../../src/mapui/route-selector.js"></script>
@@ -15,7 +17,7 @@
     <style>
         here-map {
             position: relative;
-            height: 400px;
+            height: 500px;
             display: block;
         }
         here-map > route-selector {
@@ -24,7 +26,13 @@
             top: 5px;
             bottom: 5px;
             z-index: 10;
+            border: 1px solid #aaa;
+            box-shadow: 1px 2px 2px rgba(0, 0, 0, .5);
             background-color: rgba(255, 255, 255, .9);
+        }
+        demo-routes {
+            right: 140px;
+            margin-right: 140px;
         }
     </style>
 </head>
@@ -32,25 +40,31 @@
     <h3>HERE transit routing</h3>
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+        <here-transit-router id="router"></here-transit-router>
 
-        <demo-router id="router" router="#picker"
+        <demo-router id="r_outer" r_outer="#picker"
             name="demo"
-            base="../assets/responses/here-transit-">
+            base="../assets/responses/here-transit-"
+            start="A"
+            dest="B"
+            time="2018-12-22T19:17:07">
         </demo-router>
 
-        <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <!-- picker is the input tool -->
-            <here-map-route-picker id="picker" router="#router"
-                start="A"
-                dest="B"
-                time="2018-12-22T19:17:07">
+        <here-map center="13.5,52.5" zoom="11" view-padding="10 120 10 10">
+            <here-map-route-picker role="route-source" id="picker" router="here-transit-router"
+                    start="13.31709,52.54441"
+                    dest="13.56,52.41"
+                    time="2019-01-22T19:17:07">
+                <demo-routes router="#picker" path="../assets/responses/"></demo-routes>
             </here-map-route-picker>
-            <!-- visualize router's routes -->
-            <here-map-routes selector="route-selector" router="#picker"></here-map-routes>
-
-            <route-selector router="#router"></route-selector>
+            <here-map-routes selector="route-selector"></here-map-routes>
+            <route-selector></route-selector>
         </here-map>
-        <route-link router="#picker" start="BERLIN" dest="HALLE">Berlin-Halle</route-link>
+
+        <here-map center="13.5,52.5" zoom="11" view-padding="10 120 10 10">
+            <here-map-routes route-source="demo-router"></here-map-routes>
+            <route-selector route-source="demo-router"></route-selector>
+        </here-map>
     </maps-example>
 </body>
 </html>

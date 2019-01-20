@@ -121,27 +121,28 @@ class Plugin {
     }
 
     docUrl(doc) {
+        let path = this._option.path || "";
         switch (doc.kind) {
             case "external":
                 return doc.externalLink;
             case 'class':
-                return `class/${doc.longname}-new.html`;
+                return _path.join(path, `class/${doc.longname}.html`);
             case 'get':
             case 'set':
             case 'member':
             case 'method':
             case 'constructor':
-                return `class/${doc.longname}`.replace("#", "-new.html#");
+                return _path.join(path, `class/${doc.longname}`.replace("#", ".html#"));
             case 'file':
-                return `file/${doc.name}-new.html`;
+                return _path.join(path, `file/${doc.name}.html`);
             case 'typedef':
             case 'variable':
             case 'function':
-                return `file/${doc.memberof}-new.html#${doc.name}`;
+                return _path.join(path, `file/${doc.memberof}.html#${doc.name}`);
             case 'module':
-                return `module/${doc.name}-new.html`;
+                return _path.join(path, `module/${doc.name}.html`);
             case 'index':
-                return `index-new.html`;
+                return _path.join(path, `index.html`);
             default:
                 console.warn(`Could not construct url for "${doc.longname || doc.name}" (${doc.kind}).`);
                 return `(${doc.kind})`;
@@ -149,9 +150,10 @@ class Plugin {
     }
 
     docSourceUrl(doc) {
+        let path = this._option.path || "";
         switch (doc.kind) {
             case 'class':
-                return `source/${doc.longname}-new.html` + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : "");
+                return _path.join(path, `source/${doc.longname}.html` + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : ""));
             case 'member':
             case 'method':
             case 'constructor':
@@ -160,14 +162,14 @@ class Plugin {
                 return this.docSourceUrl(this.getParentDoc(doc)) + (doc.lineNumber ? `#lineNumber${doc.lineNumber}` : "");
             case 'external':
             case 'typedef':
-                return `source/${doc.memberof}-new.html`;
+                return _path.join(path, `source/${doc.memberof}.html`);
             case 'file':
-                return `source/${doc.name}-new.html`;
+                return _path.join(path, `source/${doc.name}.html`);
             case 'variable':
             case 'function':
-                return `source/${doc.name}-new.html#lineNumber${doc.lineNumber}`;
+                return _path.join(path, `source/${doc.name}.html#lineNumber${doc.lineNumber}`);
             case 'module':
-                return `module/${doc.name}-new.html`;
+                return _path.join(path, `module/${doc.name}.html`);
             default:
                 console.log("FAILED --->", doc);
                 throw new Error(`No source-url available for type "${doc.kind}".`);
@@ -281,6 +283,11 @@ class Plugin {
             escape: content => _escapeHTML(content),
             markdown: content => _util.markdown(content),
             parseExample: example => _util.parseExample(example),  // return { body, caption }
+            resolveLink: str => str.replace(/\{@link ([\w#_\-.:~\/$]+)}/g, (str, longname) => {
+                    let doc = this.getDocByName(longname, null, null);
+                    return doc && this.docLink(doc) || str;
+                }),
+
             // link helpers
             baseUrlOf: doc => '../'.repeat(this.docUrl(doc).split('/').length-1),
             docUrl: this.docUrl.bind(this),

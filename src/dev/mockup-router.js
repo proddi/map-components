@@ -1,4 +1,5 @@
-import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString, findRootElement} from '../generics.js';
+import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString} from '../generics.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 class MockupRouter extends BaseRouter {
@@ -25,17 +26,16 @@ class MockupRouter extends BaseRouter {
          * @type {BaseRouter|null}
          */
         this.fallbackRouter = null;
+        whenElementReady(qs(this.getAttribute("fallback-router")))
+            .then(fallbackRouter => this.fallbackRouter = fallbackRouter)
+            .catch(_ => {})  // No error...
+            ;
 
         /**
          * The available locations to lookup.
          * @type {Object}
          */
         this.locations = {}
-    }
-
-    connectedCallback() {
-        super.connectedCallback();
-        this.fallbackRouter = document.querySelector(this.getAttribute("fallback-router"));
     }
 
     buildRouteRequest(start, dest, time) {

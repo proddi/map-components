@@ -1,13 +1,13 @@
-import {SetRouteMixin} from './map/mixins.js';
+import {RouteSource} from './map/mixins.js';
 
 /**
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
  *
- * @extends {SetRouteMixin}
+ * @extends {RouteSource}
  *
  * @abstract
  */
-class BaseRouter extends SetRouteMixin(HTMLElement) {
+class BaseRouter extends RouteSource(HTMLElement) {
     /** @protected */
     constructor() {
         super();
@@ -26,23 +26,23 @@ class BaseRouter extends SetRouteMixin(HTMLElement) {
          */
         this.name   = this.getAttribute("name") || this.type;
         /** @type {Address|null} */
-        this._start  = this.getAttribute("start");
+//        this._start  = this.getAttribute("start");
         /** @type {Address|null} */
-        this._dest   = this.getAttribute("dest");
+//        this._dest   = this.getAttribute("dest");
         /** @type {Date|null} */
-        this._time   = this.getAttribute("time");
+//        this._time   = this.getAttribute("time");
 
         /**
          * The current route request.
          * @type {RouteRequest|null}
          */
-        this._routeRequest = null;
+//        this._routeRequest = null;
 
         /**
          * The current route response.
          * @type {RouteResponse|null}
          */
-        this._routeResponse = null;
+//        this._routeResponse = null;
 
         /**
          * The current multiboard request.
@@ -55,27 +55,18 @@ class BaseRouter extends SetRouteMixin(HTMLElement) {
          * @type {MultiboardResponse|null}
          */
         this.multiboardResponse = null;
-
-
-        /**
-         * @deprecated
-         * @type {Request|undefined} */
-        this.currentRequest = undefined;
-        /**
-         * @deprecated
-         * @type {Response|undefined} */
-        this.currentResponse = undefined;
-        /**
-         * @deprecated
-         * @type {Route[]|undefined} */
-        this.currentRoutes  = undefined;
     }
 
     /** @protected */
-    connectedCallback() {
+//    connectedCallback() {
 //        setTimeout(() => {
 //            this.update({start:this.start, dest:this.dest, time:this.time});
 //        }, 50);
+//    }
+
+    // return myself
+    getRouter() {
+        return Promise.resolve(this);
     }
 
     /**
@@ -125,6 +116,7 @@ class BaseRouter extends SetRouteMixin(HTMLElement) {
                 this.currentRequest = this.routeRequest = request;
                 this.currentResponse = this.routeResponse = undefined;
                 this.dispatchEvent(new CustomEvent('request', { detail: request }));
+                this.setItems([], request);
                 let progress = (response) => this.dispatchEvent(new CustomEvent('route-response-intermediate', { detail: response }));
                 return (request.error ? Promise.reject(request.error) : request.router.execRouteRequest(request, progress)).catch(error => {
                     return new RouteResponse(request).setError(error);
@@ -133,6 +125,7 @@ class BaseRouter extends SetRouteMixin(HTMLElement) {
                     this.currentRoutes = this.routes = response.routes;
                     this.dispatchEvent(new CustomEvent('response', { detail: response }));
                     this.dispatchEvent(new CustomEvent('routes', { detail: { routes: response.routes }}));
+                    this.setItems(response.routes, request, response);
                 });
             } else {
                 console.warn(this, "doesn't have all request data");
@@ -140,8 +133,6 @@ class BaseRouter extends SetRouteMixin(HTMLElement) {
         }
     }
 */
-
-
     async board(location, time=undefined) {
     }
 
@@ -689,6 +680,7 @@ function parseTimeString(s) {
  * - find a {@link DOMNode} by querying by tag-name. Fails if not exactly one node found.
  * - return default if specified or throw error.
  *
+ * @deprecated Use qs(), qp() and whenElementReady() from '../ms/utils.js' instead.
  * @param {DOMNode} node - The node to start lookup.
  * @param {DOMSelector|undefined} selector - The dom selector to find the element.
  * @param {HTMLElement} Element - The required type.
@@ -730,6 +722,7 @@ function verifyClass(instance, Klass, defaultValue, message="Check console!") {
     console.error(instance, "isn't of type", Klass, "Did you forget to include html-tag support?");
     throw message;
 }
+
 
 /**
  * Builds a URI from a base-url and params. Empty values gets filteres.
