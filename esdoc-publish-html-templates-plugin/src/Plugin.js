@@ -12,9 +12,6 @@ const _util = require('./utils.js');
 
 const templatizer = require('./templatizer.js');
 
-// filters
-function nameIs(name) { (tag) => tag.name === name; }
-
 
 class Plugin {
 //    onHandlePlugins(ev) {
@@ -47,6 +44,7 @@ class Plugin {
         const options = {
             writeFile: writeFile,
             copyDir: copyDir,
+//            copyFile: copyFile,
             readFile: readFile,
             docs: tags,
             theme: this._themeDir,
@@ -98,7 +96,13 @@ class Plugin {
             const dom = _jsdom.jsdom(xml);
             Object.values(dom.querySelectorAll("template")).map(node => {
                 let id = node.getAttribute("id");
-                templates[id] = templatizer.fromElement(node, globals, `${name}#${id}`);
+                try {
+                    templates[id] = templatizer.fromElement(node, globals, `${name}#${id}`);
+                } catch (e) {
+                    if (e instanceof Error) e.message = `${e.message} (...in template ${name}#${id})`;
+                    else console.error(`${e.message} in template`, `${name}#${id}`);
+                    throw e;
+                }
             });
         });
         return templates;
@@ -116,43 +120,14 @@ class Plugin {
         }
     }
 
-    escapeHTML(content) {
-            return _escapeHTML(content);
-    }
-
-    formatExample(example) {
-        let { body, caption } = _util.parseExample(example);
-        return body;
-    }
-
-    formatMarkdown(markdown) {
-        return _util.markdown(markdown);
-    }
-
-    getBaseUrl(doc) {
-        return '../'.repeat(this.docUrl(doc).split('/').length-1);
-    }
-
-    getTitle(doc) {
-        return doc.name || doc.toString();
-    }
-
-    urlForDoc(doc) {
-        console.warn("Don't use .linkForDoc() - use .docLink() instead.");
-        return this.docUrl(doc);
-    }
-
-    linkForDoc(doc) {
-        console.warn("Don't use .linkForDoc() - use .docLink() instead.");
-        return this.docLink(doc);
-    }
-
     docUrl(doc) {
         switch (doc.kind) {
             case "external":
                 return doc.externalLink;
             case 'class':
                 return `class/${doc.longname}-new.html`;
+            case 'get':
+            case 'set':
             case 'member':
             case 'method':
             case 'constructor':
@@ -160,6 +135,7 @@ class Plugin {
             case 'file':
                 return `file/${doc.name}-new.html`;
             case 'typedef':
+            case 'variable':
             case 'function':
                 return `file/${doc.memberof}-new.html#${doc.name}`;
             case 'module':
@@ -190,6 +166,8 @@ class Plugin {
             case 'variable':
             case 'function':
                 return `source/${doc.name}-new.html#lineNumber${doc.lineNumber}`;
+            case 'module':
+                return `module/${doc.name}-new.html`;
             default:
                 console.log("FAILED --->", doc);
                 throw new Error(`No source-url available for type "${doc.kind}".`);
@@ -217,13 +195,16 @@ class Plugin {
             return typeDoc ? this.docLink(typeDoc) : type;
         }).join(' | ');
 
+        return '(' + callSignatures.join(', ') + ')' + (returnSignature ? ': ' + returnSignature : '');
         return `(${callSignatures.join(', ')}): ${returnSignature || "void"}`;
     }
 
-    buildPropertySignature(doc) {
-        let returnSignature = ((doc.type || {}).types || []).map(type => {
-            let typeDoc = this.getDocByName(type, null, null);
-            return typeDoc ? this.docLink(typeDoc) : type;
+    buildPropertySignature(prop, debug=false) {
+        debug && console.warn("signature:>", prop);
+        let returnSignature = (prop.types || []).map(typ => {
+            let typeDoc = this.getDocByName(typ, null, null);
+            debug && console.warn("signature:", typ, typeDoc);
+            return typeDoc ? this.docLink(typeDoc) : typ;
         }).join(' | ');
 
         return `: ${returnSignature || "void"}`;
@@ -243,117 +224,6 @@ class Plugin {
         return candidates[0];
     }
 
-    getClassProperties(doc) {
-        return this._docs.filter(tag => (tag.kind === "member" || tag.kind === "get") && tag.memberof ===  doc.longname);
-    }
-
-    listClassProperties(doc) {
-        let properties = this.getClassProperties(doc);
-        let others = ((doc.extends || []).concat(doc.implements || []))
-                .map(name => this.getDocByName(name))
-                .map(tag => this.getClassProperties(tag))
-                .reduce((prev, list) => prev.concat(list), [])
-                ;
-        let propertyNames = properties.map(tag => tag.name);
-
-        return properties.map(property => [
-                property,
-                others.filter(doc => doc.name === property.name),  // overrides
-                false
-            ]).concat(others.filter(doc => !propertyNames.includes(doc.name)).map(property => [
-                property,
-                [],
-                true                                               // inherits
-            ]));
-    }
-
-    getClassMethods(doc) {
-        return this._docs.filter((tag) => (tag.kind === "method" || tag.kind === "constructor") && tag.memberof ===  doc.longname);
-    }
-
-    listClassMethods(doc) {
-        let methods = this.getClassMethods(doc);
-        let others = ((doc.extends || []).concat(doc.implements || []))
-                .map(name => this.getDocByName(name))
-                .map(tag => this.getClassMethods(tag))
-                .reduce((prev, list) => prev.concat(list), [])
-                ;
-        let methodNames = methods.map(tag => tag.name);
-
-        return methods.map(method => [
-                method,
-                others.filter(doc => doc.name === method.name),  // overrides
-                false
-            ]).concat(others.filter(doc => !methodNames.includes(doc.name)).map(method => [
-                method,
-                [],
-                true                                             // inherits
-            ]));
-    }
-
-
-    /**
-     * gat url of output html page.
-     * @param {DocObject} doc - target doc object.
-     * @returns {string} url of output html. it is relative path from output root dir.
-     * @private
-     * /
-    ____getURL(doc) {
-        let inner = false;
-        if (['variable', 'function', 'member', 'typedef', 'method', 'constructor', 'get', 'set'].includes(doc.kind)) {
-          inner = true;
-        }
-
-        if (inner) {
-          const scope = doc.static ? 'static' : 'instance';
-          const fileName = this._getOutputFileName(doc);
-          return `${fileName}#${scope}-${doc.kind}-${doc.name}`;
-        } else {
-          const fileName = this._getOutputFileName(doc);
-          return fileName;
-        }
-    }
-
-    /**
-     * get file name of output html page.
-     * @param {DocObject} doc - target doc object.
-     * @returns {string} file name.
-     * @private
-     * /
-    _getOutputFileName(doc) {
-        switch (doc.kind) {
-          case 'variable':
-            return 'variable/index-new.html';
-          case 'function':
-            return 'function/index-new.html';
-          case 'member': // fall
-          case 'method': // fall
-          case 'constructor': // fall
-          case 'set': // fall
-          case 'get':
-            {
-              // fal
-              const parentDoc = this._docs.filter(doc => doc.longname === doc.memberof)[0];
-              return parentDoc && this._getOutputFileName(parentDoc);
-            }
-          case 'external':
-            return 'external/index-new.html';
-          case 'typedef':
-            return 'typedef/index-new.html';
-          case 'class':
-            return `class/${doc.longname}-new.html`;
-          case 'file':
-            return `file/${doc.name}-new.html`;
-          case 'testFile':
-            return `test-file/${doc.name}-new.html`;
-          case 'test':
-            return 'test.html';
-          default:
-            throw new Error(`DocBuilder: can not resolve file name for "${doc.kind}".`);
-        }
-    }
-    */
-
     _buildRenderGlobals(docs) {
         function sortByKey(keyFn) {
             return (a, b) => {
@@ -365,21 +235,60 @@ class Plugin {
             }
         }
 
+        const listExtends = (item, prop) => (item[prop] || [])
+                                                .map(name => this.getDocByName(name))
+                                                .map(tag => [tag].concat(listExtends(tag, prop)))
+                                                    .reduce((prev, curr) => prev.concat(curr), []);
+
+        const _combineDoc = (item, chain, kinds) => {
+            let chainMethods = chain.map(item => [item, docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && !tag.ignore)]);
+            let myMethods = docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && !tag.ignore);
+            let elements = {};
+            // default items from item
+            myMethods.forEach(method => {
+                    elements[method.name] = {
+                        item: method,
+                        overrides: [],
+                    }
+                });
+            // enrich from chain items
+            chainMethods.forEach(([item, methods]) => {
+                    methods.forEach(method => {
+                            let element = elements.hasOwnProperty(method.name) && elements[method.name];
+                            if (element) {
+                                if (!element.inherited) element.overrides.push(method);
+                            } else elements[method.name] = {
+                                item: method,
+                                overrides: [],
+                                inherited: method,
+                            }
+                        });
+                });
+            // return just values of elements
+            return Object.values(elements);
+        }
+
+        function debug(item, data) {
+            console.log(item.longname, data);
+            return data;
+        }
 
         const globals = {
             self: this,
+            // render helpers
             render: this.render.bind(this),
+            titleOf: doc => doc.name || doc.toString(),
             escape: content => _escapeHTML(content),
             markdown: content => _util.markdown(content),
+            parseExample: example => _util.parseExample(example),  // return { body, caption }
+            // link helpers
+            baseUrlOf: doc => '../'.repeat(this.docUrl(doc).split('/').length-1),
             docUrl: this.docUrl.bind(this),
             docLink: this.docLink.bind(this),
+            sourceUrl: doc => `${this.docSourceUrl(globals.sourceOf(doc))}#lineNumber${doc.lineNumber}`,
+            sourceLink: (doc, text=null) => `<span><a href="${globals.sourceUrl(doc)}">${text || doc.name}</a></span>`,
             signature: doc => doc.kind === 'function' ? this.buildFunctionSignature(doc) : this.buildPropertySignature(doc),
-            listModules: _ => docs.filter(tag => tag.kind === 'module'),
-            listModuleObjects: module => docs.filter(tag => !tag.builtinExternal && module.files.includes(tag.memberof)).filter(tag => !tag.ignore).sort(sortByKey(tag => tag.name)),
-            listExtends: doc => this._buildParentList(doc, "extends"),
-            listImplements: doc => (doc.implements || []).map(doc => this.getDocByName(doc)),
-            extendedBy: doc => docs.filter(tag => tag.kind === 'class' && (tag.extends || []).includes(doc.longname)),
-            implementedIn: doc => docs.filter(tag => tag.kind === 'class' && (tag.implements || []).includes(doc.name)),
+            // traversal helpers
             parentOf: doc => this.getDocByName(doc.memberof),
             sourceOf: doc => {
                     switch (doc.kind) {
@@ -399,8 +308,24 @@ class Plugin {
                             return doc;
                     }
                 },
-            sourceUrl: doc => `${this.docSourceUrl(globals.sourceOf(doc))}#lineNumber${doc.lineNumber}`,
-            sourceLink: (doc, text=null) => `<span><a href="${globals.sourceUrl(doc)}">${text || doc.name}</a></span>`,
+            // 1:n relation helpers
+            listModules: _ => docs.filter(tag => tag.kind === 'module'),
+            listModuleObjects: module => docs
+                                            .filter(tag => module.files.includes(tag.memberof))
+                                            .filter(tag => !tag.builtinExternal)
+                                            .filter(tag => !tag.ignore)
+                                            .sort(sortByKey(tag => tag.name)),
+            listExtends: doc => listExtends(doc, "extends"),
+            listImplements: doc => (doc.implements || []).map(doc => this.getDocByName(doc)),
+
+            extendedBy: doc => docs.filter(tag => tag.kind === 'class' && (tag.extends || []).includes(doc.longname)),
+            implementedIn: doc => docs.filter(tag => tag.kind === 'class' && (tag.implements || []).includes(doc.name)),
+            methodsOf: item => _combineDoc(item, listExtends(item, "extends"), ["method", "constructor"]),
+            propertiesOf: item => _combineDoc(item, listExtends(item, "extends"), ["get", "set", "member"]),
+            eventsOf: item => ([item].concat(listExtends(item, "extends")))
+                                            .map(item => (item.emits || []).map((event, idx) => { return {kind: "emits", __docId__: `${item.__docId__}-emits-${idx}`, name: event.types[0], description: event.description, memberof: item.longname}}))
+                                            .reduce((prev, curr) => prev.concat(curr), []),
+
         };
         return globals;
     }

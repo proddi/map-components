@@ -1,11 +1,13 @@
 import {html, render, repeat} from '../map/lit-html.js';
-// import {BaseRouter} from '../generics.js';
 import {elementTemplate} from '../map/tools.js';
 import {SelectorMixin, RouterMixin} from '../map/mixins.js';
 
 
+/**
+ * @extends {RouterMixin}
+ * @extends {SelectorMixin}
+ */
 class DepartureList extends RouterMixin(SelectorMixin(HTMLElement)) {
-    /** @private */
     constructor() {
         super();
 

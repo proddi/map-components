@@ -1,44 +1,166 @@
-<template id="attribute" args-as="klass,relations,caption,separator">
+<template id="attribute2" args-as="klass,relations,caption,separator">
     ${relations.length ? `<div class="attribute"><span class="attribute-label">${caption} </span><span class="attribute-value">${relations.map(doc => self.docLink(doc)).join(separator || ", ")}</span></div>` : ""}
 </template>
 
 
-<template id="item" args-as="item">
-    <article class="item">
+<template id="properties" args-as="item">
+    <section class="properties">
+        <h2>Properties</h2>
+        ${propertiesOf(item).map(property => render("property", property.item, property.overrides, property.inherited)).join("")}
+    </section>
+</template>
+
+
+<template id="property" args-as="item,overrides,inherited">
+    <article class="item property">
         <div class="signature">
-            <span class="source">${sourceLink(item, "source")}</span>
-            <span class="source toggle" toggle="#${item.kind}-${item.__docId__}"><a>debug</a></span>
+            ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
             <code class="access">${item.static ? "static" : ""}</code>
             <code class="access">${item.access}</code>
             <code class="access">${item.kind}</code>
-            <a name="${item.name}" class="name type-kind-${item.kind}" href="${docUrl(item)}">${item.name}</a><code class="return">${signature(item)}</code>
+            <a id="${item.name}" class="name type-kind-${item.kind}" title="${item.longname}">${item.name}</a><code class="return">${signature(item.type)}</code>
         </div>
         <div class="attributes">
-            <span class="attriute-label">Defined in:</span><span><a href="${sourceUrl(item)}">${sourceOf(item).name}</a></span>
+            ${inherited ? render("attribute", parentOf(inherited).interface ? 'Implemented in' : 'Inherited from', `${docLink(parentOf(inherited))}.${docLink(inherited)}`, "inherited")
+                : overrides.length ? render("attribute", "Overrides", overrides.map(item => `${docLink(parentOf(item))}.${docLink(item)}`).join(", "), "overrides")
+                    : ""
+            }
+        </div>
+        ${render("deprecation", item, "this property was deprecated")}
+        ${render("debug-info", { kind: "item", __docId__: item.__docId__, item:item, overrides:overrides, inherited: inherited})}
+        ${render("description", item)}
+    </article>
+</template>
+
+
+<template id="methods" args-as="item">
+    <section class="methods">
+        <h2>Methods</h2>
+        ${methodsOf(item).map(method => render("method", method.item, method.overrides, method.inherited)).join("")}
+    </section>
+</template>
+
+
+<template id="method" args-as="item,overrides,inherited">
+    <article class="item method">
+        <div class="signature">
+            ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
+            <code class="access">${item.static ? "static" : ""}</code>
+            <code class="access">${item.access}</code>
+            <code class="access">${item.kind}</code>
+            <a id="${item.name}" class="name" title="${item.longname}">${item.name}</a><code type="return">${self.buildFunctionSignature(item)}</code>
+        </div>
+        <div class="attributes">
+            ${inherited ? render("attribute", parentOf(inherited).interface ? 'Implemented in' : 'Inherited from', `${docLink(parentOf(inherited))}.${docLink(inherited)}`, "inherited")
+                : overrides.length ? render("attribute", "Overrides", overrides.map(item => `${docLink(parentOf(item))}.${docLink(item)}`). join(", "), "overrides")
+                    : ""
+            }
+        </div>
+        ${render("deprecation", item, "this method was deprecated")}
+        ${render("debug-info", { kind: "item", __docId__: item.__docId__, item:item, overrides:overrides, inherited: inherited})}
+        ${render("description", item)}
+        ${render("params", item)}
+    </article>
+</template>
+
+
+<template id="params" args-as="item">
+    ${(item.params || []).length ? `<div class="parameters"><ul>${item.params.filter(param => param.description).map(param => render("param", param)).join("")}</ul></div>` : ""}
+</template>
+
+
+<template id="param" args-as="param">
+    <li class="param"><code type="return">${param.name}</code> &ndash; ${param.description || ""}</li>
+</template>
+
+
+<template id="events" args-as="item">
+    ${render("events-impl", eventsOf(item), item)}
+</template>
+
+
+<template id="events-impl" args-as="events,item">
+    ${events.length ? `
+    <section class="events">
+        <h2>Events</h2>
+        ${events.map(item => render("event", item)).join("")}
+    </section>
+    ` : ""}
+</template>
+
+
+<template id="event" args-as="item">
+    <article class="item event">
+        <div class="signature">
+            ${render("debug-toggle", item)}
+            <a id="${item.name}" class="name" title="${item}">${item.name}</a>
+        </div>
+        ${render("debug-info", item)}
+        ${render("description", item)}
+    </article>
+</template>
+
+
+<template id="attribute" args-as="title,value,type">
+    <div class="attribute ${type}"><span class="attribute-label">${title}</span><span class="attribute-value">${value}</span></div>
+</template>
+
+
+<template id="inline-options" args-as="options">
+    <span class="options">${options.join(" | ")}</span>
+</template>
+
+<template id="item" args-as="item">
+    <article class="item">
+        <div class="signature">
+            ${render("inline-options", [render("debug-toggle", item), sourceLink(item, "source")])}
+            <code class="access">${item.static ? "static" : ""}</code>
+            <code class="access">${item.access}</code>
+            <code class="access">${item.kind}</code>
+            <a id="${item.name}" class="name type-kind-${item.kind}" href="${docUrl(item)}">${item.name}</a><code class="return">${signature(item)}</code>
+        </div>
+        <div class="attributes">
+            ${render("attribute", "Defined in:", sourceLink(item, sourceOf(item).name), "defined")}
         </div>
         ${render("deprecation", item, "this item was deprecated")}
-        <div class="object hidden" id="${item.kind}-${item.__docId__}"><pre>${escape(JSON.stringify(item, null, 2))}</pre></div>
+        ${render("debug-info", item)}
         ${render("description", item)}
-        ${render("examples", item)}
     </article>
 </template>
 
 
 <template id="description" args-as="item">
-    ${item.description ? `<p class="description">${markdown(item.description)}</p>` : ""}
+    ${item.description ? `<div class="description">${markdown(item.description)}</div>` : ""}
+    ${item.see ? render("sees", item.see) : ""}
+    ${item.examples ? render("examples", item.examples) : ""}
 </template>
 
+<template id="examples" args-as="examples">
+    ${examples.map(example => parseExample(example)).map(({body, caption}) => `
+        <div class="example">
+            <h4>Example:${caption ? ` <code>${caption}</code>` : ""}</h4>
+            <pre class="prettyprint source-code"><code>${escape(body)}</code></pre>
+        </div>
+    `)}
+</template>
+
+<template id="sees" args-as="sees">
+    <h4>See:</h4>
+    <ul>
+    ${sees.map(see => `<li><a href="${see}">${see}</a></li>`).join("")}
+    </ul>
+</template>
 
 <template id="deprecation" args-as="item,text">
-    ${item.deprecated ? `<p class="deprecated">${text}${item.deprecated !== true ? ": " + item.deprecated : ""}.</p>` : ""}
+    ${item.deprecated ? `<div class="deprecated">${text}${item.deprecated !== true ? ": " + item.deprecated : ""}.</div>` : ""}
 </template>
 
 
 <template id="debug-toggle" args-as="item">
-    <span class="toggle" toggle="#debug-${item.kind}-${item.__docId__}"><a>debug</a></span>
+    <span class="debug-toggle" toggle="#debug-${item.kind}-${item.__docId__}"><a>debug</a></span>
 </template>
 
 
 <template id="debug-info" args-as="item">
-    <div class="object hidden" id="debug-${item.kind}-${item.__docId__}"><pre>${escape(JSON.stringify(item, null, 2))}</pre></div>
+    <div class="debug-info object hidden" id="debug-${item.kind}-${item.__docId__}"><pre>${escape(JSON.stringify(item, null, 2))}</pre></div>
 </template>

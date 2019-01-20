@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <base href="${self.getBaseUrl(doc)}">
-    <title>${self.getTitle(doc)}</title>
+    <base href="${baseUrlOf(doc)}">
+    <title>${titleOf(doc)}</title>
     <link type="text/css" rel="stylesheet" href="assets/prettify-tomorrow.css"/>
     <link type="text/css" rel="stylesheet" href="assets/styles.css"/>
     <script src="assets/script/prettify/prettify.js"></script>
@@ -16,8 +16,8 @@
     </header>
     <nav>${render("navigation", docs)}</nav>
     <main>
-        <small><pre>${self.escapeHTML(JSON.stringify(doc, null, 2))}</pre></small>
-        <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">${doc.content}</code></pre>
+        <small><pre>${escape(JSON.stringify(doc, null, 2))}</pre></small>
+        <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums">${escape(doc.content)}</code></pre>
     </main>
 
     <script src="assets/script/pretty-print.js"></script>

@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <base href="${self.getBaseUrl(doc)}">
-    <title>${self.getTitle(doc)}</title>
+    <base href="${baseUrlOf(doc)}">
+    <title>${titleOf(doc)}</title>
     <link type="text/css" rel="stylesheet" href="assets/prettify-tomorrow.css"/>
     <link type="text/css" rel="stylesheet" href="assets/styles.css"/>
     <script src="assets/script/prettify/prettify.js"></script>
@@ -15,10 +15,6 @@
             padding-left: 9px;
             margin: 4px 0;
             line-height: 2em;
-        }
-        main .inheritedFrom {
-            font-style: italic;
-            margin: 6px 0 0 0;
         }
         main .details {
             margin-top: 15px;
@@ -33,15 +29,25 @@
             font-weight: bold;
             color: black;
         }
-        main .signature .source {
-            float: right;
-        }
-        main .signature .source a {
-            color: #999;
-            font-size: .7em;
-            padding-left: 0.7em;
+        main .signature a.name:hover {
+            color: #1565c0;
         }
         main .signature .return {
+            color: #666;
+        }
+        main .attributes {
+            font-style: italic;
+            margin: 6px 0 0 0;
+            font-size: 0.9em;
+        }
+        main .attributes .attribute-label {
+            padding-right: .5em;
+        }
+        main .signature,
+        main .attributes {
+            margin-bottom: .5em;
+        }
+        main .param code {
             color: #666;
         }
 
@@ -49,7 +55,7 @@
             background-color: #f0f0f0;
             border-radius: 5px;
             overflow-x: auto;
-            padding: 12px 24px;
+            padding: 12px 14px;
             word-wrap: break-word;
         }
 
@@ -70,7 +76,7 @@
           margin: 0;
         }
 
-        .object {
+        .object, debug-info {
             background-color: #f0f0f0;
             border-radius: 5px;
             overflow-x: auto;
@@ -79,31 +85,20 @@
             font-size: 0.8em;
         }
 
-        .object.hidden {
+        .object.hidden, debug-info.hidden {
             display: none;
         }
 
 
         /** attributes */
-        .attributes {
+        .at_tributes {
             margin: 10px 0;
         }
-        .attributes .attribute-label {
-            display: inline-block;
-            width: 120px;
-            color: #000;
-            font-weight: 700;
-        }
-        .attributes .attribute- {
-            display: inline-block;
-            width: 120px;
-            color: #000;
-            font-weight: 700;
-        }
 
 
-
-        .type-kind-class::before {
+        .type-kind-class::before,
+        .type-kind-external::before
+         {
             content: "?";
             color: #333;
             background-color: #ccc;
@@ -116,7 +111,6 @@
             border-radius: 0.2em;
             font-weight: bold;
             padding: 2px 1px 0px 1px;
-            margin-left: 0.375em;
             margin-right: 0.3em;
         }
 
@@ -124,6 +118,12 @@
             content: "C";
             color: #009800;
             background-color: #bfe5bf;
+        }
+
+        .type-kind-external::before {
+            content: "E";
+            color: #0738c3;
+            background-color: #bbcbea;
         }
 
     </style>
@@ -143,7 +143,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
     <script>
         $().ready(function() {
-            $(".toggle").on("click", function() {
+            $(".toggle,.debug-toggle").on("click", function() {
                 let selector = $(this).attr("toggle");
                 let target = $(selector);
                 target.toggleClass("hidden");

@@ -86,9 +86,19 @@ main h4 {
     padding: 0;
 }
 main article {
-    padding: 12px 16px;
-    border-top: 1px dashed #e8e8e8;
+    padding: 16px 16px;
+    border-top: 1px dashed #e0e0e0;
 }
+
+main .options {
+    float: right;
+    font-size: .7em;
+    padding-top: .3em;
+}
+main .options a {
+    color: #999;
+}
+
 
 
 /** description code */

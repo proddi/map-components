@@ -1,27 +1,23 @@
 <template id="class.html" args-as="doc,docs">
     ${render("import", doc)}
-    <h1>${doc.name}</h1>
-
-    <p class="inheritedFrom">Defined in: <a href="${sourceUrl(doc)}">${sourceOf(doc).name}</a></p>
+    ${render("inline-options", [render("debug-toggle", doc)])}
+    <h1 class="type-kind-class">${doc.name}</h1>
+    ${render("debug-info", doc)}
     <div class="attributes">
-    ${render("attribute", doc, listExtends(doc), "Extends:", " → ")}
-    ${render("attribute", doc, extendedBy(doc), "Extended by:", ", ")}
-    ${render("attribute", doc, listImplements(doc), "Implements:", ", ")}
-    ${render("attribute", doc, implementedIn(doc), "Implemented by:", ", ")}
+    ${render("attribute", "Defined in:", sourceLink(doc, sourceOf(doc).name), "defined")}
+    ${render("attribute2", doc, listExtends(doc), "Extends:", " → ")}
+    ${render("attribute2", doc, extendedBy(doc), "Extended by:", ", ")}
+    ${render("attribute2", doc, listImplements(doc), "Implements:", ", ")}
+    ${render("attribute2", doc, implementedIn(doc), "Implemented by:", ", ")}
     </div>
-    ${render("class-relations", doc, listExtends(doc), "Extends:", " → ")}
-    ${render("class-relations", doc, extendedBy(doc), "Extended by:", ", ")}
-    ${render("class-relations", doc, listImplements(doc), "Implements:", ", ")}
-    ${render("class-relations", doc, implementedIn(doc), "Implemented by:", ", ")}
     <!--
     $ {doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
     $ {doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
     -->
     ${render("description", doc)}
-    ${doc.examples ? doc.examples.map(example => render("example", example)).join("") : ""}
-    ${render("class-properties", doc)}
-    ${render("class-methods", doc)}
-    ${render("class-events", doc)}
+    ${render("properties", doc)}
+    ${render("methods", doc)}
+    ${render("events", doc)}
 </template>
 
 
@@ -37,110 +33,4 @@
 
 <template id="path" args-as="path">
     <div>Path: <code>${path}</code></div>
-</template>
-
-
-<template id="examples" args-as="doc">
-    ${doc.examples ? doc.examples.map(example => render("example", example)).join("") : ""}
-</template>
-
-
-<template id="example" args-as="example">
-    <div class="example">
-        <h4>Example:</h4>
-        <pre class="prettyprint source-code"><code>${self.escapeHTML(self.formatExample(example))}</code></pre>
-    </div>
-</template>
-
-
-<template id="class-relations" args-as="klass,relations,caption,separator">
-    ${relations.length ? `<p class="inheritedFrom">${caption} <code></code>${relations.map(doc => self.docLink(doc)).join(separator || ", ")}</code></p>` : ""}
-</template>
-
-
-<template id="class-properties" args-as="doc">
-    <section class="properties">
-        <h2>Properties</h2>
-        ${self.listClassProperties(doc).map(([property, overrides, inherits]) => render("class-property", property, overrides, inherits)).join("")}
-    </section>
-</template>
-
-
-<template id="class-property" args-as="property,overrides,inherits">
-    <article class="property">
-        <div class="signature">
-            <span class="source">${sourceLink(property, "source")}</span>
-            <span class="source toggle" toggle="#${property.name}"><a>obj</a></span>
-            <code class="access">${property.access}</code>
-            <a class="name">${property.name}</a><code class="return">${self.buildPropertySignature(property)}</code>
-        </div>
-        <div class="object hidden" id="${property.name}"><pre>${JSON.stringify(property, null, 2)}</pre></div>
-        ${overrides.length ? overrides.map(target => render("class-method-override", target)) : ''}
-        ${inherits ? render("class-method-inherits", self.getParentDoc(property)) : ''}
-        ${render("class-deprecation", property, "this property was deprecated")}
-        ${render("description", property)}
-    </article>
-</template>
-
-
-<template id="class-methods" args-as="doc">
-    <section class="methods">
-        <h2>Methods</h2>
-        ${self.listClassMethods(doc).map(([method, overrides, inherits]) => render("class-method", method, overrides, inherits)).join("")}
-    </section>
-</template>
-
-
-<template id="class-method" args-as="method,overrides,inherits">
-    <article class="method">
-        <div class="signature">
-            <span class="source">${sourceLink(method, "source")}</span>
-            <span class="source toggle" toggle="#${method.name}"><a>obj</a></span>
-            <code class="access">${method.static ? "static" : ""}</code>
-            <code class="access">${method.async ? "async" : ""}</code>
-            <code class="access">${method.access}</code>
-            <a name="${method.name}" class="name" title="${method.longname}">${method.name}</a><code type="return">${self.buildFunctionSignature(method)}</code>
-        </div>
-        <div class="object hidden" id="${method.name}"><pre>${JSON.stringify(method, null, 2)}</pre></div>
-        ${overrides.length ? overrides.map(target => render("class-method-override", target)) : ''}
-        ${inherits ? render("class-method-inherits", self.getParentDoc(method)) : ''}
-        ${render("class-deprecation", method, "this method was deprecated")}
-        ${render("description", method)}
-    </article>
-</template>
-
-
-<template id="class-method-override" args-as="target">
-    <p class="inheritedFrom">Override <code>${self.docLink(self.getParentDoc(target))}.${self.docLink(target)}</code></p>
-</template>
-
-
-<template id="class-method-inherits" args-as="other">
-    <p class="inheritedFrom">Inherited from <code>${self.docLink(other)}</code></p>
-</template>
-
-
-<template id="class-events" args-as="doc">
-    ${doc.emits ? `
-    <section class="events">
-        <h2>Events</h2>
-        ${(doc.emits || []).map(event => render("class-event", event)).join("")}
-    </section>
-    ` : ""}
-</template>
-
-
-<template id="class-event" args-as="event">
-    <article class="event">
-        <div class="signature">
-            <a name="${event.name}" class="name" title="${event.longname}">${event.name}</a><code type="return">${self.buildFunctionSignature(event)}</code>
-        </div>
-        ${render("description", event)}
-        <small><pre>${JSON.stringify(event, null, 2)}</pre></small>
-    </article>
-</template>
-
-
-<template id="class-deprecation" args-as="doc,text">
-    ${doc.deprecated ? `<p class="deprecated">${text}${doc.deprecated !== true ? ": "+doc.deprecated : ""}.</p>` : ""}
 </template>

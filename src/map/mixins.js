@@ -10,6 +10,9 @@ class SelectedMixin {
         /**
          * The source of selection. Will be set automatically when attribute `selector="#dom-selector"` is specified.
          * @type {SelectorMixin|null}
+         * @listens {selector#items} - bar
+         * @listens {selected} - foo
+         * @listens {deselected} - foo foo
          */
         this.selector = null;
     }
@@ -20,9 +23,23 @@ class SelectedMixin {
      */
     setSelector(selector) {}
 
+    /**
+     * Callback called when a new set of items is active.
+     * @param {Array<*>} items - List of new items.
+     */
+
     onItems(items) {}
+    /**
+     * Callback called when an item gets selected. The item is part of previously announced items in `onItems`.
+     * @param {*} selected - The selected item.
+     */
+
     onSelected(selected) {}
-    onUnselected(selected) {}
+    /**
+     * Callback called when the current selected item lost it's selection. The item is part of previously announced items in `onItems`.
+     * @param {*} selected - The current selected item to be unselected.
+     */
+    onDeselected(selected) {}
 
     /**
      * Callback when an item gets emphasized.
@@ -110,8 +127,10 @@ let SelectedMixinImpl = Base => class extends Base {
 
 /**
  * @interface
- * @emits {SelectorMixin#selected} when an item gets selected.
- * @emits {SelectorMixin#unselected} when an item gets unselected.
+ * @emits {items} - Fired when a new set of items is available.
+ * @emits {selected} - Fired when an item gets selected.
+ * @emits {deselect} - Fired when the selected item lost it's selection.
+ * @emits {emphasize-item} - Fired when an item gets a special accent.
  */
 class SelectorMixin {
     /** @private */
@@ -222,6 +241,8 @@ class RouterMixin {
     constructor() {
         /**
          * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
+         * @listens {route-request} Observe when new route request is initiated.
+         * @listens {route-response} Observe when new route response is available.
          * @type {BaseRouter|null}
          */
         this.router = null;
@@ -354,6 +375,10 @@ let RouterMixinImpl = Base => class extends Base {
 
 /**
  * @interface
+ * @emits {request} - Fired when a new request is initiated. It can be used t erase previous routes.
+ * @emits {route-response-intermediate} - Fired when an intermediate route response is available. "Intermediate" means
+ *                                        a response with an incomplete set of routes.
+ * @emits {route} - Fired when an response is available. This response is final.
  */
 class SetRouteMixin {
     constructor() {

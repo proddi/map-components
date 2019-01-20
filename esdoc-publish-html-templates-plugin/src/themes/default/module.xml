@@ -1,7 +1,7 @@
 <template id="module.html" args-as="module,modules">
-    <span class="source toggle" toggle="#member-${module.__docId__}"><a>debug</a></span>
-    <h1>Module ${module.name}</h1>
-    <div class="object hidden" id="member-${module.__docId__}"><pre>${JSON.stringify(module, null, 2)}</pre></div>
+    <h1>${render("inline-options", [render("debug-toggle", module)])}
+        Module ${module.name}</h1>
+    ${render("debug-info", module)}
 
     <h2>Members:</h2>
     ${listModuleObjects(module).map(item => render("item", item)).join("")}

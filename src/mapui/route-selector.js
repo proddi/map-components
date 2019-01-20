@@ -17,19 +17,12 @@ import '/node_modules/@polymer/iron-icons/maps-icons.js';
  *
  * <route-selector router="#router"></route-selector>
  *
+ * @extends {RouterMixin}
+ * @extends {SelectorMixin}
  * @extends {HTMLElement}
- * @implements {SelectorMixin}
- * @implements {RouterMixin}
- * @listens {BaseRouter#request} to clear the list (loading state).
- * @listens {BaseRouter#response} to update the list.
- * @emits {RouteSelector#RouteSelected} when a route gets selected.
- * @emits {RouteSelector#RouteUnselected} when a route gets selected.
- * @e_mits {RouteSelector#RouteLegSelected} when a route gets selected.
- * @e_mits {RouteSelector#RouteLegUnselected} when a route gets selected.
  *
  **/
 class RouteSelector extends RouterMixin(SelectorMixin(HTMLElement)) {
-    /** @private */
     constructor() {
         super();
 

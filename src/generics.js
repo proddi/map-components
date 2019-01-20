@@ -1,4 +1,5 @@
 "use strict";
+
 /**
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
  *
@@ -18,7 +19,9 @@ class BaseRouter extends HTMLElement {
          * @type {string}
          */
         this.id     = this.getAttribute("id") || this.tagName;
-        /** @type {string} */
+        /**
+         * @type {string}
+         */
         this.name   = this.getAttribute("name") || this.type;
         /** @type {Address|null} */
         this.start  = this.getAttribute("start");
@@ -98,10 +101,16 @@ class BaseRouter extends HTMLElement {
     }
 
     /**
+     * @deprecated - Use `updateRoute()` instead.
      * @fires GenericRouter#request
      * @fires GenericRouter#response
      */
     update({start, dest, time}={}) {
+        console.warn("DEPRECATED - use .updateRoute() instead.");
+        return this.updateRoute({start:start, dest:dest, time:time});
+    }
+
+    updateRoute({start, dest, time}={}) {
         if (start) this.start = start;
         if (dest) this.dest = dest;
         if (time) this.time = time;
@@ -194,9 +203,12 @@ class BaseRouter extends HTMLElement {
 class Request {
     /**
      * create instance.
-     * @param {router:BaseRouter, others:Object}} options - xxx
+     * @param {BaseRouter} router - The router used for this request.
+     * @param {Object} [options={}) - Additional options to be used.
      **/
-    constructor(router, others={}) {
+    constructor(router, options={}) {
+        Object.assign(this, options);
+
         /** @type {BaseRouter} */
         this.router = router;
 
@@ -205,8 +217,6 @@ class Request {
          * @type {*|null}
          */
         this.error = null;
-
-        Object.assign(this, others);
     }
 
     /**

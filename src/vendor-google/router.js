@@ -5,7 +5,7 @@ import {GooglePlatform} from './platform.js';
 /**
  * Provides an router element for google directions. It can be referenced in map components.
  *
- * @example
+ * @example <caption>foo</caption>
  * <google-router id="google-router"
  *     platform="google-platform"
  *     start="13.30,52.43"
@@ -19,6 +19,12 @@ class GoogleDirectionsRouter extends BaseRouter {
     constructor() {
         super();
         this.type = "google";
+
+        /**
+         * Travel mode to use. One of 'DRIVING', 'WALKING', 'BICYCLING', 'TRANSIT'.
+         * @type {string|null}
+         */
+        this.mode = this.getAttribute("mode");
 
         /** @type {GooglePlatform} */
         this.platform = undefined;

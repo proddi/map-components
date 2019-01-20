@@ -6,7 +6,7 @@ import { MapboxPlatform } from './platform.js';
  * Shows HERE map. This is the base canvas for other visualisation elements.
  * It requires a {@link MapboxPlatform} component to handle credentials.
  *
- * @example
+ * @example <caption>smallest setup</caption>
  * <mapbox-platform token="..."></mapbox-platform>
  *
  * <mapbox-map platform="mapbox-platform" center="13.5,52.5" zoom="11">

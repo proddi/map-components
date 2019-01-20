@@ -9,12 +9,6 @@ import {HerePlatform} from './platform.js';
  * Shows HERE map. This is the base canvas for other visualisation elements.
  * It requires a {@link HerePlatform} component to handle credentials.
  *
- * | Tables   |      Are      |  Cool |
- * |----------|:-------------:|------:|
- * | col 1 is |  left-aligned | $1600 |
- * | col 2 is |    centered   |   $12 |
- * | col 3 is | right-aligned |    $1 |
- *
  * @example <caption>This is caption</caption>
  * <here-platform app-id="..." app-code="..."></here-platform>
  *
@@ -37,15 +31,30 @@ class HereMap extends BaseMap {
                 .split(" ")
                 .map(str => str ? parseInt(str) : 0)
 
-        /** @type {HerePlatform */
+        /**
+         * The reference to a `platform`-tag to handle credentials. Usually you put just one platform tag in your document and then it's automatically discovered.
+         *
+         * @example
+         * <here-platform app-id="..." app-code="..."></here-platform>
+         * <here-map platform="here-platform"></here-map>
+         *
+         * @type {HerePlatform|null}
+         */
         this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform);
-        /** @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
+
+        /**
+         * An entry point when the element is ready.
+         * @deprecated Implement `customElements.whenDefined('here-map')` instead.
+         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
         this.whenReady = deferredPromise();
 
+        /**
+         * (Optional) An reference to a {@link History} element if you wanna enable browsers history rewriting.
+         * @type {History|null}
+         */
         this.history = document.querySelector(this.getAttribute("history") || 'mc-history');
     }
 
-    /** @private */
     connectedCallback() {
         this.platform.whenReady.then(({platform, maptypes}) => {
 //            console.log("maptypes", maptypes);

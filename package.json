@@ -13,7 +13,8 @@
         "build:prod": "NODE_ENV=production npm run build",
         "build:docs": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc.json",
         "build:docs-templates": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc-templates.json",
-        "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\""
+        "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\"",
+        "server": "./node_modules/.bin/polymer serve"
     },
     "dependencies": {
         "@polymer/iron-icons": "^3.0.1",
@@ -23,11 +24,11 @@
     },
     "devDependencies": {
         "esdoc": "^1.1.0",
-        "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
+        "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
+        "@google-web-components/google-youtube": "^3.0.1",
         "webpack": "^4.28.3",
         "webpack-cli": "^3.2.0",
-        "polymer-cli": "^1.9.5",
-        "bower": "^1.8.6"
+        "polymer-cli": "^1.9.5"
     }
 }

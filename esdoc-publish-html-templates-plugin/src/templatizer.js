@@ -32,7 +32,7 @@ function fromFile(file, argNames=[], globals={}) {
 
 
 function fromElement(node, globals={}, name="unnamed node") {
-    let argNames = (node.getAttribute("args-as") || "data").split(",");
+    let argNames = (node.getAttribute("args-as") || "data").split(",").map(arg => arg.trim());
     let markup = node.innerHTML.trim();
     markup = markup.replace(/=&gt;/g, "=>")
                    .replace(/&amp;&amp;/g, "&&");

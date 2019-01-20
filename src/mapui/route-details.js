@@ -16,12 +16,11 @@ import '/node_modules/@polymer/iron-icons/maps-icons.js';
  *
  * <route-details router="#router"></route-details>
  *
+ * @extends {SelectedMixin}
  * @extends {HTMLElement}
- * @implements {SelectedMixin}
  *
  **/
 class RouteDetails extends SelectedMixin(HTMLElement) {
-    /** @private */
     constructor() {
         super();
 
