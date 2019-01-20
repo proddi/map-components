@@ -1,4 +1,5 @@
 import {BaseRouter, RouteResponse, findRootElement} from '../generics.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 /**
@@ -431,15 +432,18 @@ let SetRouteMixinImpl = Base => class extends Base {
          * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
          * @type {BaseRouter|null}
          */
-        this.router = findRootElement(this, this.getAttribute("router"), BaseRouter);
-
-        setTimeout(_ => {
-            this.initRoute();
-
-            if (this.start && this.dest) {
-                this.setRoute(this.start, this.dest, this.time);
-            }
-        });
+        this.router = null;
+        whenElementReady(qs(this.getAttribute("router")) || qp(this, "[role=router]") || qs("[role=router]"))
+            .then(router => {
+                console.assert(router instanceof BaseRouter);
+                this.router = router;
+                this.initRoute();
+                if (this.start && this.dest) {
+                    this.setRoute(this.start, this.dest, this.time);
+                }
+            })
+            .catch(err => console.error("Unable to attach <router>:", err))
+            ;
     }
 
     initRoute() {

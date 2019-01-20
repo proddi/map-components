@@ -2,7 +2,7 @@ import {Address} from '../generics.js';
 import {html, render, repeat} from '../map/lit-html.js';
 import {MockupRouter} from './mockup-router.js';
 import {elementTemplate} from '../map/tools.js';
-
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 /**
@@ -48,7 +48,7 @@ class DemoRouter extends MockupRouter {
      */
     itemRenderer(router, name, start, dest) {
         return html`
-            <span @click=${_ => router.update({start:start, dest:dest})}>${name}</span>
+            <span @click=${_ => router.router.setRoute(start, dest)}>${name}</span>
         `
     }
 
@@ -57,6 +57,14 @@ class DemoRouter extends MockupRouter {
 
         let base = this.getAttribute("base");
         this.src = base ? base + "{start}-{dest}.json" : this.src;
+
+        this.router = null;
+        whenElementReady(qs(this.getAttribute("router")) || qs("[role=router]"))
+            .then(router => { this.router = router; })
+            .catch(err => console.warn("No attached router, use myself"))
+            ;
+
+
 
         /**
          * The available locations to lookup.

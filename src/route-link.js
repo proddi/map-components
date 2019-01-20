@@ -1,4 +1,5 @@
 import {BaseRouter, parseCoordString, parseTimeString, findRootElement} from './generics.js';
+import {qs, qp, whenElementReady} from './mc/utils.js';
 
 
 /**
@@ -14,12 +15,12 @@ class RouteLink extends HTMLElement {
         super();
 
         this.addEventListener("click", (ev) => {
-            let router = findRootElement(this, this.getAttribute("router"), BaseRouter);
-            router.update({
-                    start: this.getAttribute("start"),
-                    dest:  this.getAttribute("dest"),
-                    time:  this.getAttribute("time"),
-                });
+            let router = document.querySelector(this.getAttribute("router"));
+            router.setRoute(
+                    this.getAttribute("start"),
+                    this.getAttribute("dest"),
+                    this.getAttribute("time")
+                );
         });
 
         ensureStyles("route-link", `

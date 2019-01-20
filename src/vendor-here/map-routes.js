@@ -4,9 +4,9 @@ import {SelectedMixin, RouterMixin} from '../map/mixins.js'
 
 
 /**
+ * @extends {RouterMixin}
+ * @extends {SelectedMixin}
  * @extends {HTMLElement}
- * @implements {RouterMixin}
- * @implements {SelectedMixin}
  */
 class HereMapRoutes extends RouterMixin(SelectedMixin(HTMLElement)) {
     /** @private */

@@ -1,15 +1,13 @@
-"use strict";
-
 import {BaseMap} from '../mc/base-map.js';
 import {parseCoordString, findRootElement, deferredPromise} from '../generics.js';
-import {HerePlatform} from './platform.js';
-
+import {qs, qp, whenElementReady} from '../mc/utils.js';
+import {HerePlatform} from './platform';
 
 /**
  * Shows HERE map. This is the base canvas for other visualisation elements.
  * It requires a {@link HerePlatform} component to handle credentials.
  *
- * @example <caption>This is caption</caption>
+ * @example
  * <here-platform app-id="..." app-code="..."></here-platform>
  *
  * <here-map platform="here-platform" center="13.5,52.5" zoom="11">
@@ -18,9 +16,15 @@ import {HerePlatform} from './platform.js';
  * @see https://developer.here.com/documentation/maps/
  **/
 class HereMap extends BaseMap {
-    /** @private */
     constructor() {
         super();
+
+        /**
+         * An entry point when the element is ready.
+         * @deprecated Implement `customElements.whenDefined('here-map')` instead.
+         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
+        this.whenReady = deferredPromise();
+
         this.center = parseCoordString(this.getAttribute("center"));
         this.zoom = this.getAttribute("zoom");
         /**
@@ -40,22 +44,31 @@ class HereMap extends BaseMap {
          *
          * @type {HerePlatform|null}
          */
-        this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform);
-
-        /**
-         * An entry point when the element is ready.
-         * @deprecated Implement `customElements.whenDefined('here-map')` instead.
-         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
-        this.whenReady = deferredPromise();
+        this.platform = null; //findRootElement(this, this.getAttribute("platform"), HerePlatform);
+        whenElementReady(qs(this.getAttribute("platform")) || qp(this, "here-platform") || qs("here-platform"))
+            .then(platform => this.setPlatform(platform))
+            .catch(err => console.error("Unable to attach <here-platform>:", err))
+            ;
 
         /**
          * (Optional) An reference to a {@link History} element if you wanna enable browsers history rewriting.
          * @type {History|null}
          */
-        this.history = document.querySelector(this.getAttribute("history") || 'mc-history');
+        this.history = null; //document.querySelector(this.getAttribute("history") || 'mc-history');
+        whenElementReady(qs(this.getAttribute("history")) || qs("mc-history"))
+            .then(history => this.setHistory(history))
+            .catch(_ => {})  // ignore errors
+            ;
     }
 
-    connectedCallback() {
+
+    setPlatform(platform) {
+        console.assert(!this.platform, "Dynamic platforms not supported");
+
+        console.assert(platform instanceof HerePlatform, "Reference isn't a valid <here-platform> node")
+
+        this.platform = platform;
+
         this.platform.whenReady.then(({platform, maptypes}) => {
 //            console.log("maptypes", maptypes);
             let {location, zoom} = decodeMapPosition(this.history && this.history.get('map'), {location:this.center,zoom:this.zoom});
@@ -98,12 +111,16 @@ class HereMap extends BaseMap {
             this.whenReady.resolve({map:map, behavior:behavior, platform:platform, maptypes:maptypes});
         }).catch(error => this.whenReady.reject(error));
 
-        super.connectedCallback && super.connectedCallback();
+//        super.connectedCallback && super.connectedCallback();
     }
 
-    setViewBounds(bounds) {
-        this._map && this._map.setViewBounds(bounds, true);
+    setHistory(history) {
+        this.history = history;
     }
+
+//    setViewBounds(bounds) {
+//        this._map && this._map.setViewBounds(bounds, true);
+//    }
 }
 
 

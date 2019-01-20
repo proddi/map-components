@@ -4,7 +4,7 @@ init:
 
 .PHONY: clean
 clean:
-	@rm -rf package-lock.json node_modules docs build/dist
+	@rm -rf package-lock.json node_modules docs build
 
 .PHONY: build
 build:

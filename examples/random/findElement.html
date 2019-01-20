@@ -6,27 +6,27 @@
     <script type="module" src="../../src/mapui/example.js"></script>
 
     <script type="module">
-/*
+
 function findElement({select, lookup, lookdown, tag, is}) {
     let found = [];
     let tests = (tag ? [n=>n.tagName === tag] : []).concat(is ? [n=>n.getAttribute("is")===is] : []);
     console.assert(tests.length, "No node spec given");
-    console.log("tests", tests);
+//    console.log("tests", tests);
     let validateNode = n => !tests.find(test=>!test(n));
 
     // 1. selector
     if (select) {
-        console.log("select<", select);
+//        console.log("select<", select);
         found = found.concat(Array.prototype.slice.call(document.querySelectorAll(select)));
-        console.log("select:", found);
+//        console.log("select:", found);
         found = found.filter(validateNode);
-        console.log("select>", found);
+//        console.log("select>", found);
         if (found.length) return found[0];
     }
 
     // 2. lookup
     if (lookup) {
-        console.log("lookup<", lookup);
+//        console.log("lookup<", lookup);
         let node = lookup;
         while (node = node.parentNode) {
             try {
@@ -36,32 +36,90 @@ function findElement({select, lookup, lookdown, tag, is}) {
                 }
             } catch { break; }
         }
-        console.log("lookup>", found);
+//        console.log("lookup>", found);
         if (found.length) return found[0];
     }
 
     // 3. lookdown
     let query = (tag ? [tag] : []).concat(is ? [`[is="${is}"]`] : []).join("");
     if (lookdown) {
-        console.log("lookdown<", lookdown, query);
+//        console.log("lookdown<", lookdown, query);
         found = found.concat(Array.prototype.slice.call(lookdown.querySelectorAll(query)));
-        console.log("lookdown:", found);
+//        console.log("lookdown:", found);
         found = found.filter(validateNode);
-        console.log("lookdown>", found);
+//        console.log("lookdown>", found);
         if (found.length) return found[0];
     }
 
     // 3. global-selector
     if (query) {
-        console.log("global<", "q=", query);
+//        console.log("global<", "q=", query);
         found = found.concat(Array.prototype.slice.call(document.querySelectorAll(query)));
-        console.log("global:", found);
+//        console.log("global:", found);
         found = found.filter(validateNode);
-        console.log("global>", found);
+//        console.log("global>", found);
         if (found.length) return found[0];
     }
 }
+
+function whenReady(nodes) {
+    if (!nodes) return Promise.reject("No element found");
+    if (nodes.length != 1) return Promise.reject(`No unique element found (${nodes.length} nodes)`);
+    console.log("waiting for component", nodes[0].tagName.toLowerCase());
+    return customElements
+        .whenDefined(nodes[0].tagName.toLowerCase())
+        .then(_ => nodes[0]);
+}
+
+
+/**
+ * querySelectorAll(id)
+ */
+function qs(id) {
+    let nodes = document.querySelectorAll(id);
+    return nodes.length && nodes;
+}
+
+function qp(node, tag) {
+    while ((node = node.parentNode) && node.tagName) {
+        if (node.tagName.toLowerCase() === tag) return [node];
+    }
+}
+
+let elem = qs("here-router")[0];
+console.log("elem", elem);
+whenReady(qs("here-router2") || qp(elem, "route-debug") || qs("route-debug"))
+    .then(el => console.log(">>>", el))
+    .catch(err => console.error(">>> Not found:", err))
+    ;
+
+
+/*
+        whenReady(findElement({
+            select: "[name=car]",
+        })).then(elem => {
+            console.log("<here-platform> ready", elem, elem.platform);
+        }, error => console.error("Failed to attach to <here-platform> node:", error));
 */
+
+        class Foo extends HTMLElement {
+            constructor() {
+                super();
+
+                whenReady(findElement({
+                        select: this.getAttribute("router"),
+                        lookup: this,
+                        is:     "router",
+                    })).then(router => {
+                        this.router = router;
+                        console.log("ATTACHED to", this.router.name);
+                        window.router = this.router;
+                    });
+            }
+        }
+        customElements.define("x-foo", Foo);
+
+
 
 
         class Router extends HTMLElement {
@@ -70,7 +128,7 @@ function findElement({select, lookup, lookdown, tag, is}) {
             set foo(val) { console.log(`<${this.tagName}>.foo = "${val}"`); }
             constructor() {
                 super();
-                console.log(`Router<${this.name}>.constructor()`, this);
+//                console.log(`Router<${this.name}>.constructor()`, this);
                 this.innerHTML = `!!! ${this.name} !!!`;
             }
         }
@@ -89,21 +147,11 @@ function findElement({select, lookup, lookdown, tag, is}) {
         customElements.define(GoogleRouter.tag, GoogleRouter);
 
 
-        import {findElement} from '../../src/mc/utils.js';
-        class Foo extends HTMLElement {
-            constructor() {
-                super();
-                this.router = findElement({
-                        select: this.getAttribute("router"),
-                        lookup: this,
-                        is:     "router",
-                    });
-                console.log("ATTACHED to", this.router);
-                window.router = this.router;
-            }
-        }
-        customElements.define("x-foo", Foo);
+        class RouteDebug extends HTMLElement {}
+        setTimeout(_ => customElements.define("route-debug", RouteDebug), 2000);
 
+
+//        import {findElement} from '../../src/mc/utils.js';
 
 
 
@@ -117,6 +165,8 @@ function findElement({select, lookup, lookdown, tag, is}) {
             <p id="nested">nested start point</p>
         </div>
         <here-router></here-router>
+    </route-debug>
+    <route-debug>
         <google-router name="ped"></google-router>
         <google-router is="router" name="transit"></google-router>
         <google-router name="car"></google-router>

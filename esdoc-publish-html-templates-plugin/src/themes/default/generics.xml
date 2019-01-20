@@ -17,7 +17,6 @@
             ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
             <code class="access">${item.static ? "static" : ""}</code>
             <code class="access">${item.access}</code>
-            <code class="access">${item.kind}</code>
             <a id="${item.name}" class="name type-kind-${item.kind}" title="${item.longname}">${item.name}</a><code class="return">${signature(item.type)}</code>
         </div>
         <div class="attributes">
@@ -47,7 +46,6 @@
             ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
             <code class="access">${item.static ? "static" : ""}</code>
             <code class="access">${item.access}</code>
-            <code class="access">${item.kind}</code>
             <a id="${item.name}" class="name" title="${item.longname}">${item.name}</a><code type="return">${self.buildFunctionSignature(item)}</code>
         </div>
         <div class="attributes">

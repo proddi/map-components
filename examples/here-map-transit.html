@@ -5,7 +5,6 @@
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/dev/mockup-router.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
-    <script type="module" src="../src/vendor-here/platform.js"></script>
     <script type="module" src="../src/vendor-here/map.js"></script>
     <script type="module" src="../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
@@ -13,6 +12,7 @@
     <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
+    <script type="module" src="../src/vendor-here/platform.js"></script>
     <style>
         here-map {
             position: relative;
@@ -33,7 +33,7 @@
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-        <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
+        <here-transit-router role="router" id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"
             start="13.31709,52.54441"
             dest="13.56,52.41"
             time="2019-01-22T19:17:07">
@@ -43,9 +43,7 @@
             <!-- picker is the input tool -->
             <here-map-route-picker id="picker" router="#here-router"></here-map-route-picker>
             <!-- visualize router's routes -->
-            <here-map-routes selector="#route-selector"></here-map-routes>
-
-            <route-selector id="route-selector" router="#here-router" toggle></route-selector>
+            <here-map-routes router="#here-router"></here-map-routes>
         </here-map>
     </maps-example>
     <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
@@ -57,9 +55,9 @@
     <hr>
     <route-debug router="#here-router"></route-debug>
 
-        <script>
-            document.querySelector("here-transit-router")
-                .addEventListener("response", (ev) => console.log("response:", ev.detail));
-        </script>
+    <script>
+        document.querySelector("here-transit-router")
+            .addEventListener("response", (ev) => console.log("response:", ev.detail));
+    </script>
 </body>
 </html>

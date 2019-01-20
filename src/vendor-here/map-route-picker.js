@@ -1,10 +1,14 @@
-import {findRootElement} from '../generics.js';
 import {SetRouteMixin} from '../map/mixins.js';
+import {deferredPromise} from '../generics.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
+import {HereMap} from './map.js';
 
 /**
  * Adds start+stop map-marker to map and bind them to the router. When markers dragged the router gets updated.
+ *
+ * @extends {SetRouteMixin}
  * @extends {HTMLElement}
- * @implements {SetRouteMixin}
+ *
  * @example
  * <here-platform app-id="..." app-code="..."></here-platform>
  * <router id="router"></router>
@@ -19,11 +23,30 @@ class HereMapRoutePicker extends SetRouteMixin(HTMLElement) {
      */
     constructor() {
         super();
-        let mapComp = findRootElement(this, this.getAttribute("map"), customElements.get("here-map"));
 
-        this.history = document.querySelector(this.getAttribute("history") || 'mc-history');
+        /* *
+         * An entry point when the element is ready.
+         * @deprecated Implement `customElements.whenDefined('here-map')` instead.
+         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>} */
+        this.whenReady = deferredPromise();
 
-        this.whenReady = mapComp.whenReady.then(({map, behavior}) => {
+        this.map = null; //findRootElement(this, this.getAttribute("platform"), HerePlatform);
+        whenElementReady(qs(this.getAttribute("map")) || qp(this, "here-map") || qs("here-map"))
+            .then(map => this.setMap(map))
+            .catch(err => console.error("Unable to attach <here-map>:", err))
+            ;
+
+        this.history = null;
+        whenElementReady(qs(this.getAttribute("history")) || qs("mc-history"))
+            .then(history => this.setHistory(history))
+            .catch(_ => {})  // ignore errors
+            ;
+    }
+
+    setMap(map) {
+        console.assert(map instanceof HereMap);
+
+        map.whenReady.then(({map, behavior}) => {
             let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
             startMarker.draggable = true;
             let destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(21, 50)})});
@@ -55,12 +78,16 @@ class HereMapRoutePicker extends SetRouteMixin(HTMLElement) {
             draggableLayer.addObjects([startMarker, destMarker]);
             map.addObject(draggableLayer);
 
-            return {
+            this.whenReady.resolve({
                     map: map,
                     startMarker: startMarker,
                     destMarker: destMarker,
-                }
-        });
+                });
+        }).catch(error => this.whenReady.reject(error));
+    }
+
+    setHistory(history) {
+        this.history = history;
     }
 
     initRoute() {

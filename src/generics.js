@@ -1,11 +1,13 @@
-"use strict";
+import {SetRouteMixin} from './map/mixins.js';
 
 /**
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
  *
+ * @extends {SetRouteMixin}
+ *
  * @abstract
  */
-class BaseRouter extends HTMLElement {
+class BaseRouter extends SetRouteMixin(HTMLElement) {
     /** @protected */
     constructor() {
         super();
@@ -24,23 +26,23 @@ class BaseRouter extends HTMLElement {
          */
         this.name   = this.getAttribute("name") || this.type;
         /** @type {Address|null} */
-        this.start  = this.getAttribute("start");
+        this._start  = this.getAttribute("start");
         /** @type {Address|null} */
-        this.dest   = this.getAttribute("dest");
+        this._dest   = this.getAttribute("dest");
         /** @type {Date|null} */
-        this.time   = this.getAttribute("time");
+        this._time   = this.getAttribute("time");
 
         /**
          * The current route request.
          * @type {RouteRequest|null}
          */
-        this.routeRequest = null;
+        this._routeRequest = null;
 
         /**
          * The current route response.
          * @type {RouteResponse|null}
          */
-        this.routeResponse = null;
+        this._routeResponse = null;
 
         /**
          * The current multiboard request.
@@ -71,9 +73,9 @@ class BaseRouter extends HTMLElement {
 
     /** @protected */
     connectedCallback() {
-        setTimeout(() => {
-            this.update({start:this.start, dest:this.dest, time:this.time});
-        }, 50);
+//        setTimeout(() => {
+//            this.update({start:this.start, dest:this.dest, time:this.time});
+//        }, 50);
     }
 
     /**
@@ -101,15 +103,16 @@ class BaseRouter extends HTMLElement {
     }
 
     /**
-     * @deprecated - Use `updateRoute()` instead.
+     * @deprecated - Use `.setRoute(start, dest, time)` instead (from SetRouteMixin).
      * @fires GenericRouter#request
      * @fires GenericRouter#response
      */
     update({start, dest, time}={}) {
-        console.warn("DEPRECATED - use .updateRoute() instead.");
-        return this.updateRoute({start:start, dest:dest, time:time});
+        console.warn("DEPRECATED - use .setRoute(start, dest, time) instead (from SetRouteMixin).");
+        this.setRoute(start, dest, time);
+//        return this.updateRoute({start:start, dest:dest, time:time});
     }
-
+/*
     updateRoute({start, dest, time}={}) {
         if (start) this.start = start;
         if (dest) this.dest = dest;
@@ -136,7 +139,7 @@ class BaseRouter extends HTMLElement {
             }
         }
     }
-
+*/
 
 
     async board(location, time=undefined) {
