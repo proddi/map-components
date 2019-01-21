@@ -599,7 +599,8 @@ let SetRouteMixinImpl = Base => class extends Base {
  * @interface
  * @emits {route-request} - Fired when a new request is initiated. It can be used t erase previous routes.
  * @emits {route-response} - Fired when an route response is available. The property "intermediate" indicates a final
- *                           Response will come later.
+ *                           Response will come later. The body will contain
+ *                           `{ response: Response, intermediate: Boolean }` as payload.
  */
 class RouteSource {
     constructor() {
@@ -609,6 +610,15 @@ class RouteSource {
         this.dest = null;
         /** @type {Date|null} */
         this.time = null;
+
+        /**
+         * Defines the behavior of selectRoute(). It get's set by the `toggle` attribute. By default toggling isn't
+         * active.
+         * @attribute {toggle} - foooo
+         * @type {boolean}
+         */
+        this.toggleSelection = false;
+
         /**
          * The current route request.
          * @type {RouteRequest|null}
@@ -619,15 +629,15 @@ class RouteSource {
          * @type {RouteResponse|null}
          */
         this.routeResponse = null;
-//        /**
-//         * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
-//         * @type {BaseRouter|null}
-//         */
-//        this.router;
     }
 //    initRoute() {}
 //    setRoute(start, dest, time=null) {}
 
+    /**
+     * Indicating a new {@link Request} is initiated. It also emits a `route-request` event with `{ request: Request }`
+     * as payload.
+     * @param {Request} request
+     */
     requestRoute(request) {}
     responseRoute(response, intermediate=false) {}
     selectRoute(route) {}
@@ -697,6 +707,8 @@ let RouteSourceImpl = Base => class extends Base {
         this.dispatchEvent(new CustomEvent('route-request', { detail: { request: request, }}));
     }
 
+    /**
+     * Indicates an {@link Response} is available. It also emits a `route-response` event.
     responseRoute(response, intermediate=false) {
         this.routeResponse = response;
         this.routeResponseIsIntermediate = intermediate;
@@ -721,6 +733,10 @@ let RouteSourceImpl = Base => class extends Base {
         }
     }
 
+    /**
+     * Indicates the route is not selected anymore.
+     * @param {Route|null} [route=null] - The related route if multiselection is active.
+     */
     deselectRoute(route=null) {
         if (this.routeSelected) {
             this.dispatchEvent(new CustomEvent('route-deselected', { detail: { route: this.routeSelected, }}));
@@ -728,6 +744,11 @@ let RouteSourceImpl = Base => class extends Base {
         }
     }
 
+    /**
+     * Mark an route with an accent. This can be used for visual effects e.g. hover effects.
+     * @param {Route} route
+     * @param {*} [accent=null] - An accent for the route.
+     */
     emphasizeRoute(route, accent=null) {
         this.dispatchEvent(new CustomEvent('route-emphasized', { detail: {
                 route: route,
@@ -735,7 +756,6 @@ let RouteSourceImpl = Base => class extends Base {
                 isSelected: route === this.routeSelected,
             }}));
     }
-
 }
 
 

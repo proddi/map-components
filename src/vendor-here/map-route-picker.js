@@ -23,19 +23,22 @@ import {HereMap} from './map.js';
  * </here-map>
  **/
 class HereMapRoutePicker extends RouteSource(HTMLElement) {
-    /**
-     * create instance
-     */
+    /** @protected */
     constructor() {
         super();
 
         /**
          * An entry point when the element is ready.
          * @deprecated Implement `customElements.whenDefined('here-map')` instead.
-         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}|Error>}
+         * @todo Make this private.
+         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}>|Error>}
          */
         this.whenReady = deferredPromise();
 
+        /**
+         * The attached {@link HereMap} instance to be drawn onto.
+         * @type {HereMap|null}
+         */
         this.map = null;
         whenElementReady(qs(this.getAttribute("map")) || qp(this, "here-map") || qs("here-map"))
             .then(hereMap => this.setMap(hereMap))
@@ -53,7 +56,8 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
             ;
 
         /**
-         * The connected router. Will be set automatically when attribute `router="#dom-selector"` is specified.
+         * The used router to do routing. Will be set automatically when attribute `router="#selector"` is specified or when an
+         * element with `role="router"` is nearby.
          * @type {BaseRouter|null}
          */
         this.router = null;
