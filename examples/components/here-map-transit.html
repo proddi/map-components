@@ -24,7 +24,7 @@
             position: absolute;
             right: 5px;
             top: 5px;
-            width: 230px;
+            width: 300px;
             max-height: calc(100% - 10px);
             z-index: 10;
             border: 1px solid #aaa;
@@ -44,14 +44,13 @@
         <here-transit-router id="router"></here-transit-router>
 
         <demo-router id="r_outer" r_outer="#picker"
-            name="demo"
             base="../assets/responses/here-transit-"
             start="A"
             dest="B"
             time="2018-12-22T19:17:07">
         </demo-router>
 
-        <here-map center="13.5,52.5" zoom="11" view-padding="10 170 10 10">
+        <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
             <here-map-route-picker role="route-source" id="picker" router="here-transit-router"
                     start="13.31709,52.54441"
                     dest="13.56,52.41"
@@ -61,7 +60,7 @@
             <route-selector></route-selector>
         </here-map>
 
-        <here-map center="13.5,52.5" zoom="11" view-padding="10 170 10 10">
+        <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
             <demo-routes router="demo-router" path="../assets/responses/"></demo-routes>
             <here-map-routes route-source="demo-router"></here-map-routes>
             <route-selector route-source="demo-router"></route-selector>

@@ -24,14 +24,16 @@ import {HerePlatform} from './platform.js';
  * @see https://developer.here.com/documentation/transit/
  */
 class HereTransitRouter extends BaseRouter {
+    /**
+     * Type of the router - _"here/transit"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return "here/transit"; }
+
     constructor() {
         super();
-        /**
-         * Returns "here" for this router.
-         * @const
-         * @type {string}
-         */
-        this.type   = "here-transit";
+
         /** @type {string} */
         this.server = this.getAttribute("server") || "https://transit.api.here.com";
 

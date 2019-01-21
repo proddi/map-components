@@ -709,6 +709,9 @@ let RouteSourceImpl = Base => class extends Base {
 
     /**
      * Indicates an {@link Response} is available. It also emits a `route-response` event.
+     * @param {Response} response
+     * @param {boolean} [intermediate=false]
+     */
     responseRoute(response, intermediate=false) {
         this.routeResponse = response;
         this.routeResponseIsIntermediate = intermediate;

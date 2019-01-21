@@ -3,15 +3,15 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 class MockupRouter extends BaseRouter {
+    /**
+     * Type of the router - _"mockup"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return 'mockup'; }
+
     constructor() {
         super();
-
-        /**
-         * Returns `"mockup"` for this router.
-         * @const
-         * @type {string}
-         */
-        this.type   = "mockup";
 
         /**
          * A reference to the mocked response. It can contain placeholders

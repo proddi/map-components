@@ -8,41 +8,29 @@ import {RouteSource} from './map/mixins.js';
  * @abstract
  */
 class BaseRouter extends RouteSource(HTMLElement) {
+    /**
+     * Type of the router - `abstract` for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return 'abstract'; }
+
     /** @protected */
     constructor() {
         super();
-        /**
-         * Returns "abstract" for this router.
-         * @type {string}
-         */
-        this.type = "abstract";
+
         /**
          * Type of the router.
+         * @deprecated Use .name or .type instead
          * @type {string}
          */
-        this.id     = this.getAttribute("id") || this.tagName;
+        this.id = this.getAttribute("id") || this.tagName;
+
         /**
+         * The name of the router. It's the content of the `name="xyz"` attribute or the `.type` property.
          * @type {string}
          */
-        this.name   = this.getAttribute("name") || this.type;
-        /** @type {Address|null} */
-//        this._start  = this.getAttribute("start");
-        /** @type {Address|null} */
-//        this._dest   = this.getAttribute("dest");
-        /** @type {Date|null} */
-//        this._time   = this.getAttribute("time");
-
-        /**
-         * The current route request.
-         * @type {RouteRequest|null}
-         */
-//        this._routeRequest = null;
-
-        /**
-         * The current route response.
-         * @type {RouteResponse|null}
-         */
-//        this._routeResponse = null;
+        this.name = this.getAttribute("name") || this.type;
 
         /**
          * The current multiboard request.
@@ -56,13 +44,6 @@ class BaseRouter extends RouteSource(HTMLElement) {
          */
         this.multiboardResponse = null;
     }
-
-    /** @protected */
-//    connectedCallback() {
-//        setTimeout(() => {
-//            this.update({start:this.start, dest:this.dest, time:this.time});
-//        }, 50);
-//    }
 
     // return myself
     getRouter() {

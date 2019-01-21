@@ -6,9 +6,16 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 /**
- * Provides recorded {Response}'s without a need for credentials.
+ * Provides recorded {@link Response}'s without a need for credentials.
  */
 class DemoRouter extends MockupRouter {
+    /**
+     * Type of the router - _"demo"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return 'demo'; }
+
     baseRenderer(routes, itemRenderer) {
         return html`
             <style>
