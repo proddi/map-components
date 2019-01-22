@@ -4,6 +4,7 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 /**
  * @interface
+ * @deprecated Use {@link RouteObserver} instead (implements selected as well).
  */
 class SelectedMixin {
     /** @private */
@@ -138,6 +139,7 @@ let SelectedMixinImpl = Base => class extends Base {
 
 /**
  * @interface
+ * @deprecated Use {@link RouteSource} instead (implements select as well).
  * @emits {items} - Fired when a new set of items is available.
  * @emits {selected} - Fired when an item gets selected.
  * @emits {deselect} - Fired when the selected item lost it's selection.
@@ -244,6 +246,7 @@ let SelectorMixinImpl = Base => class extends Base {
 
 /**
  * This mixin allows an easy subscribe to an Router component.
+ * @deprecated Use {@link RouteObserver} instead.
  * @interface
  * @listens {BaseRouter#request} - When a new request is initiated.
  * @listens {BaseRouter#response} - When a new response is available.
@@ -389,6 +392,8 @@ let RouterMixinImpl = Base => class extends Base {
 /**
  * This mixin implements a routing functionality using an external `router` component. The state of the used router will
  * not be changed.
+ *
+ * @deprecated Use {@link RouteObserver} instead.
  *
  * @interface
  * @emits {request} - Fired when a new request is initiated. It can be used t erase previous routes.

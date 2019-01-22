@@ -10,9 +10,10 @@ const notFoundTag = {
     name:    "./README.md",
 }
 
-exports.builder = ({docs, writeFile, globals, fileTemplate}) => {
+exports.builder = ({docs, writeFile, globals, fileTemplate, loadTemplate}) => {
+    loadTemplate("index.xml");
     const indexTag = docs.find(tag => tag.kind === 'index') || notFoundTag;
-    const fileName = globals.docUrl(indexTag);
+    const fileName = globals.urlFor(indexTag);
     const content = fileTemplate("index", ["docs", "doc"])(docs, indexTag);
     writeFile(fileName, content);
 }

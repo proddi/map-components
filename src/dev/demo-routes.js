@@ -8,53 +8,6 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
  * Provides recorded {Response}'s without a need for credentials.
  */
 class DemoRoutes extends HTMLElement {
-    baseRenderer(routes, itemRenderer) {
-        return html`
-            <style>
-                :host {
-                    display: block;
-                    position: absolute;
-                    top: 10px;
-                    left: 10px;
-                    right: 10px;
-                    line-height: 1.5em;
-                    z-index: 10;
-                    background-color: rgba(255, 255, 255, .75);
-                }
-                :host span {
-                    border: 1px solid rgba(128, 128, 128, .5);
-                    box-shadow: 1px 1px 2px rgba(128, 128, 128, .5);
-                    border-radius: 2px;
-                    padding: 1px 5px;
-                    cursor: pointer;
-                    margin-left: 5px;
-                    margin-right: 5px;
-                    white-space: nowrap;
-                }
-                :host span:hover {
-                    background-color: rgba(128, 128, 128, .15);
-                }
-            </style>
-
-            <div role="listbox">
-                ${repeat(Object.entries(routes), (route, index) => itemRenderer(this, route[0], route[1][0], route[1][1]))}
-            </div>
-        `;
-    }
-
-    /**
-     * The default renderer to create a link
-     * @param {BaseRouter} router
-     * @param {string} name
-     * @param {Address} start
-     * @param {Address} dest
-     */
-    itemRenderer(self, name, start, dest) {
-        return html`
-            <span @click=${_ => self.routeSource.setRoute(start, dest)}>${name}</span>
-        `
-    }
-
     constructor() {
         super();
 
@@ -84,6 +37,10 @@ class DemoRoutes extends HTMLElement {
             JFK:        new Address({lng:-73.7893817794975, lat:40.64110273169828, name:"JFK Airport"}),
         }
 
+        /**
+         * The available routes to route.
+         * @type {Object}
+         */
         this.routes = {
             "Berlin A->B": ["A", "B"],
             "Ger:Berlin->Halle": ["BERLIN", "HALLE"],
@@ -96,6 +53,52 @@ class DemoRoutes extends HTMLElement {
 
         let itemRenderer = elementTemplate(this.querySelector('template[role="button"]')) || this.itemRenderer;
         render(this.baseRenderer(this.routes, itemRenderer), this.shadowRoot);
+    }
+
+    /**
+     * The body renderer
+     */
+    baseRenderer(routes, itemRenderer) {
+        return html`
+            <style>
+                :host {
+                    display: block;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    right: 10px;
+                    line-height: 1.5em;
+                    z-index: 10;
+                    background-color: rgba(255, 255, 255, .75);
+                }
+                :host span {
+                    border: 1px solid rgba(128, 128, 128, .5);
+                    box-shadow: 1px 1px 2px rgba(128, 128, 128, .5);
+                    border-radius: 2px;
+                    padding: 1px 5px;
+                    cursor: pointer;
+                    margin-left: 5px;
+                    margin-right: 5px;
+                    white-space: nowrap;
+                }
+                :host span:hover {
+                    background-color: rgba(128, 128, 128, .15);
+                }
+            </style>
+
+            <div role="listbox">
+                ${repeat(Object.entries(routes), (route, index) => itemRenderer.call(this, route[0], route[1][0], route[1][1]))}
+            </div>
+        `;
+    }
+
+    /**
+     * The default renderer to create a link
+     */
+    itemRenderer(name, start, dest) {
+        return html`
+            <span @click=${_ => this.routeSource.setRoute(start, dest)}>${name}</span>
+        `
     }
 }
 

@@ -1,3 +1,7 @@
+<template href="generics.xml"></template>
+<template href="navigation.xml"></template>
+
+
 <template id="file.html" args-as="file,tags">
     ${render("debug-toggle", file)}
     <h1>File ${file.name}</h1>

@@ -1,0 +1,16 @@
+<template href="generics.xml"></template>
+<template href="navigation.xml"></template>
+
+
+<template id="todos.html" args-as="doc,items">
+    <section class="members">
+        <h2>ToDos</h2>
+        ${items.map(item => render("item", item)).join("")}
+    </section>
+</template>
+
+
+<template id="page.head" args-as="doc">
+    <base href="./">
+    <title>ToDos</title>
+</template>

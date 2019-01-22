@@ -92,21 +92,20 @@ class DemoRouter extends MockupRouter {
             </style>
 
             <div role="listbox">
-                ${repeat(Object.entries(routes), (route, index) => itemRenderer(this, route[0], route[1][0], route[1][1]))}
+                ${repeat(Object.entries(routes), (route, index) => itemRenderer.call(this, route[0], route[1][0], route[1][1]))}
             </div>
         `;
     }
 
     /**
      * The default renderer to create a link
-     * @param {BaseRouter} router
      * @param {string} name
      * @param {Address} start
      * @param {Address} dest
      */
-    itemRenderer(self, name, start, dest) {
+    itemRenderer(name, start, dest) {
         return html`
-            <span @click=${_ => (self.router || self).update({start:start, dest:dest})}>${name}</span>
+            <span @click=${_ => (this.router || this).update({start:start, dest:dest})}>${name}</span>
         `
     }
 }

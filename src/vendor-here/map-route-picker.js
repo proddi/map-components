@@ -13,6 +13,9 @@ import {HereMap} from './map.js';
  * @extends {RouteSource}
  * @extends {HTMLElement}
  *
+ * @todo Refactor to only use the attached {@link RouteSource} instead being a {@link RouteSource} itself.
+ * @todo Fix route-source lookup
+ *
  * @example
  * <here-platform app-id="..." app-code="..."></here-platform>
  * <demo-router>...</demo-router>

@@ -5,12 +5,14 @@ import '/node_modules/@polymer/paper-spinner/paper-spinner.js';
 
 
 /**
- * Selector watches a router and emits style events according to user input (mouse)
+ * An spinner that's visible when the {@link RouteSource} is requesting.
  *
- * @example
- * <router id="router" ...></router>
+ * @example <caption>used in route-selector</caption>
+ * <router role="route-source" ...></router>
  *
- * <route-selector router="#router"></route-selector>
+ * <route-selector>
+ *   <route-spinner slot="center"></route-spinner>
+ * </route-selector>
  *
  * @extends {RouteObserver}
  * @extends {HTMLElement}

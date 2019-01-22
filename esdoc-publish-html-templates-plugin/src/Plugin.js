@@ -28,9 +28,38 @@ class Plugin {
         this._themeDir = _path.resolve(__dirname, './themes/default');
 
         this._renderGlobals = this._buildRenderGlobals(this._docs);
-        this._templates = this._loadTemplates(this._themeDir, this._renderGlobals);
+        this._templates = {}; //this._loadTemplates(this._themeDir, this._renderGlobals);
 
         this._exec(this._docs, ev.data.writeFile, ev.data.copyDir, ev.data.readFile);
+    }
+
+    _loadTemplateFile(name, index, globals) {
+        const path = _path.resolve(this._themeDir, name);
+        const xml = _fs.readFileSync(path, { encoding: 'utf-8' });
+        const dom = _jsdom.jsdom(xml);
+        Object.values(dom.querySelectorAll("template")).forEach(node => {
+            let href = node.getAttribute("href");
+            if (href) this._loadTemplateFile(href, index, globals);
+            else {
+                let id = node.getAttribute("id");
+                try {
+                    // TODO: rename existing
+                    if (index.hasOwnProperty(id)) this._superizeTemplateId(index, id);
+                    index[id] = templatizer.fromElement(node, globals, `${name}#${id}`);
+                } catch (e) {
+                    if (e instanceof Error) e.message = `${e.message} (...in template ${name}#${id})`;
+                    else console.error(`${e.message} in template`, `${name}#${id}`);
+                    throw e;
+                }
+            }
+        });
+    }
+
+    _superizeTemplateId(index, id, prefix="super.") {
+        const newId = `${prefix}${id}`;
+        if (index.hasOwnProperty(newId)) this._superizeTemplateId(index, newId, prefix);
+        index[newId] = index[id];
+        delete index[id];
     }
 
     _exec(tags, writeFile, copyDir, readFile) {
@@ -52,18 +81,19 @@ class Plugin {
             fileTemplate: (type, fields=[]) => {
                 return templatizer.fromFile(_path.resolve(this._themeDir, "layout.html"), ["type"].concat(fields), this._renderGlobals, type).bind(null, type);
             },
+            loadTemplate: name => this._loadTemplateFile(name, this._templates, this._renderGlobals),
         }
 
         builders.forEach(builder => {
+            this._templates = {};  // reset template index
             builder(options);
         });
 
-
-        this._createCodeFiles(tags, writeFile, copyDir);
-        this._createModules(tags, writeFile, copyDir);
+//        this._createCodeFiles(tags, writeFile, copyDir);
+//        this._createModules(tags, writeFile, copyDir);
         this._createStatic(this._themeDir, writeFile, copyDir);
     }
-
+/*
     _createCodeFiles(tags, writeFile, copyDir) {
         const docs = tags.filter(tag => tag.kind === 'file');
         for (const doc of docs) {
@@ -81,7 +111,7 @@ class Plugin {
             writeFile(fileName, content);
         }
     }
-
+*/
     _createStatic(templateDir, writeFile, copyDir) {
         copyDir(_path.resolve(templateDir, 'assets'), './assets');
         copyDir(_path.resolve(templateDir, 'assets/script'), './assets/script');
@@ -89,8 +119,10 @@ class Plugin {
     }
 
     _loadTemplates(path, globals={}) {
-        let templates = {};
-        _fs.readdirSync(path).filter(name => name.endsWith(".xml")).forEach(name => {
+        let index = {};
+        _fs.readdirSync(path).filter(name => name.endsWith(".xml")).forEach(fileName => {
+            this._loadTemplateFile(fileName, index, globals);
+/*
             let fileName = _path.resolve(path, name);
             const xml = _fs.readFileSync(fileName, { encoding: 'utf-8' });
             const dom = _jsdom.jsdom(xml);
@@ -104,8 +136,9 @@ class Plugin {
                     throw e;
                 }
             });
+*/
         });
-        return templates;
+        return index;
     }
 
     render(id, ...args) {
@@ -116,6 +149,7 @@ class Plugin {
         } catch (e) {
             if (e instanceof Error) e.message = `${e.message} (...in template ${template})`;
             else console.error(`${e.message} in template`, template);
+            console.info("related markup:", template.toSource());
             throw e;
         }
     }
@@ -287,12 +321,15 @@ class Plugin {
                     let doc = this.getDocByName(longname, null, null);
                     return doc && this.docLink(doc) || str;
                 }),
+            htmlTag: (tag, attributes, content) => `<${tag}${Object.entries(attributes).filter(([key, val]) => val!==undefined).map(([key, val]) => ` ${key}="${val}"`).join("")}>${content}</${tag}>`,
 
             // link helpers
             baseUrlOf: doc => '../'.repeat(this.docUrl(doc).split('/').length-1),
-            docUrl: this.docUrl.bind(this),
-            docLink: this.docLink.bind(this),
-            sourceUrl: doc => `${this.docSourceUrl(globals.sourceOf(doc))}#lineNumber${doc.lineNumber}`,
+//            docUrl: doc => { console.warn("`docUrl()` is deprecated - use `urlFor()` instead."); return this.docUrl(doc); },
+            urlFor: this.docUrl.bind(this),
+//            docLink: doc => {  console.warn("`docLink()` is deprecated - use `linkFor()` instead."); return this.docLink(doc); },
+            linkFor: this.docLink.bind(this),
+            sourceUrl: doc => this.docSourceUrl(globals.sourceOf(doc)) + (doc.lineNumber && doc.kind !== "file" ? `#lineNumber${doc.lineNumber}` : ""),
             sourceLink: (doc, text=null) => `<span><a href="${globals.sourceUrl(doc)}">${text || doc.name}</a></span>`,
             signature: doc => doc.kind === 'function' ? this.buildFunctionSignature(doc) : this.buildPropertySignature(doc),
             // traversal helpers

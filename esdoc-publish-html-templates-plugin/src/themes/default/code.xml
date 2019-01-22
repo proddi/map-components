@@ -1,0 +1,8 @@
+<template href="generics.xml"></template>
+<template href="navigation.xml"></template>
+
+
+<template id="code.html" args-as="doc">
+    <small><pre>${escape(JSON.stringify(doc, null, 2))}</pre></small>
+    <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums">${escape(doc.content)}</code></pre>
+</template>

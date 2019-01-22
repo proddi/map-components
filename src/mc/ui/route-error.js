@@ -3,12 +3,14 @@ import {RouteObserver} from '../../map/mixins.js';
 
 
 /**
- * Selector watches a router and emits style events according to user input (mouse)
+ * An label that is visible when an {@link RouteSource}'s {@link RouteResponse} indicates an failure.
  *
- * @example
- * <router id="router" ...></router>
+ * @example <caption>used in route-selector</caption>
+ * <router role="route-source" ...></router>
  *
- * <route-selector router="#router"></route-selector>
+ * <route-selector>
+ *   <route-error slot="center"></route-error>
+ * </route-selector>
  *
  * @extends {RouteObserver}
  * @extends {HTMLElement}

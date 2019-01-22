@@ -68,7 +68,8 @@ class UnionRouter extends BaseRouter {
      * Perform a route request.
      * @async
      * @param {RouteRequest} request - route request.
-     * @returns {Promise<RouteResponse, Error>} - route response
+     * @param {function} progress - Callback to notify about intermediate states.
+     * @returns {Promise<RouteResponse, Error>}
      */
     async execRouteRequest(request, progress) {
         let response = new RouteResponse(request);

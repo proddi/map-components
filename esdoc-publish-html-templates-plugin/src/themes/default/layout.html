@@ -2,14 +2,22 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <base href="${baseUrlOf(doc)}">
-    <title>${titleOf(doc)}</title>
+    ${render("page.head", doc)}
     <link type="text/css" rel="stylesheet" href="assets/prettify-tomorrow.css"/>
     <link type="text/css" rel="stylesheet" href="assets/styles.css"/>
     <script src="assets/script/prettify/prettify.js"></script>
     <style>
+        /* reset styles */
+        main article h3 {
+            padding: 0;
+            margin: 0;
+            font-size: 1em;
+            font-weight: normal;
+        }
+
+
         main article .deprecated,
-        .e_________xperimental,
+        main article .experimental,
         .i_________nstance-docs {
             border-left: solid 5px orange;
             padding-left: 9px;
@@ -25,16 +33,24 @@
             border-radius: 3px;
             padding: 4px 6px;
         }
-        main .signature a.name {
+
+        /* properties, methods, events */
+        main article h3 {
+            padding-top: .25em;
+            padding-bottom: .5em;
+        }
+
+        main article h3 .name {
             font-weight: bold;
             color: black;
         }
-        main .signature a.name:hover {
+        main article h3 a.name:hover {
             color: #1565c0;
         }
-        main .signature .return {
+        main article h3 .return {
             color: #666;
         }
+
         main .attributes {
             font-style: italic;
             margin: 6px 0 0 0;
@@ -43,7 +59,6 @@
         main .attributes .attribute-label {
             padding-right: .5em;
         }
-        main .signature,
         main .attributes {
             margin-bottom: .5em;
         }
@@ -131,11 +146,10 @@
 <body>
     <header>
         <a href="">map-components</a>
+        <a href="todos.html">ToDo's</a>
     </header>
-    <nav>${render("navigation", docs)}</nav>
-    <main>
-        ${render(`${type}.html`, doc, docs)}
-    </main>
+    <nav>${render("page.nav", docs)}</nav>
+    <main>${render(`${type}.html`, doc, docs)}</main>
 
     <script src="assets/script/pretty-print.js"></script>
     <script src="assets/script/inner-link.js"></script>

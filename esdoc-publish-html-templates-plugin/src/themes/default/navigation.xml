@@ -1,21 +1,28 @@
-<template id="navigation" args-as="docs">
+<template id="page.nav" args-as="docs">
     <div class="backpane"></div>
-    <ul>${listModules().map(module => render("navigation-module", module)).join("")}</ul>
+    <ul>${listModules().map(module => render("page.nav.module", module)).join("")}</ul>
 </template>
 
-<template id="navigation-module" args-as="module">
+
+<template id="page.nav.module" args-as="module">
     <li>
-        ${docLink(module)}
-        <ul>${listModuleObjects(module).map(doc => render("navigation-item", doc)).join("")}</ul>
+        ${linkFor(module)}
+        <ul>${listModuleObjects(module).map(doc => render("page.nav.item", doc)).join("")}</ul>
     </li>
 </template>
 
-<template id="navigation-item" args-as="doc">
-    <li>${render("doc-icon", doc)}</li>
+
+<template id="page.nav.item" args-as="doc">
+    <li>${render("doc.link", doc)}</li>
 </template>
 
 
-<template id="doc-icon" args-as="doc">${render("doc-icon-inline", doc, doc.kind === 'class' && doc.interface ? 'interface' : doc.kind)}</template>
-<template id="doc-icon-inline" args-as="doc,kind">
-    <span class="kind kind-${kind}">${(kind || "UNDEFINED").toUpperCase()[0]}</span><span>${self.docLink(doc)}</span>
+<template id="doc.link" args-as="doc">
+    <a href="${urlFor(doc)}">${render("doc.title", doc)}</a>
 </template>
+
+
+<template id="doc.title" args-as="doc">${render("doc.title.inline", doc, doc.kind === 'class' && doc.interface ? 'interface' : doc.kind)}</template>
+
+
+<template id="doc.title.inline" args-as="doc,kind"><span class="kind kind-${kind}">${(kind || "UNDEFINED").toUpperCase()[0]}</span>${doc.name}</template>

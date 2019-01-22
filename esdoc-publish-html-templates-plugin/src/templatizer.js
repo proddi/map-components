@@ -16,13 +16,20 @@ function fromMarkup(markup, argNames=[], globals={}, name="unnamed") {
         ]
         .concat(Object.keys(globals).map(key => `let ${key}=globals.${key}`))
         .concat([
-            'return `'+markup+'`',
+            'return `' + markup + '`',
             `} catch (e) { if (!(e instanceof Error)) e = new Error(e); e.message += ' (...in template ${name})'; throw e; }`,
-        ]);
-    const fn = Function.apply(null, ["globals"].concat(argNames).concat(code.join("; "))).bind(null, globals);
-    fn.toSource = _ => `template<${name}>(${argNames.join(", ")}):\n` + markup.split('\n').map((line, index) => `   ${index}: ${line}`).join("\n");
-    fn.toString = _ => `template<${name}>(${argNames.join(", ")})`;
-    return fn;
+        ]).join(";\n");
+    try {
+        const fn = Function.apply(null, ["globals"].concat(argNames).concat(code)).bind(null, globals);
+        fn.toSource = _ => `template<${name}>(${argNames.join(", ")}):\n` + markup.split('\n').map((line, index) => `   ${index}: ${line}`).join("\n");
+        fn.toString = _ => `template<${name}>(${argNames.join(", ")})`;
+        return fn;
+    } catch (e) {
+        if (!(e instanceof Error)) e = new Error(e);
+        e.message += ` (...in template ${name})`;
+        console.info(code);
+        throw e;
+    }
 }
 
 
@@ -35,6 +42,8 @@ function fromElement(node, globals={}, name="unnamed node") {
     let argNames = (node.getAttribute("args-as") || "data").split(",").map(arg => arg.trim());
     let markup = node.innerHTML.trim();
     markup = markup.replace(/=&gt;/g, "=>")
-                   .replace(/&amp;&amp;/g, "&&");
+                   .replace(/&amp;&amp;/g, "&&")
+                   .replace(/=""/g, "")
+                   ;
     return fromMarkup(markup, argNames, globals, name);
 }
