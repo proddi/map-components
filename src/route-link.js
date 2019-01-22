@@ -15,7 +15,7 @@ class RouteLink extends HTMLElement {
         super();
 
         this.addEventListener("click", (ev) => {
-            let router = document.querySelector(this.getAttribute("router"));
+            let router = (qs(this.getAttribute("router")) || qp(this, "[role=route-source]"))[0];
             router.setRoute(
                     this.getAttribute("start"),
                     this.getAttribute("dest"),

@@ -15,6 +15,7 @@
     <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
+    <script type="module" src="../src/mc/ui/route-spinner.js"></script>
     <style>
         /* component base styles */
         here-map {
@@ -38,12 +39,18 @@
         </google-router>
 
         <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <here-map-route-picker router="#google-router"></here-map-route-picker>
-            <here-map-routes selector="#route-selector"></here-map-routes>
+            <here-map-route-picker role="route-source" router="#google-router"
+                start="13.30,52.43"
+                dest="13.76,52.51"
+                time="2018-12-22T19:17:07">
+            </here-map-route-picker>
+            <here-map-routes></here-map-routes>
         </here-map>
 
         <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-            <route-selector id="route-selector" router="#google-router"></route-selector>
+            <route-selector>
+                <route-spinner slot="center"></route-spinner>
+            </route-selector>
         </div>
     </maps-example>
 

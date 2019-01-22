@@ -11,24 +11,22 @@
         body {
             font-family: 'Source Sans Pro', 'Lucida Grande', sans-serif;
         }
+        route-selector {
+            max-height: 200px;
+            transition: max-height 3s ease;
+        }
     </style>
 </head>
 <body>
     <h3>RouteSelector - map-components</h3>
 
     <maps-example>
-        <demo-router id="router" base="../assets/responses/here-transit-"
-            name="demo"
+        <demo-router role="route-source" show-routes
+            base="../assets/responses/here-transit-"
             start="A"
             dest="B">
         </demo-router>
-        <route-selector router="#router" toggle></route-selector>
-        <script>
-            document.querySelector("route-selector")
-                .addEventListener("selected", (ev) => console.log("selected:", ev.detail));
-            document.querySelector("route-selector")
-                .addEventListener("unselected", (ev) => console.log("unselected:", ev.detail));
-        </script>
+        <route-selector toggle></route-selector>
     </maps-example>
 </body>
 </html>

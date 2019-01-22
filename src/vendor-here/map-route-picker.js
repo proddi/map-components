@@ -67,7 +67,7 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
     }
 
     getRouter() {
-        return this._whenRouterReady;
+        return this._whenRouterReady.then(router => router.getRouter());
     }
 
     setMap(hereMap) {
@@ -131,24 +131,22 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
     }
 
     requestRoute(request) {
-        // update markers
-        this.whenReady.then(({map, startMarker, destMarker}) => {
-            startMarker.setPosition(request.start);
-            destMarker.setPosition(request.dest);
-            map.setViewBounds(startMarker.getParentGroup().getBounds(), true);
-        });
+        if (!request.error) {
+            // update markers
+            this.whenReady.then(({map, startMarker, destMarker}) => {
+                startMarker.setPosition(request.start);
+                destMarker.setPosition(request.dest);
+                map.setViewBounds(startMarker.getParentGroup().getBounds(), true);
+            });
 
-        // update history
-        this.history && this.history.push({
-                    route: encodeRoute(request.start, request.dest, request.time),
-                });
+            // update history
+            this.history && this.history.push({
+                        route: encodeRoute(request.start, request.dest, request.time),
+                    });
 
+    }
         return super.requestRoute(...arguments);
     }
-
-//    responseRoute(response) {
-//        return super.responseRoute(...arguments);
-//    }
 }
 
 

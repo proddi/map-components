@@ -1,4 +1,5 @@
 import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, findRootElement, parseString, buildURI, createUID} from '../generics.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 import {GooglePlatform} from './platform.js';
 
 
@@ -16,9 +17,15 @@ import {GooglePlatform} from './platform.js';
  * @see https://developers.google.com/maps/documentation/directions/start
  **/
 class GoogleDirectionsRouter extends BaseRouter {
+    /**
+     * Type of the router - _"google"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return "google"; }
+
     constructor() {
         super();
-        this.type = "google";
 
         /**
          * Travel mode to use. One of 'DRIVING', 'WALKING', 'BICYCLING', 'TRANSIT'.
@@ -27,12 +34,15 @@ class GoogleDirectionsRouter extends BaseRouter {
         this.mode = this.getAttribute("mode");
 
         /** @type {GooglePlatform} */
-        this.platform = undefined;
+        this.platform = null;
+        this._whenReady = whenElementReady(qs(this.getAttribute("platform")) || qp(this, "google-platform"))
+            .then(platform => this.platform = platform)
+            .catch(err => console.error("Unable to attach <here-platform>:", err))
+            ;
     }
 
-    connectedCallback() {
-        this.platform = findRootElement(this, this.getAttribute("platform"), GooglePlatform);
-        super.connectedCallback();
+    getRouter() {
+        return this._whenReady.then(_ => this);
     }
 
     /**
@@ -95,8 +105,8 @@ class GoogleDirectionsRouter extends BaseRouter {
                     });
                     return new Route(createUID("g-route-{uid}"), this, departure, routeArr, removeConsecModes(legs));
                 });
-                return response.setRoutes(routes);
-            }).catch(error => response.setError(error));
+                return response.resolve(routes);
+            }).catch(error => response.fail(error));
         });
     }
 }

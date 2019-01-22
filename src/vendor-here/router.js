@@ -1,5 +1,6 @@
 import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseString, findRootElement, createUID, buildURI} from '../generics.js';
 import {HerePlatform} from './platform.js';
+import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
 /**
@@ -17,22 +18,43 @@ import {HerePlatform} from './platform.js';
  **/
 class HereRouter extends BaseRouter {
     /**
+     * Type of the router - _"here"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return "here"; }
+
+    /**
      * create instance
      */
     constructor() {
         super();
-        /**
-         * Returns "here" for this router.
-         * @type {string}
-         */
-        this.type = "here";
-    }
 
+        this.platform = null;
+        this._whenReady = whenElementReady(qs(this.getAttribute("platform")) || qp(this, "here-platform"))
+            .then(
+                platform => [platform.app_id, platform.app_code],
+                error => [parseString(this.getAttribute("app-id"), window), parseString(this.getAttribute("app-code"), window)]
+            )
+            .then(([app_id, app_code]) => {
+                if (!app_id || !app_code) throw new Error("No credentials!");
+                this._app_id = app_id;
+                this._app_code = app_code;
+            })
+            ;
+    }
+/*
     connectedCallback() {
         this.platform = findRootElement(this, this.getAttribute("platform"), HerePlatform, null);
         this.app_id   = this.platform ? this.platform.app_id   : parseString(this.getAttribute("app-id"), window);
         this.app_code = this.platform ? this.platform.app_code : parseString(this.getAttribute("app-code"), window);
         super.connectedCallback();
+    }
+*/
+
+
+    getRouter() {
+        return this._whenReady.then(_ => this);
     }
 
     /**
@@ -63,8 +85,8 @@ class HereRouter extends BaseRouter {
                 legAttributdes:     `travelTime,shape`,
                 maneuverAttributes: `position,publicTransportLine`,
                 routeAttributes:    `legs,shape,lines,groups`,
-                app_id:             this.app_id,
-                app_code:           this.app_code,
+                app_id:             this._app_id,
+                app_code:           this._app_code,
             });
         let response = new RouteResponse(request);
 

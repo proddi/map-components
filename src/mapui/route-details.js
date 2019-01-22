@@ -1,6 +1,6 @@
 import {html, render, repeat} from '../map/lit-html.js';
 import {BaseRouter} from '../generics.js';
-import {SelectedMixin} from '../map/mixins.js';
+import {RouteObserver} from '../map/mixins.js';
 
 import '/node_modules/@polymer/paper-item/paper-icon-item.js';
 import '/node_modules/@polymer/paper-item/paper-item-body.js';
@@ -16,19 +16,13 @@ import '/node_modules/@polymer/iron-icons/maps-icons.js';
  *
  * <route-details router="#router"></route-details>
  *
- * @extends {SelectedMixin}
+ * @extends {RouteObserver}
  * @extends {HTMLElement}
  *
  **/
-class RouteDetails extends SelectedMixin(HTMLElement) {
+class RouteDetails extends RouteObserver(HTMLElement) {
     constructor() {
         super();
-
-        /**
-         * contains the {@link Route} to display.
-         * @type {Route|null}
-         */
-        this.selectedItem = null;
 
         // get templates
         this._baseRenderer  = baseRenderer;
@@ -56,31 +50,18 @@ class RouteDetails extends SelectedMixin(HTMLElement) {
 
         // prepare root
         this.attachShadow({mode: 'open'});
-        this.clear();
-    }
 
-    onItemSelected(route) {
-        this.showRoute(route);
-    }
-
-    onItemDeselected(route) {
-        this.clear();
-    }
-
-    showLoading(request) {
-        this.clear();
-    }
-
-    showRoute(route) {
-        render(this._baseRenderer(route, this._legRenderer), this.shadowRoot);
-    }
-
-    showResponse(response) {
-        this.showRoute(response.routes[0]);
-    }
-
-    clear() {
+        // initial render
         render(this._baseRenderer({}), this.shadowRoot);
+    }
+
+    onRouteSelected(route) {
+        render(this._baseRenderer(route, this._legRenderer), this.shadowRoot);
+        this.setAttribute("selected", "");
+    }
+
+    onRouteDeselected(route) {
+        this.removeAttribute("selected");
     }
 }
 
@@ -100,6 +81,13 @@ function baseRenderer(route, legTemplate) {
     <style>
         :host {
             display: block;
+        }
+        :h_ost [role=listbox] {
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+        :h_ost([selected]) [role=listbox] {
+            opacity: 1;
         }
         :host paper-icon-item {
             position: relative;

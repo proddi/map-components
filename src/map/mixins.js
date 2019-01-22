@@ -612,14 +612,6 @@ class RouteSource {
         this.time = null;
 
         /**
-         * Defines the behavior of selectRoute(). It get's set by the `toggle` attribute. By default toggling isn't
-         * active.
-         * @attribute {toggle} - foooo
-         * @type {boolean}
-         */
-        this.toggleSelection = false;
-
-        /**
          * The current route request.
          * @type {RouteRequest|null}
          */
@@ -662,7 +654,7 @@ let RouteSourceImpl = Base => class extends Base {
          */
         this.routeResponse = null;
 
-        this.toggleSelection = this.hasAttribute("toggle");
+        this.routeSelected = null;
 
         setTimeout(_ => {
             this.initRoute();
@@ -690,13 +682,20 @@ let RouteSourceImpl = Base => class extends Base {
         this.time = time === undefined ? this.time : time;
         if (this.start && this.dest) {
             this.getRouter().then(router => {
-                    let request = router.buildRouteRequest(this.start, this.dest, this.time);
+                    this.deselectRoute();
+                    let request;
+                    try {
+                        request = router.buildRouteRequest(this.start, this.dest, this.time);
+                    } catch (e) {
+                        request = new RouteResponse(this, this.start, this.dest, this.time).fail(e);
+                    }
                     this.requestRoute(request);
                     let progress = (response) => this.responseRoute(response, true);
                     return (request.error ? Promise.reject(request.error) : request.router.execRouteRequest(request, progress))
                         .catch(error => new RouteResponse(request).fail(error))
-                        .then(response => this.responseRoute(response));
-                })  // failure? we don't care
+                        .then(response => this.responseRoute(response))
+                        ;
+                }, err => console.error("No router available:", err))  // failure? we don't care
                 ;
         }
     }
@@ -719,6 +718,7 @@ let RouteSourceImpl = Base => class extends Base {
     }
 
     clearRoute() {
+        this.deselectRoute();
         this.dispatchEvent(new CustomEvent('route-clear'));
     }
 
@@ -731,8 +731,6 @@ let RouteSourceImpl = Base => class extends Base {
             this.deselectRoute(this.routeSelected);
             this.routeSelected = route;
             this.dispatchEvent(new CustomEvent('route-selected', { detail: { route: this.routeSelected, }}));
-        } else {
-            if (this.toggleSelection) this.deselectRoute(route);
         }
     }
 

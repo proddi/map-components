@@ -1,4 +1,5 @@
 import {BaseRouter, RouteResponse} from './generics.js';
+import {qs, qp, whenElementReady} from './mc/utils.js';
 
 
 /**
@@ -12,19 +13,35 @@ import {BaseRouter, RouteResponse} from './generics.js';
  * </union-router>
  */
 class UnionRouter extends BaseRouter {
-    /** @private */
+    /**
+     * Type of the router - _"union"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return "union"; }
+
+    /** @protected */
     constructor() {
         super();
 
-        /** @type {string} */
-        this.type   = "union";
         /** @type {BaseRouter[]} */
-        this.routers = undefined;
+
+        this.routers = [];
+
+        this._whenReady = Promise.all(
+            this.getAttribute("routers")
+                .split(",")
+                .filter(id => id)
+                .map(id => whenElementReady(qs(id)))
+            )
+//            .then(routers => { console.log(".all:", routers); return routers; })
+            .then(routers => this.routers = routers);
     }
 
-    connectedCallback() {
-        if (!this.routers) this.setRouters(this.getAttribute("routers"));
-        super.connectedCallback();
+    getRouter() {
+        return this._whenReady
+            .then(routers => Promise.all(routers.map(router => router.getRouter())))
+            .then(_ => this);
     }
 
     /**
@@ -42,7 +59,9 @@ class UnionRouter extends BaseRouter {
     }
 
     buildRouteRequest(start, dest, time=undefined) {
-        return super.buildRouteRequest(start, dest, time, { routers: this.routers, });
+        return super.buildRouteRequest(start, dest, time, {
+                requests: this.routers.map(router => router.buildRouteRequest(...arguments)),
+            });
     }
 
     /**
@@ -51,15 +70,20 @@ class UnionRouter extends BaseRouter {
      * @param {RouteRequest} request - route request.
      * @returns {Promise<RouteResponse, Error>} - route response
      */
-    async execRouteRequest(request) {
+    async execRouteRequest(request, progress) {
         let response = new RouteResponse(request);
         return Promise.all(
-            request.routers.map(router => router.execRouteRequest(router.buildRouteRequest(request.start, request.dest, request.time)))//.catch(error => undefined))
+            request.requests.map(request => request.router.execRouteRequest(request).then(res => {
+                    response.resolve(response.routes.concat(res.routes));
+                    progress(response);
+                    return res;
+                }))//.catch(error => undefined))
         ).then(responses => {
             let errors = responses.filter(response => response.error).map(response => response.error);
             let routes = responses.map(response => response.routes).reduce((prev, curr) => prev.concat(curr), []);
-            return response.setRoutes(routes).setError(errors.join("; ") || undefined);
-        });
+            return response.resolve(routes).fail(errors.join("; ") || undefined);
+        })
+        .catch(errors => { console.error(errors); throw errors;});
     }
 }
 

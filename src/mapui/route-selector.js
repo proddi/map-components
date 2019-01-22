@@ -28,28 +28,50 @@ class RouteSelector extends RouteObserver(HTMLElement) {
         this._baseRenderer = baseRenderer;
         this._routeRenderer = routeRenderer;
 
+        /**
+         * Defines the behavior of selectRoute(). It get's set by the `toggle` attribute. By default toggling isn't
+         * active.
+         * @attribute {toggle} - foooo
+         * @type {boolean}
+         */
+        this.toggleSelection = this.hasAttribute("toggle");
+
         // prepare root
         this.attachShadow({mode: 'open'});
+
+        // initial rendering
+        this.onRouteClear();
+    }
+
+    selectRoute(route) {
+        if (route === this.routeSource.routeSelected && this.toggleSelection) {
+            this.routeSource.deselectRoute(route);
+        } else {
+            this.routeSource.selectRoute(route);
+        }
     }
 
     onRouteRequest(request) {
-        this.showLoading(request);
+        this.setAttribute("loading", "");
     }
 
     onRouteResponse(response) {
-        this.showResponse(response);
+//        if (!response.error) {
+            render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
+            this.removeAttribute("loading");
+//        }
     }
 
     onRouteClear() {
         render(this._baseRenderer(this, {}, this._routeRenderer), this.shadowRoot);
     }
 
-    showLoading(request) {
-        this.onRouteClear();
+    onRouteSelected(route) {
+        this.setAttribute("selected", "");
     }
 
-    showResponse(response) {
-        render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
+    onRouteDeselected(route) {
+        this.removeAttribute("selected");
     }
 }
 
@@ -75,6 +97,13 @@ function baseRenderer(self, response, routeTemplate) {
             display: block;
             overflow-y: hidden;
             overflow-y: auto;
+        }
+        :host [role=listbox] {
+            opacity: 1;
+            transition: opacity .3s ease;
+        }
+        :host([loading]) [role=listbox] {
+            opacity: 0;
         }
         :host .route-lines {
             background-color: #f0f0f0;
@@ -105,12 +134,23 @@ function baseRenderer(self, response, routeTemplate) {
         :host paper-icon-item:hover {
             background-color: rgba(128, 128, 128, .12);
         }
+
+        :host > slot[name=center] {
+            display: block;
+            position: absolute;
+            text-align: center;
+            top: 40%;
+            left: 0;
+            right: 0;
+        }
     </style>
 
+    <slot name="top"></slot>
+    <slot name="center"></slot>
     <div role="listbox">
-        <div>${response.error}</div>
         ${repeat(response.routes || [], (route) => route.id, (route, index) => routeTemplate(self, route, response))}
     </div>
+    <slot name="bottom"></slot>
 `;
 }
 
@@ -118,7 +158,7 @@ function baseRenderer(self, response, routeTemplate) {
 function routeRenderer(self, route, response) {
     return html`
       <paper-icon-item data-route="${route.uid}"
-            @click=${_ => self.routeSource.selectRoute(route)}
+            @click=${_ => self.selectRoute(route)}
             @mouseenter=${_ => self.routeSource.emphasizeRoute(route, "highlighted")}
             @mouseleave=${_ => self.routeSource.emphasizeRoute(route)}>
         <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>

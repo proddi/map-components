@@ -16,6 +16,57 @@ class DemoRouter extends MockupRouter {
      */
     get type() { return 'demo'; }
 
+    constructor() {
+        super();
+
+        let base = this.getAttribute("base");
+        this.src = base ? base + "{start}-{dest}.json" : this.src;
+
+        /**
+         * The target router to be updated with new routes. This is optional.
+         * @type {BaseRouter|null}
+         */
+        this.router = null;
+        whenElementReady(qs(this.getAttribute("router") || qp("[role=router]")))
+            .then(router => this.router = router)
+            .catch(_ => {})  // ignore error
+            ;
+
+        /**
+         * The available locations to lookup.
+         * @type {Object}
+         */
+        this.locations = {
+            A:          new Address({lng:13.31709, lat:52.54441, name:"A"}),
+            B:          new Address({lng:13.56, lat:52.41, name:"B"}),
+            BERLIN:     new Address({lng:13.447128295898438, lat:52.512864781394114, name:"Berlin"}),
+            HALLE:      new Address({lng:11.973157884785905, lat:51.48050248106511, name:"Halle"}),
+            UTRECHT:    new Address({lng:5.134984018513933, lat:52.07354489152308, name:"Utrecht"}),
+            DORDRECHT:  new Address({lng:4.658216001698747, lat:51.80320799021636, name:"Dordrecht"}),
+            LONDON_A:   new Address({lng:-0.38328552246099434, lat:51.53735345562071, name:"LONDON_A"}),
+            LONDON_B:   new Address({lng:0.21958923339838066, lat:51.44329522308777, name:"LONDON_B"}),
+            PELHAM:     new Address({lng:-73.80951026774704, lat:40.9111206612218, name:"Pelham, NYC"}),
+            JFK:        new Address({lng:-73.7893817794975, lat:40.64110273169828, name:"JFK Airport"}),
+        }
+
+        this.routes = {
+            "Berlin A->B": ["A", "B"],
+            "Ger:Berlin->Halle": ["BERLIN", "HALLE"],
+            "Ned:Utrecht->Dordrecht": ["UTRECHT", "DORDRECHT"],
+            "London:A->B": ["LONDON_A", "LONDON_B"],
+            "NYC:Pelham->JFK": ["PELHAM", "JFK"],
+        };
+
+        this.attachShadow({mode: 'open'});
+
+        this.showRoutes = this.hasAttribute("show-routes");
+
+        if (this.showRoutes) {
+            let itemRenderer = elementTemplate(this.querySelector('template[role="button"]')) || this.itemRenderer;
+            render(this.baseRenderer(this.routes, itemRenderer), this.shadowRoot);
+        }
+    }
+
     baseRenderer(routes, itemRenderer) {
         return html`
             <style>
@@ -53,47 +104,10 @@ class DemoRouter extends MockupRouter {
      * @param {Address} start
      * @param {Address} dest
      */
-    itemRenderer(router, name, start, dest) {
+    itemRenderer(self, name, start, dest) {
         return html`
-            <span @click=${_ => router.update({start:start, dest:dest})}>${name}</span>
+            <span @click=${_ => (self.router || self).update({start:start, dest:dest})}>${name}</span>
         `
-    }
-
-    constructor() {
-        super();
-
-        let base = this.getAttribute("base");
-        this.src = base ? base + "{start}-{dest}.json" : this.src;
-
-        /**
-         * The available locations to lookup.
-         * @type {Object}
-         */
-        this.locations = {
-            A:          new Address({lng:13.31709, lat:52.54441, name:"A"}),
-            B:          new Address({lng:13.56, lat:52.41, name:"B"}),
-            BERLIN:     new Address({lng:13.447128295898438, lat:52.512864781394114, name:"Berlin"}),
-            HALLE:      new Address({lng:11.973157884785905, lat:51.48050248106511, name:"Halle"}),
-            UTRECHT:    new Address({lng:5.134984018513933, lat:52.07354489152308, name:"Utrecht"}),
-            DORDRECHT:  new Address({lng:4.658216001698747, lat:51.80320799021636, name:"Dordrecht"}),
-            LONDON_A:   new Address({lng:-0.38328552246099434, lat:51.53735345562071, name:"LONDON_A"}),
-            LONDON_B:   new Address({lng:0.21958923339838066, lat:51.44329522308777, name:"LONDON_B"}),
-            PELHAM:     new Address({lng:-73.80951026774704, lat:40.9111206612218, name:"Pelham, NYC"}),
-            JFK:        new Address({lng:-73.7893817794975, lat:40.64110273169828, name:"JFK Airport"}),
-        }
-
-        this.routes = {
-            "Berlin A->B": ["A", "B"],
-            "Ger:Berlin->Halle": ["BERLIN", "HALLE"],
-            "Ned:Utrecht->Dordrecht": ["UTRECHT", "DORDRECHT"],
-            "London:A->B": ["LONDON_A", "LONDON_B"],
-            "NYC:Pelham->JFK": ["PELHAM", "JFK"],
-        };
-
-        this.attachShadow({mode: 'open'});
-
-        let itemRenderer = elementTemplate(this.querySelector('template[role="button"]')) || this.itemRenderer;
-        render(this.baseRenderer(this.routes, itemRenderer), this.shadowRoot);
     }
 }
 

@@ -49,9 +49,9 @@ class DemoRoutes extends HTMLElement {
      * @param {Address} start
      * @param {Address} dest
      */
-    itemRenderer(router, name, start, dest) {
+    itemRenderer(self, name, start, dest) {
         return html`
-            <span @click=${_ => router.router.setRoute(start, dest)}>${name}</span>
+            <span @click=${_ => self.routeSource.setRoute(start, dest)}>${name}</span>
         `
     }
 
@@ -60,10 +60,10 @@ class DemoRoutes extends HTMLElement {
 
         let base = this.getAttribute("base");
 
-        this.router = null;
-        whenElementReady(qs(this.getAttribute("router")) || qp(this, "[role=router]"))
-            .then(router => { this.router = router; })
-            .catch(err => console.warn("No attached router, use myself"))
+        this.routeSource = null;
+        whenElementReady(qs(this.getAttribute("router")) || qp(this, "[role=route-source]"))
+            .then(routeSource => { this.routeSource = routeSource; })
+            .catch(err => console.error("No attached router/route-source:", err))
             ;
 
 

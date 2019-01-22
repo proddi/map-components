@@ -10,21 +10,12 @@
     <script type="module" src="../../src/mapui/route-selector.js"></script>
     <script type="module" src="../../src/mapui/route-details.js"></script>
     <script type="module" src="../../src/union-router.js"></script>
-    <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
-
-    <script type="module">
-        window.getClosest = function(el, selector) {
-            while (el) {
-                if (el.matches && el.matches(selector)) return el;
-                el = el.parentNode || el.host;
-            }
-        };
-    </script>
+    <script type="module" src="/node_modules/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
 </head>
 <body>
     <h3>RouteDetails - map-components</h3>
 
-    <demo-router id="router"
+    <demo-router role="route-source"
         name="demo"
         base="../assets/responses/here-transit-"
         start="A"
@@ -33,11 +24,11 @@
     </demo-router>
 
     <maps-example style="float:right; width:38%; margin-left:0">
-        <route-details selector="route-selector"></route-details>
+        <route-details></route-details>
     </maps-example>
 
     <maps-example style="width:38%; margin-right:0">
-        <route-selector router="#router" toggle></route-selector>
+        <route-selector toggle></route-selector>
     </maps-example>
 </body>
 </html>

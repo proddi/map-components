@@ -1,4 +1,5 @@
 import {html, render} from 'https://unpkg.com/lit-html?module';
+import {RouteObserver} from './map/mixins.js';
 
 
 /**
@@ -9,26 +10,13 @@ import {html, render} from 'https://unpkg.com/lit-html?module';
  *
  * <route-debug router="#router"></route-debug>
  **/
-class RouteDebug extends HTMLElement {
+class RouteDebug extends RouteObserver(HTMLElement) {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
     }
 
-    connectedCallback() {
-        let router = document.querySelector(this.getAttribute("router"));
-        if (router) {
-            // router events
-            router.addEventListener("request", (ev) => {
-                this.showDebug(ev.detail);
-            });
-
-            // set current state
-            router.currentRequest && this.showDebug(router.currentRequest);
-        }
-    }
-
-    showDebug(request) {
+    onRouteRequest(request) {
         render(TEMPLATE(request), this.shadowRoot);
     }
 }
@@ -42,7 +30,7 @@ const TEMPLATE = (request) => html`
                 background-color: rgba(255, 0, 0, .8);
             }
         </style>
-        <div>start=<span>"${request.start.lng},${request.start.lat}"</span> dest=<span>"${request.dest.lng},${request.dest.lat}"</span> time=<span>"${request.time}"</span></div>
+        <div>start=<span>"${request.start.lng},${request.start.lat}"</span> dest=<span>"${request.dest.lng},${request.dest.lat}"</span> time=<span>"${request.time.toISOString()}"</span></div>
     `;
 
 

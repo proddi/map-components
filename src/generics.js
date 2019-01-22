@@ -640,8 +640,9 @@ class DepartureStop extends Stop {
  */
 function parseCoordString(s) {
     if (typeof s === 'string' || s instanceof String) {
-        let coords = s.split(",");
-        return { lat: parseFloat(coords[1]), lng: parseFloat(coords[0]), name: coords[2], }
+        let [lng, lat, name] = s.split(",").map((val, i) => i<2 ? parseFloat(val) : val.trim());
+        if (isNaN(lng) || isNaN(lat)) throw new Error(`Could not parse coord-str: ${s}`);
+        return { lat, lng, name }
     }
     return Address.enforce(s);
 }

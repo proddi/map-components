@@ -10,59 +10,45 @@
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../src/vendor-here/map-routes.js"></script>
     <script type="module" src="../src/mapui/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-details.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
-    <style>
-        here-map {
-            position: relative;
-            height: 400px;
-            display: block;
-        }
-        here-map > route-selector {
-            position: absolute;
-            right: 2px;
-            top: 2px;
-            z-index: 10;
-            background-color: rgba(255, 255, 255, .8);
-        }
-    </style>
+    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
 </head>
 <body>
     <h3>HERE transit routing</h3>
+
+    <route-link start="13.31709,52.54441" dest="13.03205086063835,52.306711574213146">Berlin1</route-link>
+    <route-link start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508">Berlin2</route-link>
+    <route-link start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511">Berlin-Halle</route-link>
+    <route-link start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658">Belgium</route-link>
+    <route-link start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777">London</route-link>
+
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
 
-        <here-transit-router id="here-router" app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-transit-router>
+        <here-transit-router></here-transit-router>
 
         <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <here-map-route-picker role="router" id="picker" router="#here-router"
+
+            <here-map-route-picker role="route-source" id="picker" router="here-transit-router"
                     start="13.31709,52.54441"
                     dest="13.56,52.41"
                     time="2019-01-22T19:17:07">
-                <here-map-routes router="#pickder"></here-map-routes>
             </here-map-route-picker>
 
-            <here-map-route-picker role="router" router="#here-router"
-                    start="13.31709,52.54441"
-                    dest="13.56,52.41"
-                    time="2019-01-22T19:17:07">
-                <here-map-routes></here-map-routes>
-            </here-map-route-picker>
+            <here-map-routes></here-map-routes>
         </here-map>
+
+        <route-selector toggle>
+            <route-spinner slot="top"></route-spinner>
+            <route-error slot="top"></route-error>
+        </route-selector>
+        <route-details></route-details>
     </maps-example>
-    <route-link router="#here-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>
-    <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="13.383270263671875,52.46101698509508" time=2018-12-22T19:17:07>route2</route-link>
-    <route-link router="#here-router" start="13.447128295898438,52.512864781394114" dest="11.973157884785905,51.48050248106511" time=2018-12-22T19:17:07>Berlin-Halle</route-link>
-    <route-link router="#here-router" start="4.920364379882756,52.33196919051871" dest="5.120864868164006,52.08793171508658">Belgium</route-link>
-    <route-link router="#here-router" start="-0.38328552246099434,51.53735345562071" dest="0.21958923339838066,51.44329522308777" time=2019-01-22T19:17:07>London</route-link>
 
     <hr>
-    <route-debug router="#here-router"></route-debug>
-
-    <script>
-        document.querySelector("here-transit-router")
-            .addEventListener("response", (ev) => console.log("response:", ev.detail));
-    </script>
+    <route-debug></route-debug>
 </body>
 </html>
