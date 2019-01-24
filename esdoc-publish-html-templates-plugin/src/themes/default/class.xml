@@ -43,3 +43,102 @@
 <template id="path" args-as="path">
     <div>Path: <code>${path}</code></div>
 </template>
+
+
+<template id="properties" args-as="item">
+    <section class="properties">
+        <h2>Properties</h2>
+        ${propertiesOf(item).map(property => render("property", property.item, property.overrides, property.inherited)).join("")}
+    </section>
+</template>
+
+
+<template id="property" args-as="item,overrides,inherited">
+    <article class="item property">
+        <h3 class="signature">
+            ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
+            <span>
+                <a class="anchor" id="${item.name}" href="#${item.name}"></a>
+                <code class="access">${item.static ? "static" : ""}</code>
+                <code class="access">${item.access}</code>
+                <span class="name">${render("doc.title", item)}</span><!--
+         --></span><!--
+         --><code class="return">${signature(item.type)}</code>
+        </h3>
+        <div class="attributes">
+            ${inherited ? render("attribute", parentOf(inherited).interface ? 'Implemented in' : 'Inherited from', linkFor(inherited, parentOf(inherited).name), "inherited")
+                : overrides.length ? render("attribute", "Overrides", overrides.map(item => linkFor(item, parentOf(item).name)).join(", "), "overrides")
+                    : ""
+            }
+        </div>
+        ${render("deprecation", item, "this property was deprecated")}
+        ${render("debug-info", { kind: "item", __docId__: item.__docId__, item:item, overrides:overrides, inherited: inherited})}
+        ${render("description", item)}
+    </article>
+</template>
+
+
+<template id="methods" args-as="item">
+    <section class="methods">
+        <h2>Methods</h2>
+        ${methodsOf(item).map(method => render("method", method.item, method.overrides, method.inherited)).join("")}
+    </section>
+</template>
+
+
+<template id="method" args-as="item,overrides,inherited">
+    <article class="item method">
+        <h3 class="signature">
+            ${render("inline-options", [render("debug-toggle", { kind: "item", __docId__: item.__docId__ }), sourceLink(item, "source")])}
+            <span>
+                <a class="anchor" id="${item.name}" href="#${item.name}"></a>
+                <code class="access">${item.static ? "static" : ""}</code>
+                <code class="access">${item.access}</code>
+                <span class="name">${render("doc.title", item)}</span><!--
+         --></span><!--
+         --><code class="return">${self.buildFunctionSignature(item)}</code>
+        </h3>
+        <div class="attributes">
+            ${inherited ? render("attribute", parentOf(inherited).interface ? 'Implemented in' : 'Inherited from', linkFor(inherited, parentOf(inherited).name), "inherited")
+                : overrides.length ? render("attribute", "Overrides", overrides.map(item => linkFor(item, parentOf(item).name)). join(", "), "overrides")
+                    : ""
+            }
+        </div>
+        ${render("deprecation", item, "this method was deprecated")}
+        ${render("debug-info", { kind: "item", __docId__: item.__docId__, item:item, overrides:overrides, inherited: inherited})}
+        ${render("description", item)}
+        ${render("params", item)}
+    </article>
+</template>
+
+
+
+<template id="events" args-as="item">
+    ${render("events-impl", eventsOf(item), item)}
+</template>
+
+
+<template id="events-impl" args-as="events,item">
+    ${events.length ? `
+    <section class="events">
+        <h2>Events</h2>
+        ${events.map(item => render("event", item)).join("")}
+    </section>
+    ` : ""}
+</template>
+
+
+<template id="event" args-as="item">
+    <article class="item event">
+        <h3 class="signature">
+            <span class="options">${render("debug-toggle", item)}</span>
+            <span>
+                <a class="anchor" id="${item.name}" href="#${item.name}"></a>
+                <a id="${item.name}" class="name" title="${item}">${item.name}</a>
+            </span><!--
+         --><code class="return">${signature(item)}</code>
+        </h3>
+        ${render("debug-info", item)}
+        ${render("description", item)}
+    </article>
+</template>

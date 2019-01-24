@@ -36,6 +36,7 @@
 
         /* properties, methods, events */
         main article h3 {
+            white-space-collapsing: discard;
             padding-top: .25em;
             padding-bottom: .5em;
         }
@@ -54,13 +55,20 @@
         main .attributes {
             font-style: italic;
             margin: 6px 0 0 0;
-            font-size: 0.9em;
+            f_ont-size: 0.9em;
+        }
+        main .attributes:empty {
+            display: none;
+        }
+        main .attributes .attribute {
+            b_order-left: 4px dotted #ddd;
+            p_adding-left: 7px;
         }
         main .attributes .attribute-label {
-            padding-right: .5em;
+            padding-right: .2em;
         }
         main .attributes {
-            margin-bottom: .5em;
+            m_argin-bottom: .5em;
         }
         main .param code {
             color: #666;

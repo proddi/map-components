@@ -602,10 +602,12 @@ let SetRouteMixinImpl = Base => class extends Base {
  * not be changed.
  *
  * @interface
- * @emits {route-request} - Fired when a new request is initiated. It can be used t erase previous routes.
- * @emits {route-response} - Fired when an route response is available. The property "intermediate" indicates a final
- *                           Response will come later. The body will contain
- *                           `{ response: Response, intermediate: Boolean }` as payload.
+ * @emits {CustomEvent} route-request - Fired when a new request is initiated. The structure is: `{ request: {@link RouteRequest} }`.
+ * @emits {CustomEvent} route-response - Fired when an route response is available. The structure is: `{ response: {@link RouteResponse}, intermediate: {@link boolean} }`. The property "intermediate" indicates a final Response will come later.
+ * @emits {CustomEvent} route-clear - Fired when a response gets cleared. The structure is: `{ }`.
+ * @emits {CustomEvent} route-selected - Fired when a route gets selected. The structure is: `{ route: {@link Route} }`.
+ * @emits {CustomEvent} route-deselected - Fired when a route gets deselected. The structure is: `{ route: {@link Route} }`.
+ * @emits {CustomEvent} route-emphasized - Fired when a route gets makred with an accent. The structure is: `{ route: {@link Route}, accent: {*} }`.
  */
 class RouteSource {
     constructor() {
@@ -633,12 +635,37 @@ class RouteSource {
     /**
      * Indicating a new {@link Request} is initiated. It also emits a `route-request` event with `{ request: Request }`
      * as payload.
+     * @deprecated Override the "protected" method `_emitRouteRequest()`.
      * @param {Request} request
      */
     requestRoute(request) {}
+    /**
+     * Emits a {@link RouteRequestEvent} as `route-request`.
+     * @protected
+     * @param {RouteRequest} request
+     */
+    _emitRouteRequest(request) {}
+    /**
+     * Emits a {@link RouteResponseEvent} as `route-response`.
+     * @param {Response} response
+     * @param {boolean} [intermediate=false]
+     */
     responseRoute(response, intermediate=false) {}
+    /**
+     * Emits a {@link RouteSelectedEvent} as `route-selected`.
+     * @param {Route} route
+     */
     selectRoute(route) {}
+    /**
+     * Emits a {@link RouteDeselectedEvent} as `route-deselected`.
+     * @param {Route} route
+     */
     deselectRoute(route) {}
+    /**
+     * Emits a {@link RouteEmphasizedEvent} as `route-emphasized`.
+     * @param {Route} route
+     * @param {*} accent
+     */
     emphasizeRoute(route, accent=null) {}
 }
 
@@ -705,17 +732,19 @@ let RouteSourceImpl = Base => class extends Base {
         }
     }
 
-    requestRoute(request) {
+    requestRoute(...args) {
+        return this._emitRouteRequest(...args);
+//        this.routeRequest = request;
+//        this.routeResponse = null;
+//        this.dispatchEvent(new CustomEvent('route-request', { detail: { request: request, }}));
+    }
+
+    _emitRouteRequest(request) {
         this.routeRequest = request;
         this.routeResponse = null;
         this.dispatchEvent(new CustomEvent('route-request', { detail: { request: request, }}));
     }
 
-    /**
-     * Indicates an {@link Response} is available. It also emits a `route-response` event.
-     * @param {Response} response
-     * @param {boolean} [intermediate=false]
-     */
     responseRoute(response, intermediate=false) {
         this.routeResponse = response;
         this.routeResponseIsIntermediate = intermediate;
@@ -784,6 +813,7 @@ class RouteObserver {
 
     /**
      * Sets a new router source.
+     * @todo Change to Promise (using whenElementReady) or accept no {@link DOMNode} anymore.
      * @param {RouteSource|DOMSelector|null} routeSource - The new router-source.
      * @return {RouteSource|null} - The previous router-source instance.
      */
@@ -803,9 +833,17 @@ class RouteObserver {
 
     /**
      * Callback when new request is initiated.
+     * @deprecated Override the "protected" method `_onRouteRequest()`.
      * @param {RouteRequest} request
      */
     onRouteRequest(request) {}
+
+    /**
+     * Event listener for router's `route-request` event.
+     * @protected
+     * @param {RouteRequest} request
+     */
+    _onRouteRequest(request) {}
 
     /**
      * Callback when new response is available.
@@ -829,7 +867,7 @@ let RouteObserverImpl = Base => class extends Base {
     constructor() {
         super();
 
-        this._routeRequestHandler              = (ev) => this.onRouteRequest(ev.detail.request);
+        this._routeRequestHandler              = (ev) => this._onRouteRequest(ev.detail.request);
         this._routeResponseHandler             = (ev) => this.onRouteResponse(ev.detail.response, ev.detail.intermediate);
         this._routeClearHandler                = (ev) => this.onRouteClear();
         this._routeSelectedHandler             = (ev) => this.onRouteSelected(ev.detail.route);
@@ -888,7 +926,8 @@ let RouteObserverImpl = Base => class extends Base {
 
 //    getRouteResponse() { return this.router && this.router.routeResponse; }
 
-    onRouteRequest(request) {}
+    onRouteRequest(...args) { return this._onRouteRequest(...args); }
+    _onRouteRequest(request) {}
 
     onRouteResponse(response) {}
 

@@ -5,6 +5,9 @@ import {qs, qp, whenElementReady} from './mc/utils.js';
 /**
  * Element for combining multiple routers {BaseRouter}s into one.
  *
+ * @todo Autodiscover node.children routers (qci(this, BaseRouter) - queryChildInstance)
+ * @todo Find the right place.
+ *
  * @example
  * <router1 id="router1"></router1>
  * <router2 id="router2"></router2>
@@ -24,7 +27,10 @@ class UnionRouter extends BaseRouter {
     constructor() {
         super();
 
-        /** @type {BaseRouter[]} */
+        /**
+         * @attribute {routers} - List of HTMLElement's with {@link BaseRouter} interface.
+         * @type {BaseRouter[]}
+         */
 
         this.routers = [];
 

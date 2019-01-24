@@ -635,8 +635,8 @@ class DepartureStop extends Stop {
 
 /**
  * Return coordinate-object for coordinte-string
- * @param {string} s - A string like `"52.432,13.254"`
- * @returns {CoordinatePair} - The object representation.
+ * @param {CoordinateString} s - A string like `"52.432,13.254"`
+ * @returns {Object} - The object representation.
  */
 function parseCoordString(s) {
     if (typeof s === 'string' || s instanceof String) {
@@ -662,7 +662,7 @@ function parseTimeString(s) {
  * - find a {@link DOMNode} by querying by tag-name. Fails if not exactly one node found.
  * - return default if specified or throw error.
  *
- * @deprecated Use qs(), qp() and whenElementReady() from '../ms/utils.js' instead.
+ * @deprecated Use qs(), qp() and whenElementReady() from '../mc/utils.js' instead.
  * @param {DOMNode} node - The node to start lookup.
  * @param {DOMSelector|undefined} selector - The dom selector to find the element.
  * @param {HTMLElement} Element - The required type.
@@ -671,6 +671,7 @@ function parseTimeString(s) {
  * @throws Exception when no {DOMNode} was found and no defaultValue was provided.
  */
 function findRootElement(node, selector, Element, defaultValue=undefined) {
+    console.warn('.findRootElement() is deprecated - use qs() and whenElementReady() from `mc/utils.js`');
     let found;
     // return node by selector
     if (selector) {

@@ -5,8 +5,8 @@
  *   BASE STYLES
  ****************************************/
 body {
-    font-family: Helvetica,Arial,sans-serif;
-    font-size: 0.9em;
+    font-family: 'Source Sans Pro',sans-serif,Helvetica,Arial,sans-serif;
+    f_ont-size: 0.9em;
     color: #222;
 }
 
@@ -23,6 +23,9 @@ body, h1, h2, h3, h4 {
     -webkit-font-smoothing: antialiased;
 }
 
+code {
+    font-size: 1.1em;
+}
 :target { background-color: red; }
 
 /* HEADER */
@@ -32,8 +35,8 @@ header {
     top: 0;
     right: 0;
     left: 0;
-    height: 60px;
-    line-height: 60px;
+    height: 50px;
+    line-height: 50px;
     background-color: #FFF;
     box-shadow: 2px 0 8px black;
     z-index: 1;
@@ -117,7 +120,7 @@ main article a.anchor {
 }
 main article *:hover > a.anchor::before {
     position: absolute;
-    width: 20em;
+    width: 30px;
     height: 20px;
     left: -28px;
     bottom: -1px;
@@ -138,8 +141,11 @@ main .options a {
 
 /** description code */
 .description {
-    margin-top: 15px;
+    margin-top: .2em;
     margin-bottom: 10px;
+}
+.description > p {
+    margin-top: 0;
 }
 .description code {
     background-color: #eee;
@@ -149,7 +155,9 @@ main .options a {
 .description pre > code {
   display: block;
 }
-
+.description code > code {
+    background-color: unset;
+}
 
 /* FOOTER */
 
@@ -166,7 +174,7 @@ main .options a {
     background-color: var(--kind-bg-color, silver);
     width: 1.2em;
     height: 1.2em;
-    line-height: 1.2em;
+    line-height: 1.0em;
     text-align: center;
     border-radius: 0.2em;
     font-weight: bold;
@@ -175,7 +183,7 @@ main .options a {
     margin-right: 0.3em;
 }
 a:hover > .kind {
-    box-shadow: 0 1px 2px var(--kind-fg-color);
+    box-shadow: 0 1px 1px var(--kind-fg-color);
 }
 .kind-class {
     --kind-display: inline-block;

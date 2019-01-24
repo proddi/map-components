@@ -10,10 +10,13 @@
     <script type="module" src="../../src/dev/demo-routes.js"></script>
     <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../../src/mapui/route-selector.js"></script>
-    <script type="module" src="../../src/mapui/route-details.js"></script>
+    <script type="module" src="../../src/vendor-google/platform.js"></script>
+    <script type="module" src="../../src/vendor-google/router.js"></script>
+    <script type="module" src="../../src/union-router.js"></script>
     <script type="module" src="../../src/route-link.js"></script>
-    <script type="module" src="../../src/mc/ui/route-spinner.js"></script>
+    <script type="module" src="../../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../../src/mc/ui/route-details.js"></script>
+    <script type="module" src="../../src/mc/ui/route-progress.js"></script>
     <script type="module" src="../../src/mc/ui/route-error.js"></script>
     <style>
         here-map {
@@ -32,9 +35,11 @@
             right: 5px;
             top: 5px;
             width: 300px;
+            min-height: 4em;
             max-height: calc(100% - 10px);
             z-index: 10;
             border: 1px solid #aaa;
+            border-radius: 4px;
             box-shadow: 1px 2px 2px rgba(0, 0, 0, .5);
             background-color: rgba(255, 255, 255, .9);
         }
@@ -58,23 +63,29 @@
         here-map > route-selector[selected] {
             opacity: .6;
             transform: scale(0.93) translateX(-50px);
-            p_ointer-events: none;
+            /* pointer-events: none; */
         }
     </style>
 </head>
 <body>
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-    <here-transit-router id="router"></here-transit-router>
+    <google-platform key="${GOOGLE_KEY}"></google-platform>
+
+    <union-router id="router" routers="#transit-router,#car-router,#bike-router">
+        <here-transit-router id="transit-router"></here-transit-router>
+        <google-router id="car-router" mode="DRIVING" name="google/car"></google-router>
+        <google-router id="bike-router" mode="BICYCLING" name="google/bike"></google-router>
+    </union-router>
 
     <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
-        <here-map-route-picker role="route-source" id="picker" router="here-transit-router"
+        <here-map-route-picker role="route-source" router="#router"
                 start="13.31709,52.54441"
                 dest="13.56,52.41"
                 time="2019-01-22T19:17:07">
         </here-map-route-picker>
         <here-map-routes></here-map-routes>
         <route-selector toggle>
-            <route-spinner slot="center"></route-spinner>
+            <route-progress slot="top"></route-progress>
             <route-error slot="center"></route-error>
         </route-selector>
         <route-details></route-details>

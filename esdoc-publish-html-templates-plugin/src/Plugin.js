@@ -14,9 +14,26 @@ const templatizer = require('./templatizer.js');
 
 
 class Plugin {
-//    onHandlePlugins(ev) {
-//        ev.data = ev.data.filter(plugin => plugin.name !== 'esdoc-publish-html-plugin');
-//    }
+    onHandleDocClass(ev) {
+        let {type, Clazz, ParamParser} = ev.data
+        switch (type) {
+            case 'Class':
+                ev.data.Clazz = class extends ev.data.Clazz {
+                    _$emits() {
+                        const values = this._findAllTagValues(['@emits']);
+                        if (!values) return;
+
+                        this._value.emits = [];
+                        for (const value of values) {
+                          const {typeText, paramName, paramDesc} = ParamParser.parseParamValue(value);
+                          const result = ParamParser.parseParam(typeText, paramName, paramDesc);
+                          this._value.emits.push(result);
+                        }
+                    }
+                }
+            break;
+        }
+    }
 
     onHandleDocs(ev) {
         this._docs = this._enrichModules(ev.data.docs);
@@ -210,8 +227,8 @@ class Plugin {
         }
     }
 
-    docLink(doc) {
-        return `<span><a href="${this.docUrl(doc)}">${doc.name}</a></span>`;
+    docLink(doc, text=null) {
+        return `<span><a href="${this.docUrl(doc)}">${text || doc.name}</a></span>`;
     }
 
     docSourceLink(doc, text=null) {
@@ -237,7 +254,7 @@ class Plugin {
 
     buildPropertySignature(prop, debug=false) {
         debug && console.warn("signature:>", prop);
-        let returnSignature = (prop.types || []).map(typ => {
+        let returnSignature = ((prop || {}).types || []).map(typ => {
             let typeDoc = this.getDocByName(typ, null, null);
             debug && console.warn("signature:", typ, typeDoc);
             return typeDoc ? this.docLink(typeDoc) : typ;
@@ -277,8 +294,8 @@ class Plugin {
                                                     .reduce((prev, curr) => prev.concat(curr), []);
 
         const _combineDoc = (item, chain, kinds) => {
-            let chainMethods = chain.map(item => [item, docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && !tag.ignore)]);
-            let myMethods = docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && !tag.ignore);
+            let chainMethods = chain.map(item => [item, docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && (!tag.ignore || tag.access === 'protected'))]);
+            let myMethods = docs.filter(tag => kinds.includes(tag.kind) && tag.memberof === item.longname && (!tag.ignore || tag.access === 'protected'));
             let elements = {};
             // default items from item
             myMethods.forEach(method => {
@@ -331,7 +348,7 @@ class Plugin {
             linkFor: this.docLink.bind(this),
             sourceUrl: doc => this.docSourceUrl(globals.sourceOf(doc)) + (doc.lineNumber && doc.kind !== "file" ? `#lineNumber${doc.lineNumber}` : ""),
             sourceLink: (doc, text=null) => `<span><a href="${globals.sourceUrl(doc)}">${text || doc.name}</a></span>`,
-            signature: doc => doc.kind === 'function' ? this.buildFunctionSignature(doc) : this.buildPropertySignature(doc),
+            signature: (doc, ...args) => (doc || {}).kind === 'function' ? this.buildFunctionSignature(doc, ...args) : this.buildPropertySignature(doc, ...args),
             // traversal helpers
             parentOf: doc => this.getDocByName(doc.memberof),
             sourceOf: doc => {
@@ -367,7 +384,9 @@ class Plugin {
             methodsOf: item => _combineDoc(item, listExtends(item, "extends"), ["method", "constructor"]),
             propertiesOf: item => _combineDoc(item, listExtends(item, "extends"), ["get", "set", "member"]),
             eventsOf: item => ([item].concat(listExtends(item, "extends")))
-                                            .map(item => (item.emits || []).map((event, idx) => { return {kind: "emits", __docId__: `${item.__docId__}-emits-${idx}`, name: event.types[0], description: event.description, memberof: item.longname}}))
+                                            .filter(item => item.emits)
+//                                            .map(item => { console.log(item); return item; })
+                                            .map(item => item.emits.map((event, idx) => Object.assign({kind: "emits", __docId__: `${item.__docId__}-emits-${idx}`, memberof: item.longname}, event)))
                                             .reduce((prev, curr) => prev.concat(curr), []),
 
         };

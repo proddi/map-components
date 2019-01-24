@@ -21,6 +21,12 @@ class MockupRouter extends BaseRouter {
         this.src = this.getAttribute("src");
 
         /**
+         * A simulated delay until the response is done.
+         * @type {number}
+         */
+        this.delay = parseFloat(this.getAttribute("delay") || "0");
+
+        /**
          * If a fallback router is specified (`fallback-router="#other-router"`), all non matching routes
          * will be forwarded to this router
          * @type {BaseRouter|null}
@@ -60,38 +66,41 @@ class MockupRouter extends BaseRouter {
      */
     async execRouteRequest(request) {
         let response = new RouteResponse(request);
-        return fetch(request.src).then(res => res.json()).then(data => {
-            let routes = data.routes.map(data => new Route(
-                data.id,
-                this,
-                buildLocation(data.departure),
-                buildLocation(data.arrival),
-                data.legs.map(leg => new Leg(
-                        buildLocation(leg.departure),
-                        buildLocation(leg.arrival),
-                        new Transport(leg.transport),
-                        leg.geometry,
-                        {
-                            id: leg.id,
-                            distance: leg.distance,
-                            summary:leg.summary,
-                            steps: leg.steps.map(step => buildLocation(step))
-                        }
-                ))
-            ));
-            return response.resolve(routes).fail(data.error);
-        }, error => {
-            console.trace("demo req failed:", error);
-            if (request.fallbackRouter) {
-                return request.fallbackRouter.execRouteRequest(
-                        request.fallbackRouter.buildRouteRequest(request.start, request.dest, request.time)
-                    ).then(response => {
-                        console.log("fallback-response:", response);
-                        return response;
-                    });
-            }
-            return response.fail(error);
-        });
+        return fetch(request.src).then(res => res.json())
+            .then(data => {
+                let routes = data.routes.map(data => new Route(
+                    data.id,
+                    this,
+                    buildLocation(data.departure),
+                    buildLocation(data.arrival),
+                    data.legs.map(leg => new Leg(
+                            buildLocation(leg.departure),
+                            buildLocation(leg.arrival),
+                            new Transport(leg.transport),
+                            leg.geometry,
+                            {
+                                id: leg.id,
+                                distance: leg.distance,
+                                summary:leg.summary,
+                                steps: leg.steps.map(step => buildLocation(step))
+                            }
+                    ))
+                ));
+                return response.resolve(routes).fail(data.error);
+            }, error => {
+                console.trace("demo req failed:", error);
+                if (request.fallbackRouter) {
+                    return request.fallbackRouter.execRouteRequest(
+                            request.fallbackRouter.buildRouteRequest(request.start, request.dest, request.time)
+                        ).then(response => {
+                            console.log("fallback-response:", response);
+                            return response;
+                        });
+                }
+                return response.fail(error);
+            })
+            .then(res => new Promise((resolve, reject) => setTimeout(_ => resolve(res), this.delay*1000)))
+            ;
     }
 
 }

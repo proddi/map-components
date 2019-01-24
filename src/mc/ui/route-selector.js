@@ -43,6 +43,9 @@ class RouteSelector extends RouteObserver(HTMLElement) {
         this.onRouteClear();
     }
 
+    /**
+     * @param {Route} route
+     */
     selectRoute(route) {
         if (route === this.routeSource.routeSelected && this.toggleSelection) {
             this.routeSource.deselectRoute(route);
@@ -51,10 +54,16 @@ class RouteSelector extends RouteObserver(HTMLElement) {
         }
     }
 
+    /**
+     * @param {RouteRequest} request
+     */
     onRouteRequest(request) {
         this.setAttribute("loading", "");
     }
 
+    /**
+     * @param {RouteResponse} response
+     */
     onRouteResponse(response) {
         render(this._baseRenderer(this, response, this._routeRenderer), this.shadowRoot);
         this.removeAttribute("loading");
@@ -64,12 +73,45 @@ class RouteSelector extends RouteObserver(HTMLElement) {
         render(this._baseRenderer(this, {}, this._routeRenderer), this.shadowRoot);
     }
 
+    /**
+     * @param {Route} route
+     */
     onRouteSelected(route) {
         this.setAttribute("selected", "");
     }
 
+
+    /**
+     * @param {Route} route
+     */
     onRouteDeselected(route) {
         this.removeAttribute("selected");
+    }
+
+    /**
+     * @param {RouteResponse} response
+     * @return {TemplateResult}
+     */
+    bodyTemplate(response) {
+        return html`
+            <slot name="top"></slot>
+            <slot name="center"></slot>
+            <div role="listbox">
+                ${repeat(response.routes || [], (route) => route.id, (route, index) => this.routeTemplate(route, response))}
+            </div>
+            <slot name="bottom"></slot>
+        `
+    }
+
+    /**
+     * @param {Route} route
+     * @param {RouteResponse} response
+     * @return {TemplateResult}
+     */
+    routeTemplate(route, response) {
+        return html`
+            <div>Route: ${route.id}</div>
+        `
     }
 }
 
@@ -125,6 +167,7 @@ function baseRenderer(self, response, routeTemplate) {
         }
         :host .provider {
             float: right;
+            font-size: .8em;
         }
         :host paper-icon-item {
             cursor: pointer;
@@ -133,6 +176,14 @@ function baseRenderer(self, response, routeTemplate) {
             background-color: rgba(128, 128, 128, .12);
         }
 
+        :host > slot[name=top] {
+            display: block;
+            position: absolute;
+            text-align: center;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
         :host > slot[name=center] {
             display: block;
             position: absolute;
