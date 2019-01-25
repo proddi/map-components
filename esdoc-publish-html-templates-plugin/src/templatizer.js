@@ -43,7 +43,6 @@ function fromElement(node, globals={}, name="unnamed node") {
     let markup = node.innerHTML.trim();
     markup = markup.replace(/=&gt;/g, "=>")
                    .replace(/&amp;&amp;/g, "&&")
-                   .replace(/=""/g, "")
                    ;
     return fromMarkup(markup, argNames, globals, name);
 }

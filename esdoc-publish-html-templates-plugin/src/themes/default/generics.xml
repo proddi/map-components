@@ -9,13 +9,16 @@
 </template>
 
 
-<template id="params" args-as="item">
-    ${(item.params || []).length ? `<div class="parameters"><ul>${item.params.filter(param => param.description).map(param => render("param", param)).join("")}</ul></div>` : ""}
+<template id="params" args-as="item">${render("params-inline", ((item.params || []).concat(item.return ? Object.assign({name: "return"}, item.return) : [])).filter(param => param.description))}</template>
+
+
+<template id="params-inline" args-as="params">
+    ${params.length ? `<div class="parameters"><ul>${params.map(param => render("param", param)).join("")}</ul></div>` : ""}
 </template>
 
 
 <template id="param" args-as="param">
-    <li class="param"><code type="return">${param.name}</code> &ndash; ${param.description || ""}</li>
+    <li class="param"><code type="return">${param.name}</code> &ndash; ${resolveLink(param.description)}</li>
 </template>
 
 
@@ -37,7 +40,7 @@
             <code class="access">${item.access} </code>
             <code class="access">${item.kind} </code>
             <a class="name" href="${urlFor(item)}">${render("doc.title", item)}</a><!--
-         --><code class="return">${signature(item.type)}</code>
+         --><code class="return">${signature(item.type || item.return)}</code>
         </h3>
         <div class="attributes">
             ${render("attribute", "Defined in:", sourceLink(item, sourceOf(item).name), "defined")}

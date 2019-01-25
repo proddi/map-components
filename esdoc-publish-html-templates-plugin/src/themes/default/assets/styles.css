@@ -171,7 +171,7 @@ main .options a {
     background-color: var(--kind-bg-color, silver);
     width: 1.2em;
     height: 1.2em;
-    line-height: 1.0em;
+    line-height: 1.1em;
     text-align: center;
     border-radius: 0.2em;
     font-weight: bold;

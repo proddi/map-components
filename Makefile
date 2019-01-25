@@ -4,12 +4,7 @@ init:
 
 .PHONY: clean
 clean:
-	@rm -rf package-lock.json node_modules docs build esdoc/node_modules esdoc/out
-
-.PHONY: esdoc
-esdoc:
-	git clone git@github.com:proddi/esdoc.git || exit 0
-	docker run --rm -it --user "`id -u`":"`id -g`" -v `pwd`:/src -w /src/esdoc node:lts-slim /bin/bash -c "npm i; npm run build"
+	@rm -rf package-lock.json node_modules docs build
 
 .PHONY: build
 build:

@@ -3,30 +3,32 @@
 
 
 <template id="class.html" args-as="doc,docs">
-    ${render("import", doc)}
-    ${render("inline-options", [render("debug-toggle", doc)])}
-    <h1 class="type-kind-class">${doc.name}</h1>
-    ${render("debug-info", doc)}
-    <div class="attributes">
-    ${render("attribute", "Defined in:", sourceLink(doc, sourceOf(doc).name), "defined")}
-    ${render("attribute2", doc, listExtends(doc), "Extends:", " → ")}
-    ${render("attribute2", doc, extendedBy(doc), "Extended by:", ", ")}
-    ${render("attribute2", doc, listImplements(doc), "Implements:", ", ")}
-    ${render("attribute2", doc, implementedIn(doc), "Implemented by:", ", ")}
-    </div>
-    <!--
-    $ {doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
-    $ {doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
-    -->
-    ${render("deprecation", doc, "this class was deprecated")}
-    ${render("experimental", doc)}
+    <article class="class">
+        ${render("import", doc)}
+        ${render("inline-options", [render("debug-toggle", doc)])}
+        <h1>${render("doc.title", doc)}</h1>
+        ${render("debug-info", doc)}
+        <div class="attributes">
+        ${render("attribute", "Defined in:", sourceLink(doc, sourceOf(doc).name), "defined")}
+        ${render("attribute2", doc, listExtends(doc), "Extends:", " → ")}
+        ${render("attribute2", doc, extendedBy(doc), "Extended by:", ", ")}
+        ${render("attribute2", doc, listImplements(doc), "Implements:", ", ")}
+        ${render("attribute2", doc, implementedIn(doc), "Implemented by:", ", ")}
+        </div>
+        <!--
+        $ {doc._custom_direct_subclasses ? builder.renderDirectSubclass(builder, doc._custom_direct_subclasses) : ""}
+        $ {doc._custom_indirect_subclasses ? builder.renderIndirectSubclass(builder, doc._custom_indirect_subclasses) : ""}
+        -->
+        ${render("deprecation", doc, "this class was deprecated")}
+        ${render("experimental", doc)}
 
-    ${render("description", doc)}
-    ${render("todo", doc)}
+        ${render("description", doc)}
+        ${render("todo", doc)}
 
-    ${render("properties", doc)}
-    ${render("methods", doc)}
-    ${render("events", doc)}
+        ${render("properties", doc)}
+        ${render("methods", doc)}
+        ${render("events", doc)}
+    </article>
 </template>
 
 

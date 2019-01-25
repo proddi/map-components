@@ -235,32 +235,121 @@ class Plugin {
         return `<span><a href="${this.docSourceUrl(doc)}">${text || doc.name}</a></span>`;
     }
 
-    buildFunctionSignature(doc) {
-        let callSignatures = (doc.params || []).map(param => {
-            return param.name + ": " + param.types.map(type => {
-                let typeDoc = this.getDocByName(type, null, null);
-                return typeDoc ? this.docLink(typeDoc) : type;
-            }).join(' | ');
-        });
+    buildTypeSignature(type) {
+        // e.g. number[]
+        if (type.endsWith('[]')) {
+            return `${this.buildTypeSignature(type.slice(0, -2))}[]`;
+        }
 
-        let returnSignature = ((doc.return || {}).types || []).map(type => {
-            let typeDoc = this.getDocByName(type, null, null);
-            return typeDoc ? this.docLink(typeDoc) : type;
-        }).join(' | ');
+        // e.g. function(a: number, b: string): boolean
+        let matched = type.match(/function *\((.*?)\)(.*)/);
+        if (matched) {
+            const functionLink = this.buildTypeSignature('function');
+            if (!matched[1] && !matched[2]) return `${functionLink}()`;
 
-        return '(' + callSignatures.join(', ') + ')' + (returnSignature ? ': ' + returnSignature : '');
-        return `(${callSignatures.join(', ')}): ${returnSignature || "void"}`;
+            let innerTypes = [];
+            if (matched[1]) {
+                // bad hack: Map.<string, boolean> => Map.<string\Z boolean>
+                // bad hack: {a: string, b: boolean} => {a\Y string\Z b\Y boolean}
+                const inner = matched[1].replace(/<.*?>/g, a => a.replace(/,/g, '\\Z')).replace(/{.*?}/g, a => a.replace(/,/g, '\\Z').replace(/:/g, '\\Y'));
+                innerTypes = inner.split(',').map(v => {
+                    const tmp = v.split(':').map(v => v.trim());
+                    if (tmp.length !== 2) throw new SyntaxError(`Invalid function type annotation: \`${matched[0]}\``);
+
+                    const paramName = tmp[0];
+                    const typeName = tmp[1].replace(/\\Z/g, ',').replace(/\\Y/g, ':');
+                    return `${paramName}: ${this.buildTypeSignature(typeName)}`;
+                });
+            }
+
+            let returnType = '';
+            if (matched[2]) {
+                const type = matched[2].split(':')[1];
+                if (type) returnType = `: ${this.buildTypeSignature(type.trim())}`;
+            }
+
+            return `${functionLink}(${innerTypes.join(', ')})${returnType}`;
+        }
+
+        // e.g. {a: number, b: string}
+        matched = type.match(/^\{(.*?)\}$/);
+        if (matched) {
+            if (!matched[1]) return '{}';
+            // bad hack: Map.<string, boolean> => Map.<string\Z boolean>
+            // bad hack: {a: string, b: boolean} => {a\Y string\Z b\Y boolean}
+            const inner = matched[1].replace(/<.*?>/g, a => a.replace(/,/g, '\\Z')).replace(/{.*?}/g, a => a.replace(/,/g, '\\Z').replace(/:/g, '\\Y'));
+
+            let broken = false;
+            const innerTypes = inner.split(',').map(v => {
+                const tmp = v.split(':').map(v => v.trim());
+
+                // edge case: if object key includes comma, this parsing is broken.
+                // e.g. {"a,b": 10}
+                // https://github.com/esdoc/esdoc-plugins/pull/49
+                if (!tmp[0] || !tmp[1]) {
+                    broken = true;
+                    return;
+                }
+
+                const paramName = tmp[0];
+                let typeName = tmp[1].replace(/\\Z/g, ',').replace(/\\Y/g, ':');
+
+                return `${paramName}: ${this.buildTypeSignature(typeName)}`;
+            });
+
+            if (broken) return `*`;
+
+            return `{${innerTypes.join(', ')}}`;
+        }
+
+        // e.g. Map<number, string>
+        matched = type.match(/^(.*?)\.?<(.*?)>$/);
+        if (matched) {
+            const mainType = matched[1];
+
+            // bad hack: Map.<string, boolean> => Map.<string\Z boolean>
+            // bad hack: {a: string, b: boolean} => {a\Y string\Z b\Y boolean}
+            const inner = matched[2].replace(/<.*?>/g, a => a.replace(/,/g, '\\Z')).replace(/{.*?}/g, a => a.replace(/,/g, '\\Z').replace(/:/g, '\\Y'));
+
+            const innerTypes = inner.split(',')
+                    .map(v => v.trim().replace(/\\Z/g, ',').replace(/\\Y/g, ':'))
+                    .map(v => this.buildTypeSignature(v))
+                    .join(', ')
+                    ;
+
+            return `${this.buildTypeSignature(mainType)}&lt;${innerTypes}&gt;`;
+        }
+
+        // e.g. ...number
+        if (type.startsWith('...')) {
+            return `...${this.buildTypeSignature(type.slice(3))}`;
+        }
+
+        // e.g. ?number
+        if (type.startsWith('?')) {
+            return `?${this.buildTypeSignature(type.slice(1))}`;
+        }
+
+        // e.g. number|string
+        if (type.includes('|')) {
+            return type.split('|').map(_type => this.buildTypeSignature(_type)).join('|');
+        }
+
+        let typeDoc = this.getDocByName(type, null, null);
+        return typeDoc ? this.docLink(typeDoc) : type;
     }
 
-    buildPropertySignature(prop, debug=false) {
-        debug && console.warn("signature:>", prop);
-        let returnSignature = ((prop || {}).types || []).map(typ => {
-            let typeDoc = this.getDocByName(typ, null, null);
-            debug && console.warn("signature:", typ, typeDoc);
-            return typeDoc ? this.docLink(typeDoc) : typ;
-        }).join(' | ');
+    buildFunctionSignature(doc) {
+        let callSignatures = (doc.params || []).map(param => {
+            return param.name + ": " + param.types.map(type => this.buildTypeSignature(type)).join(' | ');
+        });
+        return `(${callSignatures.join(', ')})` + this.buildPropertySignature(doc.return, null);
+    }
 
-        return `: ${returnSignature || "void"}`;
+    buildPropertySignature(prop, voidStr=null) {
+        const sig = ((prop || {}).types || []).map(type => this.buildTypeSignature(type)).join(' | ');
+
+        return sig ? `: ${sig}` : '';
     }
 
     getParentDoc(doc) {

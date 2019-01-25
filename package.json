@@ -2,6 +2,10 @@
     "name": "@proddi/map-components",
     "version": "0.0.1",
     "license": "MIT",
+    "author": {
+        "name": "proddi",
+        "url": "https://github.com/proddi/map-components"
+    },
     "module": "src/index.js",
     "main": "src/index.js",
     "repository": {
@@ -12,7 +16,6 @@
         "build": "./node_modules/.bin/webpack --config webpack.config.js",
         "build:prod": "NODE_ENV=production npm run build",
         "build:docs": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc.json",
-        "build:docs-templates": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc-templates.json",
         "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\"",
         "server": "./node_modules/.bin/polymer serve"
     },
@@ -29,7 +32,7 @@
         "lit-html": "^1.0.0-rc.2"
     },
     "devDependencies": {
-        "esdoc": "file:esdoc",
+        "@proddi/esdoc": "^1.2.0",
         "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
         "polymer-cli": "^1.9.5",
