@@ -4,6 +4,19 @@ import {RouteObserver} from '../../map/mixins.js';
 import '/node_modules/@polymer/paper-progress/paper-progress.js';
 
 
+/**
+ * Shows the loading progress of the attached {@link RouteSource}.
+ *
+ * @example
+ * <router role="route-source" ...></router>
+ * <route-selector>
+ *   <route-progress></route-progress>
+ * </route-selector>
+ *
+ * @extends {RouteObserver}
+ * @extends {HTMLElement}
+ *
+ **/
 class RouteProgress extends RouteObserver(HTMLElement) {
     constructor() {
         super();

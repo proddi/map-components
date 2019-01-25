@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Element class - map components</title>
+    <script type="module" src="../../src/mc/ui/html-demo.js"></script>
+    <script type="module">
+        import {Element, html} from '../../src/mc/core/Element.js';
+
+        class MyElement extends Element {
+
+            static get properties() {
+                return Object.assign({}, super.properties, {
+                    fName: {
+                        type: String,
+                        attribute: "first-name",
+                        reflect: true,
+                        hasChanged(newVal, oldVal) {
+                            console.log("fName.hasChanged()", newVal, oldVal);
+                            return newVal.length > 4;
+                        },
+                    },
+                    lastName: {
+                        reflect: true,
+                        converter: {
+                            fromAttribute: value => value.slice(1),
+                            toAttribute: value => "~"+value,
+                        },
+                    },
+                    age: { type: Number },
+                    onDuty: { type: Boolean },
+                    medals: { type: Array },
+                    skills: { type: "StringArray", reflect: true, },
+                    cv: { type: Object },
+                    noAccessors: {
+                        noAccessors: true,
+                    },
+                });
+            }
+
+            constructor() {
+                super();
+                this.medals = [];
+                this.skills = [];
+                this.cv = {};
+                this.id = this.getAttribute('id');
+            }
+
+            requestUpdate(...args) {
+                console.log(this.id, "requestUpdate", ...args);
+                super.requestUpdate(...args);
+            }
+
+            firstUpdated(props) {
+                console.log(this.id, "firstUpdated", props);
+            }
+
+            updated(props) {
+                console.log(this.id, "updated", props);
+            }
+
+            render() {
+                return html`
+                    <div>
+                        <p>Name: ${this.fName} ${this.lastName}</p>
+                        <p>Age: ${this.age}</p>
+                        <p>Duty: ${this.onDuty ? "yes" : "no"}</p>
+                        <p>Medals: ${this.medals.join(", ")}</p>
+                        <p>Skills: ${this.skills.join(", ")}</p>
+                        <p>CV: <code>${JSON.stringify(this.cv)}</code></p>
+                        <slot></slot>
+                        <hr>
+                    </div>
+                    <slot name="foo">
+                        <template id="bar">[BAR]</template>
+                    </slot>
+                `;
+            }
+        }
+
+        customElements.define('my-element', MyElement);
+    </script>
+</head>
+<body>
+    <h3>RouteDetails - map-components</h3>
+
+    <html-demo>
+        <my-element id="my-el-1"
+            first-name="John"
+            last-name="~Doe"
+            age="24"
+            on-duty
+            medals='["novice","combat",24]'
+            skills="foo,bar,24"
+            cv="%7B%22study%22%3A%22yes%22%2C%22since%22%3A24%2C%22and%22%3Atrue%7D"
+        >
+          <p>Add: this</p>
+          <p>Add: another</p>
+        </my-element>
+        <my-element id="my-el-2"
+            first-name="Elmar"
+            last-name="~Travis"
+            skills="drinking,relaxing,enjoying"
+        >
+          <p>Add: this</p><p foo="bar">Add: this</p>
+        </my-element>
+    </html-demo>
+</body>
+</html>
