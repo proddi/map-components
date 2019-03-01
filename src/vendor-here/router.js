@@ -123,9 +123,13 @@ class HereRouter extends BaseRouter {
                 }).reverse();
                 return new Route(createUID("h-route-{uid}"), this, departure, arrival, legs);
             });
-            return response.setRoutes(routes);
-        }).catch(error => response.setError(error));
+            return response.resolve(routes);
+        }).catch(error => response.fail(error));
     }
+
+    buildLocationRequest(query, at=null) {
+    }
+
 }
 
 

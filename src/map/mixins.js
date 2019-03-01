@@ -1,5 +1,6 @@
 import {BaseRouter, RouteResponse, findRootElement} from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
+import {RouteRequestEvent} from '../mc/events.js';
 
 
 /**
@@ -602,7 +603,7 @@ let SetRouteMixinImpl = Base => class extends Base {
  * not be changed.
  *
  * @interface
- * @emits {CustomEvent} route-request - Fired when a new request is initiated. The structure is: `{ request: {@link RouteRequest} }`.
+ * @emits {RouteRequestEvent} route-request - Fired when a new request is initiated. The structure is: `{ request: {@link RouteRequest} }`.
  * @emits {CustomEvent} route-response - Fired when an route response is available. The structure is: `{ response: {@link RouteResponse}, intermediate: {@link boolean} }`. The property "intermediate" indicates a final Response will come later.
  * @emits {CustomEvent} route-clear - Fired when a response gets cleared. The structure is: `{ }`.
  * @emits {CustomEvent} route-selected - Fired when a route gets selected. The structure is: `{ route: {@link Route} }`.
@@ -642,6 +643,7 @@ class RouteSource {
     /**
      * Emits a {@link RouteRequestEvent} as `route-request`.
      * @protected
+     * @fires {RouteRequestEvent} route-request
      * @param {RouteRequest} request
      */
     _emitRouteRequest(request) {}
@@ -743,6 +745,7 @@ let RouteSourceImpl = Base => class extends Base {
         this.routeRequest = request;
         this.routeResponse = null;
         this.dispatchEvent(new CustomEvent('route-request', { detail: { request: request, }}));
+//        this.dispatchEvent(new RouteRequestEvent(request));
     }
 
     responseRoute(response, intermediate=false) {

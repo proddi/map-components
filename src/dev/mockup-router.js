@@ -48,9 +48,12 @@ class MockupRouter extends BaseRouter {
         let startLoc = this.locations[start];
         let destLoc = this.locations[dest];
         if (!(startLoc && destLoc && this.src)) {
-            if (this.fallbackRouter) return this.fallbackRouter.buildRouteRequest(startLoc || start, destLoc || dest, time);
-            return super.buildRouteRequest(startLoc || start || "1,1", destLoc || dest || "2,2", time).setError(
-                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (for src: "${this.src}")`);
+            if (this.fallbackRouter) {
+                return this.fallbackRouter.buildRouteRequest(startLoc || start, destLoc || dest, time);
+            }
+            throw new Error(`MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (for src: "${this.src}")`);
+//            return super.buildRouteRequest(startLoc || start || "1,1", destLoc || dest || "2,2", time).fail(
+//                    `MockupRouter doesn't know eighter start: "${start}" or dest: "${dest}" (for src: "${this.src}")`);
         }
         return super.buildRouteRequest(startLoc, destLoc, time, {
                 src: this.src.replace("{start}", start).replace("{dest}", dest),

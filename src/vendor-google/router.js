@@ -109,6 +109,17 @@ class GoogleDirectionsRouter extends BaseRouter {
             }).catch(error => response.fail(error));
         });
     }
+
+    async execLocationRequest(request) {
+//        let response = new RouteResponse(request);
+        return this.platform.whenReady.then(({ service }) => {
+            throw new Error("not implemented");
+            service.place({
+
+            });
+        }).catch(error => response.fail(error));
+    }
+
 }
 
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>route-details - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="module" src="../../src/mapui/example.js"></script>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="/node_modules/@cwmr/paper-autocomplete/paper-autocomplete.js"></script>;
+    <script type="module" src="../../src/mc/ui/location-input.js"></script>
+</head>
+<body>
+    <h3>RouteDetails - map-components</h3>
+
+    <demo-router role="route-source"
+        name="demo"
+        base="../assets/responses/here-transit-"
+        start="A"
+        dest="B"
+        time="2019-01-09T05:15:07">
+    </demo-router>
+
+    <maps-example>
+        <paper-autocomplete title="Start location">
+            <template slot="suggestion">
+                <paper-item role="option" aria-selected="false">
+                    <div>{{this.name}}</div>
+                </paper-item>
+            </template>
+        </paper-autocomplete>
+        <location-input
+            input-suggestions="location-input-suggestions"
+            label="foo"
+            value="val"
+            router="demo-router">
+        </location-input>
+        <location-input input-suggestions="location-input-suggestions" label="Dest" value="loc">
+        </location-input>
+        <hr>
+        <location-input-suggestions></location-input-suggestions>
+    </maps-example>
+</body>
+</html>

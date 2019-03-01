@@ -4,6 +4,8 @@ import {RouteSource} from './map/mixins.js';
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
  *
  * @extends {RouteSource}
+ * @extends {HTMLElement}
+ * @implements {RouteSource}
  *
  * @abstract
  */
@@ -52,6 +54,7 @@ class BaseRouter extends RouteSource(HTMLElement) {
 
     /**
      * Creates a route request
+     * @protected
      * @return {RouteRequest}
      */
     buildRouteRequest(start, dest, time, others={}) {
@@ -100,7 +103,7 @@ class BaseRouter extends RouteSource(HTMLElement) {
                 this.setItems([], request);
                 let progress = (response) => this.dispatchEvent(new CustomEvent('route-response-intermediate', { detail: response }));
                 return (request.error ? Promise.reject(request.error) : request.router.execRouteRequest(request, progress)).catch(error => {
-                    return new RouteResponse(request).setError(error);
+                    return new RouteResponse(request).fail(error);
                 }).then(response => {
                     this.currentResponse = this.routeResponse = response;
                     this.currentRoutes = this.routes = response.routes;
@@ -117,13 +120,36 @@ class BaseRouter extends RouteSource(HTMLElement) {
     async board(location, time=undefined) {
     }
 
+    /**
+     * @protected
+     */
     buildBoardRequest(location, time=undefined) {
     }
 
+    /**
+     * @protected
+     */
     async execBoardRequest(boardRequest) {
     }
 
+    async location(query, at=null) {
+        let request = await this.buildLocationRequest(query, at);
+        return (request.error ? Promise.reject(request.error) : request.router.execLocationRequest(request)).catch(error => {
+            return request.fail(error);
+        });
+    }
 
+    async buildLocationRequest(query, at=null) {
+        return new LocationRequest(
+                this,
+                query,
+                at,
+            );
+    }
+
+    async execLocationRequest(locationRequest) {
+        throw Error("Not implemented");
+    }
 
     /**
      * Performs an multiboard request.
@@ -173,7 +199,9 @@ class BaseRouter extends RouteSource(HTMLElement) {
 
 
 /**
- * Router Request class.
+ * Generic Router Request class.
+ *
+ * @todo `status` or finished property.
  */
 class Request {
     /**
@@ -192,16 +220,6 @@ class Request {
          * @type {*|null}
          */
         this.error = null;
-    }
-
-    /**
-     * Marks this request failed
-     * @deprecated use .fail(error) instead
-     * @param {*} error - The failure.
-     * @returns {Request} - this instance
-     */
-    setError(error) {
-        return this.fail(error);
     }
 
     /**
@@ -247,6 +265,15 @@ class RouteRequest extends Request {
         /** @type {Date} */
         this.time = time;
     }
+}
+
+
+/**
+ * Data class for requesting transit board
+ * @see fooo
+ */
+class LocationRequest extends Request {
+    get type() { return "location"; }
 }
 
 
@@ -303,13 +330,10 @@ class Response {
     }
 
     /**
-     * @deprecated
+     * Marks this response failed.
+     * @param {*} error - The failure.
+     * @returns {Response} - this instance
      */
-    setError(error) {
-        console.warn("DEPRECATED: Response.setError() - use .fail() instead");
-        return this.fail(error);
-    }
-
     fail(error) {
         this.elapsed = (new Date() - this._constructTime) / 1000;
         this.error = error;
@@ -339,7 +363,7 @@ class RouteResponse extends Response {
 
     /**
      * Marks the response as finish and assigns routes.
-     * @deprecated
+     * @deprecated Use .resolve(routes) instead.
      * @param {Array<Route>} routes
      * @returns {RouteResponse}
      */
@@ -350,8 +374,8 @@ class RouteResponse extends Response {
 
     /**
      * Marks the response as finish and assigns routes.
-     * @param {Array<Route>} routes
-     * @returns {RouteResponse}
+     * @param {Route[]} routes
+     * @returns {RouteResponse} - this instance
      */
     resolve(routes) {
         return super.resolve({routes: routes});

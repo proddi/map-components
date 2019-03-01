@@ -23,9 +23,6 @@ body, h1, h2, h3, h4 {
     -webkit-font-smoothing: antialiased;
 }
 
-code {
-    font-size: 1.1em;
-}
 :target { background-color: red; }
 
 /* HEADER */
@@ -105,7 +102,7 @@ main article:not(:first-of-type) {
 /* sticky section headers */
 main section h2 {
     position: sticky;
-    top: 55px;
+    top: 35px;
     margin-top: 0;
     padding-top: .83em;
     margin-bottom: .53em;
