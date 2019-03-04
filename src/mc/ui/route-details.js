@@ -57,8 +57,6 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     overflow-y: auto;
                 }
                 .list-group {
-                    d_isplay: flex;
-                    f_lex-direction: column;
                     padding-bottom: 1px;
                     padding-left: 0;
                     margin-bottom: 0;
@@ -70,7 +68,6 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
                     /* cursor: pointer; */
                     position: relative;
-                    padding: 4px 12px 10px 50px;
                     background-color: transparent;
                     transition: background-color .2s ease;
                     border-radius: 3px;
@@ -79,22 +76,38 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     background-color: #eee;
                 }
                 .list-item.active {
-                    c_olor: white;
-                    background-color: #007bff;
                     background-color: rgba(55, 88, 123, .2);
-                    b_ackground-color: #d2dce8;
+                }
+
+                /* GENERIC BODY STYLES */
+                .list-item > header,
+                .list-item > content,
+                .list-item > ul {
+                    display: block;
+                    margin: 6px 0;
+                }
+                .list-item > ul {
+                    padding: 0;
+
+                }
+                .list-item > header,
+                .list-item > content,
+                .list-item > ul > li {
+                    position: relative;
+                    padding: 3px 12px 3px 50px;
+                }
+
+                .list-item ul.steps > li {
+                    background-color: transparent;
+                    transition: background-color .2s ease;
+                    cursor: pointer;
+                }
+
+                .list-item ul.steps > li:hover {
+                    background-color: rgba(0, 0, 0, .075);
                 }
 
                 /* HEADER STYLES */
-                .list-item header,
-                .list-item content {
-                    position: relative;
-                    margin: 8px 0;
-                    t_ext-overflow: ellipsis;
-                    o_verflow-x: hidden;
-                    w_hite-space: nowrap;
-                }
-
 
                 /* CONTENT STYLES */
                 .list-item content > div {
@@ -109,20 +122,24 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 .list-item content ul {
                     margin: 0;
                     list-style: none;
-                    padding: 10px 0 0 0;
+                    p_adding: 10px 0;
                 }
-                .list-item content ul li {
+                .l_ist-item content ul {
+                    margin: 2px -12px 2px -50px;
+                }
+
+                .l_ist-item content ul > li {
                     padding: 6px 0;
                 }
 
-                .list-item content ul.stops li {
-                    position: relative;
-                    padding: 2px 0;
+                .list-item > ul.stops > li {
+                    padding-top: 2px;
+                    padding-bottom: 2px;
                 }
-                .list-item content ul.stops li:after {
+                .list-item > ul.stops > li:after {
                     position: absolute;
                     top: calc(50% - 6px);
-                    left: -32px;
+                    left: 18px;
                     width: 6px;
                     height: 6px;
                     content: "";
@@ -132,20 +149,20 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     transition: background .15s ease;
                     z-index: 3;
                 }
-                .list-item content ul.stops li:hover:after {
+                .list-item > ul.steps > li:hover:after {
                     background: var(--line-color);
                 }
 
-                .list-item content .steps-toggle {
+                .list-item .steps-toggle {
                     color: rgb(44, 72, 161);
                     cursor: pointer;
                 }
 
-                .list-item content .steps-toggle:hover {
+                .list-item .steps-toggle:hover {
                     text-decoration: underline;
                 }
 
-                .list-item content.steps-hidden ul.stops {
+                .list-item.steps-hidden ul {
                     display: none;
                 }
 
@@ -158,50 +175,49 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 }
 
                 .no-wrap {
+                    white-space: nowrap;
+                }
+
+                .ellipsis {
                     text-overflow: ellipsis;
                     overflow-x: hidden;
-                    white-space: nowrap;
                 }
 
                 /* HEADER STYLES */
 
 
-                .list-item > .list-item-icon {
+                /* GFX STYLES */
+                .leg-icon {
                     position: absolute;
                     left: 12px;
-                    top: 12px;
+                    top: 0;
                     width: 24px;
                     height: 24px;
                     fill: var(--line-color);
                 }
 
-
-                .list-item > header > .list-item-icon {
+                .maneuver-icon {
                     position: absolute;
-                    left: -38px;
-                    top: calc(50% - 12px);
-                    width: 24px;
-                    height: 24px;
+                    left: 12px;
+                    top: 5px;
+                    width: 16px;
+                    height: 16px;
+                    fill: #2c48a1;
+
                 }
 
-
-
-
-                /* vertical lines */
                 .list-item .line {
                     position: absolute;
-                    top: 40px;
+                    top: 27px;
                     left: 22px;
-                    bottom: -9px;
+                    bottom: -4px;
                     border-left: 4px solid var(--line-color, rgb(75, 81, 89));
                     z-index: 2;
                 }
                 .list-item .line.line-walk {
-                    b_order-color: rgb(44, 72, 161);
                     border-left-style: dotted;
                 }
                 .list-item .line.line-car {
-                    b_order-color: #2c48a1;
                     border-left-style: dotted;
                 }
 
@@ -218,7 +234,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     arrivalRenderer(route) {
         return html`
             <div class="list-item">
-                <mc-icon class="list-item-icon" icon="mc:place"></mc-icon>
+                <mc-icon class="leg-icon" icon="mc:place"></mc-icon>
                 <header><time>${formatTime(route.arrival.time)}</time>Arrive at ${route.arrival.name}</header>
             </div>
         `;
@@ -234,7 +250,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
-                <mc-icon class="list-item-icon" icon="${foo(leg)}"></mc-icon>
+                <mc-icon class="leg-icon" icon="${foo(leg)}"></mc-icon>
                 <div class="line"></div>
                 <header><time datetime="PT2H30M">${leg.departure.timeString}</time>${leg.summary}</header>
                 <content>
@@ -248,7 +264,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         return html`
             <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <mc-icon class="list-item-icon" icon="mc:walk"></mc-icon>
+                <mc-icon class="leg-icon" icon="mc:walk"></mc-icon>
                 <div class="line line-walk"></div>
                 <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
                 <content>
@@ -289,25 +305,25 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
     transitLegRenderer(leg) {
         return html`
-            <div class="list-item" data-leg="${leg.id}"
+            <div class="list-item steps-hidden" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line line-transit" style="border-color: ${leg.transport.color}"></div>
-                <mc-icon class="list-item-icon" icon="${foo(leg)}" st_yle="fill:${leg.transport.color}"></mc-icon>
+                <mc-icon class="leg-icon" icon="${foo(leg)}" st_yle="fill:${leg.transport.color}"></mc-icon>
                 <header class="no-wrap">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
                 <content class="steps-hidden">
                     <header class="no-wrap" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</header>
                     <div>
-                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "content", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})
+                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})
                     </div>
-                    <ul class="stops">
-                    ${repeat(leg.steps || [], (step, index) => html`
-                        <li><div class="no-wrap"><time>${formatTime(step.time)}</time>${step.name}</div></li>
-                    `)}
-                    </ul>
                 </content>
+                <ul class="steps stops">
+                ${repeat(leg.steps || [], (step, index) => html`
+                    <li class="no-wrap ellipsis"><time>${formatTime(step.time)}</time>${step.name}</li>
+                `)}
+                </ul>
             </div>
         `;
     }
@@ -316,20 +332,25 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         return html`
             <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <div class="line line-car"></div>
-                <mc-icon class="list-item-icon" icon="mc:car"></mc-icon>
+                <div class="l_ine line-car"></div>
+                <mc-icon class="leg-icon" icon="mc:car"></mc-icon>
                 <header>
                     <time>${leg.departure.timeString}</time>Start at ${leg.departure.name}
                 </header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-                    <div>Manuevers: ${leg.steps.length}</div>
-                    <ul class="manuevers">
-                    ${repeat(leg.steps || [], (step, index) => html`
-                        <li class="no-wrap"><time>${formatTime(leg.departure.time)}</time>${step.name}</li>
-                    `)}
-                    </ul>
+                    <div>
+                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Manuevers: ${leg.steps.length}</span>
+                    </div>
                 </content>
+                <ul class="steps maneuvers">
+                ${repeat(leg.steps || [], (step, index) => html`
+                    <li>
+                        <mc-icon class="maneuver-icon" icon="maneuvers:turn-left"></mc-icon>
+                        <div class="ellipsis"><time>${formatTime(leg.departure.time)}</time>${step.name}</div>
+                    </li>
+                `)}
+                </ul>
             </div>
         `;
     }
