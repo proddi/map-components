@@ -73,7 +73,7 @@ class MockupRouter extends BaseRouter {
             .then(data => {
                 let routes = data.routes.map(data => new Route(
                     data.id,
-                    this,
+                    data.router || this,
                     buildLocation(data.departure),
                     buildLocation(data.arrival),
                     data.legs.map(leg => new Leg(

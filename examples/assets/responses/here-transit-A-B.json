@@ -3509,7 +3509,8 @@
         "time":"2019-01-09T04:47:07.000Z"
       },
       "router":{
-        "name":"google/car"
+        "name":"google/car",
+        "type":"car"
       },
       "legs":[
         {
@@ -9198,7 +9199,8 @@
         "time":"2019-01-09T09:31:03.000Z"
       },
       "router":{
-        "name":"google/walk"
+        "name":"google/walk",
+        "type":"walk"
       },
       "legs":[
         {

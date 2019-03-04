@@ -870,7 +870,7 @@ let RouteObserverImpl = Base => class extends Base {
     constructor() {
         super();
 
-        this._routeRequestHandler              = (ev) => this._onRouteRequest(ev.detail.request);
+        this._routeRequestHandler              = (ev) => this.onRouteRequest(ev.detail.request);
         this._routeResponseHandler             = (ev) => this.onRouteResponse(ev.detail.response, ev.detail.intermediate);
         this._routeClearHandler                = (ev) => this.onRouteClear();
         this._routeSelectedHandler             = (ev) => this.onRouteSelected(ev.detail.route);
@@ -929,8 +929,7 @@ let RouteObserverImpl = Base => class extends Base {
 
 //    getRouteResponse() { return this.router && this.router.routeResponse; }
 
-    onRouteRequest(...args) { return this._onRouteRequest(...args); }
-    _onRouteRequest(request) {}
+    onRouteRequest(request) {}
 
     onRouteResponse(response) {}
 

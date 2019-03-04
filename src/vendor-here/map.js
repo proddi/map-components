@@ -1,7 +1,7 @@
 import {BaseMap} from '../mc/base-map.js';
 import {parseCoordString, findRootElement, deferredPromise} from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
-import {HerePlatform} from './platform';
+import {HerePlatform} from './platform.js';
 
 /**
  * Shows HERE map. This is the base canvas for other visualisation elements.

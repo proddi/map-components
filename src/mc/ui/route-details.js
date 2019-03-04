@@ -2,10 +2,9 @@ import {html, render, repeat} from '../../map/lit-html.js';
 import {BaseRouter} from '../../generics.js';
 import {RouteObserver} from '../../map/mixins.js';
 
-import '/node_modules/@polymer/paper-item/paper-icon-item.js';
-import '/node_modules/@polymer/paper-item/paper-item-body.js';
-import '/node_modules/@polymer/iron-icons/iron-icons.js';
-import '/node_modules/@polymer/iron-icons/maps-icons.js';
+import {formatDuration, formatTime, formatDistance} from '../../map/tools.js';
+
+import './mc-icon.js';
 
 
 /**
@@ -24,234 +23,334 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     constructor() {
         super();
 
-        // get templates
-        this._baseRenderer  = baseRenderer;
-
-        let defaultRenderer = getDefaultRenderer(this);
-        let transitRenderer = getTransitRenderer(this);
-        let carRenderer     = getCarRenderer(this);
-        let walkRenderer    = getWalkRenderer(this);
-        let arrivalRenderer = getArrivalRenderer(this);
-
-        this._legTypeTemplates = {
-            default:    defaultRenderer,
-            walk:       walkRenderer,
-            car:        carRenderer,
-            bus:        transitRenderer,
-            tram:       transitRenderer,
-            subway:     transitRenderer,
-            metro:      transitRenderer,
-            train:      transitRenderer,
-            highspeed_train:      transitRenderer,
-            bus_rapid:  transitRenderer,
-            arrival:    arrivalRenderer,
-        }
-        this._legRenderer = (leg, route) => (this._legTypeTemplates[leg.transport.type] || defaultRenderer)(leg, route);
-
-        // prepare root
         this.attachShadow({mode: 'open'});
+    }
 
-        // initial render
-        render(this._baseRenderer({}), this.shadowRoot);
+    selectLeg(leg) {
+        if (leg !== this.selectedLeg) {
+            if (this.selectedLeg) this.shadowRoot.querySelector(`[data-leg="${this.selectedLeg.id}"]`).classList.remove('active');
+            this.selectedLeg = leg;
+            if (this.selectedLeg) this.shadowRoot.querySelector(`[data-leg="${this.selectedLeg.id}"]`).classList.add('active');
+        }
     }
 
     onRouteSelected(route) {
-        render(this._baseRenderer(route, this._legRenderer), this.shadowRoot);
+        render(this.render(route), this.shadowRoot);
         this.setAttribute("selected", "");
     }
 
     onRouteDeselected(route) {
+        this.selectedLeg = null;
         this.removeAttribute("selected");
     }
-}
 
-
-import {Leg, Transport} from '../../generics.js';
-
-function bar(route) {
-    if ((route.legs || []).length) {
-        return [new Leg(undefined, route.arrival, new Transport({type:"arrival"}), [])];
+    _toggleLegElement(leg, selector, cssClass="hidden") {
+        this.shadowRoot.querySelector(`[data-leg="${leg.id}"] ${selector}`).classList.toggle(cssClass);
     }
-    return [];
-}
+
+    render(route) {
+        return html`
+            <style>
+                :host {
+                    display: block;
+                    overflow-y: hidden;
+                    overflow-y: auto;
+                }
+                .list-group {
+                    d_isplay: flex;
+                    f_lex-direction: column;
+                    padding-bottom: 1px;
+                    padding-left: 0;
+                    margin-bottom: 0;
+                }
+                .list-item {
+                    font-size: .80em;
+                    color: #495057;
+                    box-sizing: border-box;
+
+                    /* cursor: pointer; */
+                    position: relative;
+                    padding: 4px 12px 10px 50px;
+                    background-color: transparent;
+                    transition: background-color .2s ease;
+                    border-radius: 3px;
+                }
+                .list-item:hover {
+                    background-color: #eee;
+                }
+                .list-item.active {
+                    c_olor: white;
+                    background-color: #007bff;
+                    background-color: rgba(55, 88, 123, .2);
+                    b_ackground-color: #d2dce8;
+                }
+
+                /* HEADER STYLES */
+                .list-item header,
+                .list-item content {
+                    position: relative;
+                    margin: 8px 0;
+                    t_ext-overflow: ellipsis;
+                    o_verflow-x: hidden;
+                    w_hite-space: nowrap;
+                }
 
 
-function baseRenderer(route, legTemplate) {
-    return html`
-    <style>
-        :host {
-            display: block;
-        }
-        :h_ost [role=listbox] {
-            opacity: 0;
-            transition: opacity .3s ease;
-        }
-        :h_ost([selected]) [role=listbox] {
-            opacity: 1;
-        }
-        :host paper-icon-item {
-            position: relative;
-        }
-        :host paper-icon-item .line{
-            position: absolute;
-            top: -8px;
-            left: 26px;
-            bottom: -7px;
-            border-left: 4px solid rgb(75, 81, 89);
-        }
-        :host paper-icon-item .line-walk {
-            border-color: rgb(44, 72, 161);
-            border-left-style: dotted;
-        }
-        :host paper-icon-item.leg-walk .distance {
-            color: rgb(44, 72, 161);
-        }
-        :host paper-icon-item .line-car {
-            border-color: #2c48a1;
-            border-left-style: dotted;
-        }
-    </style>
+                /* CONTENT STYLES */
+                .list-item content > div {
+                    font-size: .9em;
+                    opacity: .7;
+                }
 
-    <div role="listbox">
-        ${repeat((route.legs || []).concat(bar(route)), (leg) => leg.id, (leg, index) => legTemplate(leg, route))}
-    </div>
-`;
-}
+                .list-item content .distance {
+                    color: rgb(44, 72, 161);
+                }
+
+                .list-item content ul {
+                    margin: 0;
+                    list-style: none;
+                    padding: 10px 0 0 0;
+                }
+                .list-item content ul li {
+                    padding: 6px 0;
+                }
+
+                .list-item content ul.stops li {
+                    position: relative;
+                    padding: 2px 0;
+                }
+                .list-item content ul.stops li:after {
+                    position: absolute;
+                    top: calc(50% - 6px);
+                    left: -32px;
+                    width: 6px;
+                    height: 6px;
+                    content: "";
+                    border: 3px solid var(--line-color);
+                    background: white;
+                    border-radius: 6px;
+                    transition: background .15s ease;
+                    z-index: 3;
+                }
+                .list-item content ul.stops li:hover:after {
+                    background: var(--line-color);
+                }
+
+                .list-item content .steps-toggle {
+                    color: rgb(44, 72, 161);
+                    cursor: pointer;
+                }
+
+                .list-item content .steps-toggle:hover {
+                    text-decoration: underline;
+                }
+
+                .list-item content.steps-hidden ul.stops {
+                    display: none;
+                }
 
 
-import {formatDuration, formatTime, formatDistance} from '../../map/tools.js';
+
+                /* GENERIC STYLES */
+                time {
+                    float: right;
+                    padding-left: 7px;
+                }
+
+                .no-wrap {
+                    text-overflow: ellipsis;
+                    overflow-x: hidden;
+                    white-space: nowrap;
+                }
+
+                /* HEADER STYLES */
 
 
-function getDefaultRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${route.uid}">
-        <iron-icon icon="${foo(leg)}" slot="item-icon"></iron-icon>
-        <paper-item-body two-line>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>${leg.summary}
-          </div>
-          <div secondary>
-            <div class="leg-details">
-                type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}
+                .list-item > .list-item-icon {
+                    position: absolute;
+                    left: 12px;
+                    top: 12px;
+                    width: 24px;
+                    height: 24px;
+                    fill: var(--line-color);
+                }
+
+
+                .list-item > header > .list-item-icon {
+                    position: absolute;
+                    left: -38px;
+                    top: calc(50% - 12px);
+                    width: 24px;
+                    height: 24px;
+                }
+
+
+
+
+                /* vertical lines */
+                .list-item .line {
+                    position: absolute;
+                    top: 40px;
+                    left: 22px;
+                    bottom: -9px;
+                    border-left: 4px solid var(--line-color, rgb(75, 81, 89));
+                    z-index: 2;
+                }
+                .list-item .line.line-walk {
+                    b_order-color: rgb(44, 72, 161);
+                    border-left-style: dotted;
+                }
+                .list-item .line.line-car {
+                    b_order-color: #2c48a1;
+                    border-left-style: dotted;
+                }
+
+
+            </style>
+
+            <div role="listbox">
+                ${repeat((route.legs || []), (leg) => leg.id, (leg, index) => this.renderLeg(leg))}
+                ${this.arrivalRenderer(route)}
             </div>
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
-`;
-}
+        `;
+    }
 
-
-function getTransitRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${leg.id}">
-        <iron-icon icon="${foo(leg)}" slot="item-icon" style="fill:${leg.transport.color}"></iron-icon>
-        <paper-item-body>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>${leg.departure.name}
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
-
-      <paper-icon-item data-leg="${leg.id}" tabIndex="-1">
-        <div class="line ${leg.transport.type}" style="border-color: ${leg.transport.color}"></div>
-        <paper-item-body two-line>
-          <div>
-            <div class="leg-details" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color:${leg.transport.color}">
-                ${leg.transport.name} → ${leg.transport.headsign}
+    arrivalRenderer(route) {
+        return html`
+            <div class="list-item">
+                <mc-icon class="list-item-icon" icon="mc:place"></mc-icon>
+                <header><time>${formatTime(route.arrival.time)}</time>Arrive at ${route.arrival.name}</header>
             </div>
-          </div>
-          <div secondary>
-            Stops: ${leg.steps.length} &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})
-          </div>
+        `;
+    }
 
-        ${leg.steps.length>4 ? html`<div secondary>...</div>` : ``}
-        ${repeat(leg.steps.slice(-4) || [], (step, index) => html`
-          <div secondary><span style="float:right">${formatTime(step.time)}</span>${step.name}</div>
-        `)}
+    renderLeg(leg) {
+        const renderer = this[`${leg.transport.type}LegRenderer`] || this.defaultLegRenderer;
+        return renderer.call(this, leg);
+    }
 
-        </paper-item-body>
-      </paper-icon-item>
-`;
-}
+    defaultLegRenderer(leg) {
+        return html`
+            <div class="list-item" data-leg="${leg.id}"
+                    style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
+                    @click=${_ => this.selectLeg(leg)}>
+                <mc-icon class="list-item-icon" icon="${foo(leg)}"></mc-icon>
+                <div class="line"></div>
+                <header><time datetime="PT2H30M">${leg.departure.timeString}</time>${leg.summary}</header>
+                <content>
+                    <div>type: ${leg.transport.type} ${foo(leg)} - color: ${leg.transport.color} - name: ${leg.transport.name}</div>
+                </content>
+            </div>
+        `;
+    }
 
+    walkLegRenderer(leg) {
+        return html`
+            <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
+                    @click=${_ => this.selectLeg(leg)}>
+                <mc-icon class="list-item-icon" icon="mc:walk"></mc-icon>
+                <div class="line line-walk"></div>
+                <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
+                <content>
+                    <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
+                    <div>Steps: ${leg.steps.length}</div>
+                </content>
+            </div>
+        `;
+    }
 
-function getWalkRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${leg.id}">
-        <iron-icon icon="maps:directions-walk" slot="item-icon" style="fill:rgb(44, 72, 161);"></iron-icon>
-        <paper-item-body>
-          <div title="${leg.summary}"><span style="float:right;padding-left:5px;">${leg.departure.timeString}</span>${leg.summary}</div>
-        </paper-item-body>
-      </paper-icon-item>
+    busLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
-      <paper-icon-item data-leg="${leg.id}" class="leg-walk">
-        <div class="line line-walk"></div>
-        <paper-item-body>
-          <div secondary><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-          <div secondary>Steps: ${leg.steps.length}</div>
-        </paper-item-body>
-      </paper-icon-item>
-`;
-}
+    tramLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
+    metroLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
-function getCarRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item data-leg="${leg.id}">
-        <iron-icon icon="maps:directions-car" slot="item-icon"></iron-icon>
-        <paper-item-body two-line>
-          <div>
-            <span style="float:right">${leg.departure.timeString}</span>Start at ${leg.departure.name}
-          </div>
-          <div secondary><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-          <div secondary>Manuevers: ${leg.steps.length}</div>
-        </paper-item-body>
-      </paper-icon-item>
-        ${repeat(leg.steps || [], (step, index) => html`
+    subwayLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
-      <paper-icon-item data-leg-step="${leg.id}-1">
-        <div class="line line-car"></div>
-        <iron-icon icon="maps:near-me" slot="item-icon"></iron-icon>
-        <paper-item-body>
-          <div secondary>
-            <span style="float:right">${formatTime(leg.departure.time)}</span>${step.name}
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
+    trainLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
-        `)}
-`;
-}
+    highspeed_trainLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
+    bus_rapidLegRenderer(leg) {
+        return this.transitLegRenderer(leg);
+    }
 
-function getArrivalRenderer(self) {
-    return (leg, route) => html`
-      <paper-icon-item>
-        <iron-icon icon="maps:place" slot="item-icon"></iron-icon>
-        <paper-item-body>
-          <div>
-            <span style="float:right">${formatTime(leg.arrival.time)}</span>Arrive at ${leg.arrival.name}
-          </div>
-        </paper-item-body>
-      </paper-icon-item>
-`;
+    transitLegRenderer(leg) {
+        return html`
+            <div class="list-item" data-leg="${leg.id}"
+                    style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
+                    @click=${_ => this.selectLeg(leg)}>
+                <div class="line line-transit" style="border-color: ${leg.transport.color}"></div>
+                <mc-icon class="list-item-icon" icon="${foo(leg)}" st_yle="fill:${leg.transport.color}"></mc-icon>
+                <header class="no-wrap">
+                    <time>${leg.departure.timeString}</time>${leg.departure.name}
+                </header>
+                <content class="steps-hidden">
+                    <header class="no-wrap" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</header>
+                    <div>
+                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "content", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})
+                    </div>
+                    <ul class="stops">
+                    ${repeat(leg.steps || [], (step, index) => html`
+                        <li><div class="no-wrap"><time>${formatTime(step.time)}</time>${step.name}</div></li>
+                    `)}
+                    </ul>
+                </content>
+            </div>
+        `;
+    }
+
+    carLegRenderer(leg) {
+        return html`
+            <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
+                    @click=${_ => this.selectLeg(leg)}>
+                <div class="line line-car"></div>
+                <mc-icon class="list-item-icon" icon="mc:car"></mc-icon>
+                <header>
+                    <time>${leg.departure.timeString}</time>Start at ${leg.departure.name}
+                </header>
+                <content>
+                    <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
+                    <div>Manuevers: ${leg.steps.length}</div>
+                    <ul class="manuevers">
+                    ${repeat(leg.steps || [], (step, index) => html`
+                        <li class="no-wrap"><time>${formatTime(leg.departure.time)}</time>${step.name}</li>
+                    `)}
+                    </ul>
+                </content>
+            </div>
+        `;
+    }
+
 }
 
 
 const _TYPE_MAP = {
-    walk:       "maps:directions-walk",
-    bike:       "maps:directions-bike",
-    car:        "maps:directions-car",
-    bus:        "maps:directions-bus",
-    bus_rapid:  "maps:directions-bus",
-    tram:       "maps:tram",
-    subway:     "maps:directions-subway",
-    metro:      "maps:directions-railway",
-    highspeed_train:    "maps:train",
-    train:      "maps:train",
+    walk:       "mc:walk",
+    bike:       "mc:bike",
+    car:        "mc:car",
+    bus:        "mc:bus",
+    bus_rapid:  "mc:bus",
+    tram:       "mc:tram",
+    subway:     "mc:subway",
+    metro:      "mc:metro",
+    highspeed_train:    "mc:train",
+    train:      "mc:train",
 }
 function foo(leg) {
-    return _TYPE_MAP[leg.transport.type] || "maps:directions-transit";
+    return _TYPE_MAP[leg.transport.type] || "mc:transit";
 }
 
 customElements.define('route-details', RouteDetails);
