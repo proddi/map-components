@@ -173,8 +173,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 }
 
 
-
-                /* GENERIC STYLES */
+                /* ===== GENERIC STYLES ===== */
                 .no-wrap {
                     white-space: nowrap;
                 }
@@ -194,12 +193,6 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 }
 
                 /* HEADER STYLES */
-
-
-                /* LEG TYPE SPECIFIC STYLES */
-                .list-item.walk-item > ul.steps > li {
-                    margin-left: 30px;
-                }
 
 
 
@@ -232,15 +225,20 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     border-left: 4px solid var(--line-color, rgb(75, 81, 89));
                     z-index: 2;
                 }
-                .line.walk-line {
+
+
+                /* ===== LEG TYPE SPECIFIC STYLES ===== */
+                .list-item.walk-item > ul.steps > li {
+                    margin-left: 30px;
+                }
+
+                .list-item.walk-item .line {
                     border-left-style: dotted;
                 }
-                .line.car-line {
-                    border-left-style: dotted;
+
+                .list-item.car-item .line {
                     border-left-style: dashed;
                 }
-
-
             </style>
 
             <div role="listbox">
@@ -263,8 +261,6 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         const [basetype] = `${leg.transport.type}/`.split("/", 1);
         const renderer = this.legRenderer[leg.transport.type] || this.legRenderer[basetype] || this.legRenderer.default;
         return renderer(leg);
-//        const renderer = this[`${leg.transport.type}LegRenderer`] || this.defaultLegRenderer;
-//        return renderer.call(this, leg);
     }
 
     defaultLegRenderer(leg) {
@@ -293,7 +289,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 <ul class="steps">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
-                        <mc-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}"></mc-icon>
+                        <mc-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}" title="manuever: ${step.maneuver}"></mc-icon>
                         <div class="ellipsis"><time>${formatTime(step.time)}</time>${step.name}</div>
                         <div><span class="distance">${formatDistance(leg.distance)}</span></div>
                     </li>
@@ -303,37 +299,9 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         `;
     }
 
-    busLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    tramLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    metroLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    subwayLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    trainLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    highspeed_trainLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
-    bus_rapidLegRenderer(leg) {
-        return this.transitLegRenderer(leg);
-    }
-
     transitLegRenderer(leg) {
         return html`
-            <div class="list-item steps-hidden" data-leg="${leg.id}"
+            <div class="list-item transit-item steps-hidden" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line transit-line"></div>
@@ -354,7 +322,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
     carLegRenderer(leg) {
         return html`
-            <div class="list-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
+            <div class="list-item car-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line car-line"></div>
                 <mc-icon class="leg-icon" icon="mc:car"></mc-icon>

@@ -57,6 +57,45 @@ class HereRouter extends BaseRouter {
         return this._whenReady.then(_ => this);
     }
 
+
+
+
+    resolveAddress(loc) {
+        return this.requestAddressFromLocation(loc).then(addresses => addresses[0]);
+    }
+
+    requestAddressFromLocation(loc) {
+        let url = buildURI("https://reverse.geocoder.api.here.com/6.2/reversegeocode.json", {
+                prox:               `${loc.lat},${loc.lng}`,
+                mode:               'retrieveAddresses',
+//                waypoint1:          `geo!${request.dest.lat},${request.dest.lng}`,
+//                departure:          request.time.toISOString(),
+//                mode:               `fastest;${request.modes.join(",")}`,
+//                alternatives:       request.max || 3,
+//                representation:     `display`,
+//                legAttributdes:     `travelTime,shape`,
+//                maneuverAttributes: `position,publicTransportLine`,
+//                routeAttributes:    `legs,shape,lines,groups`,
+                app_id:             this._app_id,
+                app_code:           this._app_code,
+            });
+
+
+        return fetch(url).then(res => res.json()).then(data => {
+            console.log("> res:", data);
+            return data.Response.View[0].Result.map(res => new Address({
+                    lat: res.Location.DisplayPosition.Latitude,
+                    lng: res.Location.DisplayPosition.Longitude,
+                    name: res.Location.Address.Label,
+                    time: new Date(0),
+                }));
+        });
+    }
+
+
+
+
+
     /**
      * Creates an request object.
      * @returns {RouteRequest}

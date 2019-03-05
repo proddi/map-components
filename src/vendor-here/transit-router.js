@@ -1,6 +1,6 @@
 import {
     BaseRouter,
-    RouteResponse, MultiboardResponse, StopResponse,
+    RouteResponse, MultiboardResponse, StopsByNameRequest, StopResponse,
     Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseString, buildURI, createUID,
 } from '../generics.js';
@@ -54,26 +54,34 @@ class HereTransitRouter extends BaseRouter {
      * @todo Structure this according to API
      * @async
      */
-    async requestStopsByName(name, center) {
+    async requestStopsByName(query, center) {
+        // TODO: make this function safe
+        let request = this.buildStopsByNameRequest(query, center);
+        return this.execStopsByNameRequest(request);
+    }
 
+    buildStopsByNameRequest(query, center, options) {
+        return new StopsByNameRequest(this, query, center, options);
+    }
+
+    async execStopsByNameRequest(request) {
         let platform = this.platform;
 
         let url = buildURI(`${this.server}/v3/stations/by_name.json`, {
-                name:       name,
-                center:     `${center.lat},${center.lng}`,
+                name:       request.query,
+                center:     `${request.center.lat},${request.center.lng}`,
                 client:     "map-components",
 //                max:        request.max,
                 app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
                 app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
             });
 
-        let response = new StopResponse(null);
+        let response = new StopResponse(request);
         return fetch(url).then(res => res.json()).then(res => {
-                console.log(`by_name(${name})`, res);
                 if (res.Res.Message) {
                     throw new Error(res.Res.Message.text);
                 }
-                // parse connections
+                // parse stations
                 let stops = res.Res.Stations.Stn.map(stn => new Stop({
                         lat:  stn.y,
                         lng:  stn.x,
@@ -228,12 +236,21 @@ class HereTransitRouter extends BaseRouter {
 const MANEUVER_ACTIONS = {
     "leftTurn":             "turn-left",
     "slightLeftTurn":       "slightly-left-turn",
-//    "leftRoundaboutExit1":  "",
+    "leftFork":             "left-fork",
+    "leftRoundaboutEnter":  "left-roundabout-enter",
+    "leftRoundaboutExit1":  "left-roundabout-exit1",
+    "leftRoundaboutExit2":  "left-roundabout-exit2",
+    "leftRoundaboutExit3":  "left-roundabout-exit3",
+    "leftRoundaboutExit4":  "left-roundabout-exit4",
 
     "rightTurn":            "turn-right",
     "slightRightTurn":      "slightly-right-turn",
-//    "rightFork":        "rightFork-fork-right",
-
+    "rightFork":            "right-fork",
+    "rightRoundaboutEnter": "right-roundabout-enter",
+    "rightRoundaboutExit1": "right-roundabout-exit1",
+    "rightRoundaboutExit2": "right-roundabout-exit2",
+    "rightRoundaboutExit3": "right-roundabout-exit3",
+    "rightRoundaboutExit4": "right-roundabout-exit4",
 }
 
 

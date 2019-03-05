@@ -6,6 +6,7 @@
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/mc/ui/html-demo.js"></script>
     <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/vendor-here/router.js"></script>
     <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-here/platform.js"></script>
     <script type="module" src="../../src/vendor-here/map.js"></script>
@@ -18,7 +19,7 @@
 
     <script type="module">
 import { html, render, repeat } from '../../src/map/lit-html.js';
-import { Address } from '../../src/generics.js';
+import { Address, Stop } from '../../src/generics.js';
 import { RouteObserver } from '../../src/mc/mixins.js';
 
 
@@ -29,8 +30,11 @@ class RouteInputs extends RouteObserver(HTMLElement) {
         this.attachShadow({mode: 'open'});
 
         render(this.render(), this.shadowRoot);
+
         this._startInput = this.shadowRoot.querySelector('#start');
         this._destInput = this.shadowRoot.querySelector('#dest');
+
+        this._geoSource = document.querySelector('[role="geo-source"]');
 
         this._startInput.addEventListener('change', ev => {
 //            this.getRouter().then(router => {
@@ -38,7 +42,7 @@ class RouteInputs extends RouteObserver(HTMLElement) {
                     .then(response => {
                             this._startLoc = response.stops[0];
                             this._startInput.value = this._startLoc.title;
-                            this.routeSource.setRoute(this._startLoc, this._destLoc)
+                            this.routeSource.updateRoute({start: this._startLoc, dest: this._destLoc});
                         })
                     ;
                 })
@@ -49,7 +53,7 @@ class RouteInputs extends RouteObserver(HTMLElement) {
                     .then(response => {
                             this._destLoc = response.stops[0];
                             this._destInput.value = this._destLoc.title;
-                            this.routeSource.setRoute(this._startLoc, this._destLoc)
+                            this.routeSource.updateRoute({start: this._startLoc, dest: this._destLoc});
                         })
                     ;
                 });
@@ -57,23 +61,34 @@ class RouteInputs extends RouteObserver(HTMLElement) {
     }
 
     onRouteRequest(request) {
-        console.log("req", request.start, "->", request.dest);
-
         this._startLoc = Address.enforce(request.start);
         this._destLoc = Address.enforce(request.dest);
         this._startInput.value = this._startLoc.title;
         this._destInput.value = this._destLoc.title;
-//        render(this.render(), this.shadowRoot);
     }
 
     onRouteResponse(response) {
-        console.log("> res", response);
-        let route = response.routes[0];
-        this._startLoc = route.departure;
-        this._destLoc = route.arrival;
-        console.log("route", this._startLoc, "->", this._destLoc);
-        this._startInput.value = this._startLoc.title;
-        this._destInput.value = this._destLoc.title;
+        if (!response.error) {
+            let route = response.routes[0];
+            this._startLoc = route.departure;
+            this._destLoc = route.arrival;
+            this._startInput.value = this._startLoc.title;
+            this._destInput.value = this._destLoc.title;
+
+            // georeverse if needed
+            if (!(this._startLoc instanceof Stop)) {
+                this._geoSource.resolveAddress(this._startLoc).then(address => {
+                    this._startLoc = address;
+                    this._startInput.value = this._startLoc.title;
+                });
+            }
+            if (!(this._destLoc instanceof Stop)) {
+                this._geoSource.resolveAddress(this._destLoc).then(address => {
+                    this._destLoc = address;
+                    this._destInput.value = this._destLoc.title;
+                });
+            }
+        }
     }
 
     render() {
@@ -81,6 +96,14 @@ class RouteInputs extends RouteObserver(HTMLElement) {
             <style>
                 :host {
                     display: block;
+                    line-height: 1.5;
+                }
+                input {
+                    height: calc(1.5em + .75rem + 2px);
+                    padding: .175rem .55rem;
+                    border: 1px solid #ced4da;
+                    border-radius: .25rem;
+                    font-size: 1em;
                 }
             </style>
 
@@ -97,40 +120,17 @@ customElements.define('route-inputs', RouteInputs);
 
     </script>
 
-    <style>
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .row > * {
-            flex-basis: 0;
-            -ms-flex-positive: 1;
-            flex-grow: 1;
-            max-width: 100%;
-            margin: 0 1em;
-        }
-        .row > *:first-child {
-            margin-left: 2em;
-        }
-        .row > *:last-child {
-            margin-right: 2em;
-        }
-    </style>
 </head>
 <body>
     <h3>RouteInput - map-components</h3>
 
-    <demo-router show-routes
-        base="../assets/responses/here-transit-"
-        start="A"
-        dest="B">
-    </demo-router>
-
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+
+    <here-router role="geo-source"></here-router>
 
     <here-transit-router role="route-source"
                     start="13.31709,52.54441"
-                    dest="13.56,52.41"></here-transit-router>
+                    dest="13.46,52.51"></here-transit-router>
 
     <html-demo>
         <route-inputs></route-inputs>
@@ -139,6 +139,17 @@ customElements.define('route-inputs', RouteInputs);
             <here-map-routes route-source="here-transit-router"></here-map-routes>
         </here-map>
     </html-demo>
+
+
+    <script>
+        setTimeout(_ => {
+            let map = document.querySelector('here-map')._map;
+            map.addEventListener('mapviewchange', ev => {
+                console.log("> map", ev.target.getZoom());
+            });
+        }, 1000);
+    </script>
+
 
 </body>
 </html>

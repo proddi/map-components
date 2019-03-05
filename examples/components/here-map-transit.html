@@ -65,7 +65,7 @@
     <h3>HERE transit routing</h3>
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-        <demo-router
+        <demo-router role="route-source"
             base="../assets/responses/here-transit-"
             start="A"
             dest="B"
@@ -73,6 +73,7 @@
         </demo-router>
 
         <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
+            <here-map-route-picker></here-map-route-picker>
             <demo-routes router="demo-router" path="../assets/responses/"></demo-routes>
             <here-map-routes route-source="demo-router"></here-map-routes>
         </here-map>

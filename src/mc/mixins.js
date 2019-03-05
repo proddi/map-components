@@ -98,8 +98,9 @@ let RouteSourceImpl = Base => class extends Base {
         this.routeSelected = null;
 
         setTimeout(_ => {
+            // TODO: initRoute returns data ???
             this.initRoute();
-            this.setRoute(this.start, this.dest, this.time);
+            this.updateRoute({});
         });
     }
 
@@ -117,10 +118,11 @@ let RouteSourceImpl = Base => class extends Base {
         return Promise.reject("Abstract: No router available");
     }
 
-    setRoute(start, dest, time=null) {
-        this.start = start;
-        this.dest = dest;
-        this.time = time === undefined ? this.time : time;
+    updateRoute({start, dest, time}) {
+        if (start) this.start = start;
+        if (dest) this.dest = dest;
+        if (time) this.time = time;
+        // TODO: other parameters
         if (this.start && this.dest) {
             this.getRouter().then(router => {
                     this.deselectRoute();
@@ -139,6 +141,16 @@ let RouteSourceImpl = Base => class extends Base {
                 }, err => console.error("No router available:", err))  // failure? we don't care
                 ;
         }
+    }
+
+    setRoute(start, dest, time=null) {
+        console.warn("Using .setRoute() is deprecated - use .updateRoute() instead.");
+
+        this.updateRoute({
+                start: start,
+                dest: dest,
+                time: time,
+            });
     }
 
     /**
@@ -262,6 +274,12 @@ class RouteObserver {
     setRouteSource(routeSource) {}
 
     /**
+     * Updates the primary route on route source
+     * @experimental
+     */
+    updateRoute({start, dest, time}) {}
+
+    /**
      * Returns the current route request if available.
      * @return {RouteRequest|null}
      */
@@ -362,6 +380,14 @@ let RouteObserverImpl = Base => class extends Base {
 
         if (super.setRouteSource) throw "Whoopsie, @dev ... fix this...";
         return oldRouteSource;
+    }
+
+    updateRoute(data) {
+        if (this.routeSource) {
+            this.routeSource.updateRoute(data);
+        } else {
+            console.warn("Not supported yet - updating an unconnected route source.");
+        }
     }
 
 //    getRouteRequest() { return this.router && this.router.routeRequest; }

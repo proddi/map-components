@@ -308,6 +308,27 @@ class MultiboardRequest extends Request {
 
 
 /**
+ * Data class for requesting stops by name
+ * @see fooo
+ */
+class StopsByNameRequest extends Request {
+    get type() { return "stop/name"; }
+
+    /**
+     * create instance.
+     * @param {{query:String, center:Location, others:Object}} options - xxx
+     **/
+    constructor(router, query, center, others={}) {
+        super(router, others);
+        /** @type {String} */
+        this.query = query;
+        /** @type {Location} */
+        this.center = center;
+    }
+}
+
+
+/**
  * Router Response class.
  */
 class Response {
@@ -889,7 +910,7 @@ export {
     RouteRequest, RouteResponse,
     BoardRequest, BoardResponse,
     MultiboardRequest, MultiboardResponse,
-    StopResponse,
+    StopsByNameRequest, StopResponse,
     Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseCoordString, parseTimeString, findRootElement, buildURI, buildURIParams, deferredPromise, parseString, createUID,
     loadScript, loadStyle

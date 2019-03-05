@@ -1,4 +1,4 @@
-import {RouteSource} from '../mc/mixins.js';
+import { RouteObserver } from '../mc/mixins.js';
 import {deferredPromise} from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
 import {HereMap} from './map.js';
@@ -10,7 +10,7 @@ import {HereMap} from './map.js';
  *
  * When setting `role="route-source"` nearby elements finds the picker as router automatically.
  *
- * @extends {RouteSource}
+ * @extends {RouteObserver}
  * @extends {HTMLElement}
  *
  * @todo Refactor to only use the attached {@link RouteSource} instead being a {@link RouteSource} itself.
@@ -25,7 +25,7 @@ import {HereMap} from './map.js';
  *   <here-map-routes></here-map-routes>
  * </here-map>
  **/
-class HereMapRoutePicker extends RouteSource(HTMLElement) {
+class HereMapRoutePicker extends RouteObserver(HTMLElement) {
     /** @protected */
     constructor() {
         super();
@@ -34,7 +34,7 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
          * An entry point when the element is ready.
          * @deprecated Implement `customElements.whenDefined('here-map')` instead.
          * @todo Make this private.
-         * @type {Promise<{map:H.Map, behavior: H.mapevents.Behavior, platform:H.service.Platform, maptypes:object}>|Error>}
+         * @type {Promise<{map:H.Map, startMarker: H.map.Marker, destMarker:H.map.Marker}>|Error>}
          */
         this.whenReady = deferredPromise();
 
@@ -48,36 +48,37 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
             .catch(err => console.error("Unable to attach <here-map>:", err))
             ;
 
-        /**
-         * (Optional) An reference to a {@link History} element if you wanna enable browsers history rewriting.
-         * @type {History|null}
-         */
-        this.history = null;
-        whenElementReady(qs(this.getAttribute("history")) || qs("mc-history"))
-            .then(history => this.setHistory(history))
-            .catch(_ => {})  // ignore errors
-            ;
-
-        /**
-         * The used router to do routing. Will be set automatically when attribute `router="#selector"` is specified or when an
-         * element with `role="router"` is nearby.
-         * @type {BaseRouter|null}
-         */
-        this.router = null;
-        this._whenRouterReady = whenElementReady(qs(this.getAttribute("router")) || qp(this, "[role=router]") || qs("[role=router]"))
-            .then(router => this.router = router)
-            ;
     }
 
-    getRouter() {
-        return this._whenRouterReady.then(router => router.getRouter());
+    onRouteRequest(request) {
+        if (!request.error) {
+            this.whenReady.then(({map, startMarker, destMarker}) => {
+                startMarker.setPosition(request.start);
+                destMarker.setPosition(request.dest);
+                startMarker.setVisibility(true);
+                destMarker.setVisibility(true);
+                map.setViewBounds(startMarker.getParentGroup().getBounds(), true);
+            });
+        }
     }
 
+    onRouteClear() {
+        this.whenReady.then(({map, startMarker, destMarker}) => {
+            startMarker.setVisibility(false);
+            destMarker.setVisibility(false);
+        });
+    }
+
+    /**
+     * Attaches the map component.
+     * @todo - have to work with a domselecor and map instance
+     */
     setMap(hereMap) {
         hereMap.whenReady.then(({map, behavior}) => {
-            let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
+            this._map = map;
+            let startMarker = this._startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
             startMarker.draggable = true;
-            let destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(21, 50)})});
+            let destMarker = this._destMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_DEST_SVG, {anchor: new H.math.Point(21, 50)})});
             destMarker.draggable = true;
 
             function _dragStartHandler() {
@@ -89,8 +90,11 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
                     data = target.getData(),
                     position = target.getPosition();
                 behavior.enable();
-                this.setRoute(startMarker.getPosition(), destMarker.getPosition());
-//                this.router.update({start:startMarker.getPosition(), dest:destMarker.getPosition(),});
+
+                this.updateRoute({
+                    start: startMarker.getPosition(),
+                    dest: destMarker.getPosition(),
+                });
             }
 
             function _dragHandler(ev) {
@@ -114,75 +118,6 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
                 });
         }).catch(error => this.whenReady.reject(error));
     }
-
-    setHistory(history) {
-        this.history = history;
-    }
-
-    initRoute() {
-        let route = this.history && this.history.get("route");
-        if (route) {
-            let {start, dest, time} = decodeRoute(route);
-            this.start = start;
-            this.dest = dest;
-            this.time = time;
-        } else {
-            super.initRoute();
-        }
-    }
-
-    requestRoute(request) {
-        if (!request.error) {
-            // update markers
-            this.whenReady.then(({map, startMarker, destMarker}) => {
-                startMarker.setPosition(request.start);
-                destMarker.setPosition(request.dest);
-                map.setViewBounds(startMarker.getParentGroup().getBounds(), true);
-            });
-
-            // update history
-            this.history && this.history.push({
-                        route: encodeRoute(request.start, request.dest, request.time),
-                    });
-
-    }
-        return super.requestRoute(...arguments);
-    }
-}
-
-
-function decodeRoute(s) {
-    let pieces = s.split(":");
-    return {
-        start: decodeLocation(pieces[0]),
-        dest:  decodeLocation(pieces[1]),
-        time:  pieces[2] && new Date(pieces.slice(2).join(":")),
-    };
-}
-
-
-function encodeRoute(start, dest, time) {
-    return [
-            encodeLocation(start),
-            encodeLocation(dest),
-        ].concat(
-            time ? time.toISOString() : []
-        ).join(":");
-}
-
-
-function decodeLocation(s, default_=null) {
-    let pieces = s.split(",", 3);
-    return {
-        lng: parseFloat(pieces[0]),
-        lat: parseFloat(pieces[1]),
-        name: pieces[2],
-    };
-}
-
-
-function encodeLocation(location) {
-    return [location.lng.toPrecision(7), location.lat.toPrecision(7)].concat(location.name ? [location.name] : []).join(",");
 }
 
 
