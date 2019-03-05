@@ -1,9 +1,9 @@
 import {RouteDetails} from '../../../src/mapui/route-details.js';
 import {elementTemplate} from '../../../src/map/tools.js';
-import {SelectorMixin, SelectedMixin} from '../../../src/map/mixins.js';
+import {RouteObserver} from '../../../src/map/mixins.js';
 import {html, render} from '../../../src/map/lit-html.js';
 
-class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
+class RouteDetailsPane extends RouteObserver(HTMLElement) {
     baseRenderer() {
         return html`
         <style>
@@ -57,11 +57,11 @@ class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
         render(this.baseRenderer(), this.shadowRoot);
     }
 
-    onItemSelected(route) {
+    onRouteSelected(route) {
         this.showRoute(route);
     }
 
-    onItemDeselected() {
+    onRouteDeselected() {
         this.clear();
     }
 
@@ -69,12 +69,12 @@ class RouteDetailsPane extends SelectedMixin(SelectorMixin(HTMLElement)) {
         render(this._headerRenderer(route), this.shadowRoot.querySelector("header"));
         render(this._contentRenderer(route), this.shadowRoot.querySelector("content"));
         this.setAttribute("visible", "");
-        this.selectItem(route);
+//        this.selectItem(route);
     }
 
     clear() {
         this.removeAttribute("visible");
-        this.deselectItem();
+//        this.deselectItem();
     }
 }
 

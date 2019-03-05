@@ -1,9 +1,9 @@
 import {MapboxMap} from './map.js';
 import {findRootElement} from '../generics.js';
-import {SelectedMixin} from '../map/mixins.js'
+import {RouteObserver} from '../map/mixins.js'
 
 
-class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
+class MapboxMapRoutes extends RouteObserver(HTMLElement) {
     constructor() {
         super();
         this._routes = [];
@@ -36,7 +36,7 @@ class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
             }
             router.currentRoutes && this.addRoutes(map, router.currentRoutes);
             */
-            this._routes && this.onItems(this._routes);
+            this._routes && this._onRoutes(this._routes);
         });
 //        this._router = router;
         super.connectedCallback && super.connectedCallback();
@@ -46,7 +46,14 @@ class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
         return this._uiElements[this._routes.indexOf(route)];
     }
 
-    onItems(routes) {
+    onRouteRequest(request) {
+    }
+
+    onRouteResponse(response) {
+        this._onRoutes(response.routes);
+    }
+
+    _onRoutes(routes) {
         if (!this._map) {
             this._routes = routes;
             return;
@@ -58,7 +65,7 @@ class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
         this._uiElements = routes.map(route => this.addRoute(route));
     }
 
-    onItemSelected(route) {
+    onRouteSelected(route) {
         if (!this._map) {
             this._selectedRoute = route;
             return;
@@ -66,7 +73,7 @@ class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
         this._applyRouteStyleUi(route, this._getUiForRoute(route), "selected");
     }
 
-    onItemDeselected(route) {
+    onRouteDeselected(route) {
         if (!this._map) {
             this._selectedRoute = null;
             return;
@@ -74,7 +81,7 @@ class MapboxMapRoutes extends SelectedMixin(HTMLElement) {
         this._applyRouteStyleUi(route, this._getUiForRoute(route));
     }
 
-    onEmphasizedItem(route, accent, isSelected) {
+    onRouteEmphasized(route, accent, isSelected) {
         if (!this._map) return;
         if (isSelected) return;
         this._applyRouteStyleUi(route, this._getUiForRoute(route), accent);

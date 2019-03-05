@@ -1,6 +1,6 @@
 import {
     BaseRouter, RouteResponse, MultiboardResponse,
-    Route, Leg, Transport, Address, Stop, Departure, DepartureStop,
+    Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseString, buildURI, createUID,
 } from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
@@ -67,8 +67,9 @@ class HereTransitRouter extends BaseRouter {
                 dep:        `${request.start.lat},${request.start.lng}`,
                 arr:        `${request.dest.lat},${request.dest.lng}`,
                 time:       request.time.toISOString(),
-                client:     "webcomponents",
+                client:     "map-components",
                 graph:      1,
+                maneuvers:  1,
                 modes:      request.modes,
                 max:        request.max,
                 app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
@@ -81,6 +82,30 @@ class HereTransitRouter extends BaseRouter {
                 if (res.Res.Message) {
                     throw new Error(res.Res.Message.text);
                 }
+                // parse guidance + maneuver as lookup if exists
+                let maneuvers = {};
+                let geometries = {};
+                ((res.Res.Guidance || {}).Maneuvers || []).forEach(data => {
+                    let steps = data.Maneuver.map(m => new Maneuver({
+                            lat:      52.534318,    // TODO: use first coord from graph
+                            lng:      13.328702,    // ...
+                            name:     m.instruction,
+                            maneuver: MANEUVER_ACTIONS[m.action] || m.action,
+                            distance: m.distance,
+                            duration: m.duration,   // TODO: parse duration
+                            time:     new Date(),
+                        }));
+                    let geometry = data.Maneuver
+                            .map(m => m.graph ? m.graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [null])  // parse "52.5131292,13.4469195 52.5131464,13.4469759"
+                            .map(coords => coords.slice(0,-1))   // end coords covered by next maneuver
+                            .reduce((prev, curr) => prev.concat(curr), [])
+                            ;
+                    data.sec_ids.split(" ").forEach(sec_id => {
+                            maneuvers[sec_id] = steps;
+                            geometries[sec_id] = geometry;
+                        });
+                });
+                // parse connections
                 let routes = res.Res.Connections.Connection.map((conn) => {
                     let departure = buildLocation(conn.Dep);
                     let arrival = buildLocation(conn.Arr);
@@ -89,9 +114,11 @@ class HereTransitRouter extends BaseRouter {
                         let arrival = buildLocation(sec.Arr);
                         let transport = buildTransport(sec.Dep.Transport);
                         let geometry = sec.graph ? sec.graph.split(" ").map(coord => coord.split(",").map(parseFloat)) : [];
+                        if (geometry.length === 0) geometry = geometries[sec.id] || [];  // when no geometry try from maneuvers
                         let steps = (sec.Journey.Stop || []).map(e => buildLocation(e, {time:"dep"}));
+                        if (steps.length === 0) steps = maneuvers[sec.id] || [];  // when no steps try maneuvers
                         return new Leg(departure, arrival, transport, geometry, {
-                                id:       createUID("g-leg-{uid}"),
+                                id:       createUID("h-leg-{uid}"),
                                 distance: sec.Journey.distance,
                                 summary:  `Go to ${arrival.name}`,
                                 steps:    steps,
@@ -148,6 +175,18 @@ class HereTransitRouter extends BaseRouter {
 }
 
 
+const MANEUVER_ACTIONS = {
+    "leftTurn":             "turn-left",
+    "slightLeftTurn":       "slightly-left-turn",
+//    "leftRoundaboutExit1":  "",
+
+    "rightTurn":            "turn-right",
+    "slightRightTurn":      "slightly-right-turn",
+//    "rightFork":        "rightFork-fork-right",
+
+}
+
+
 function buildTransport(transport) {
     let t = Object.assign({}, transport.At || {}, transport);
     return new Transport({
@@ -160,13 +199,20 @@ function buildTransport(transport) {
 
 
 const ROUTER_MODES = {
-    0:  "highspeed_train",
-    3:  "train",
+    0:  "train/highspeed",
+    1:  "train/intercity",
+    2:  "train/interregional",
+    3:  "train/regional",
     4:  "metro",
     5:  "bus",
     7:  "subway",
     8:  "tram",
-    12: "bus_rapid",
+    9:  "bus/private",
+    10: "inclined",
+    11: "aerial",
+    12: "bus/rapid",
+    13: "monorail",
+    14: "flight",
     20: "walk",
 }
 

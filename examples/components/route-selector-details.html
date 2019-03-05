@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>route-selector - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="text/javascript" src="../credentials.js"></script>
+    <script type="module" src="../../src/mc/ui/html-demo.js"></script>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../../src/mc/ui/route-details.js"></script>
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+
+    <style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .row > * {
+            flex-basis: 0;
+            -ms-flex-positive: 1;
+            flex-grow: 1;
+            max-width: 100%;
+            margin: 0 1em;
+        }
+        .row > *:first-child {
+            margin-left: 2em;
+        }
+        .row > *:last-child {
+            margin-right: 2em;
+        }
+    </style>
+</head>
+<body>
+    <h3>RouteSelector - map-components</h3>
+
+    <demo-router role="route-source" show-routes
+        base="../assets/responses/here-transit-"
+        start="A"
+        dest="B">
+    </demo-router>
+
+    <div class="row">
+        <html-demo>
+            <route-selector toggle></route-selector>
+        </html-demo>
+
+        <html-demo>
+            <route-details></route-details>
+        </html-demo>
+    </div>
+
+    <script>
+        const router = document.querySelector('demo-router');
+        router.addEventListener('route-response', ev => {
+            const route = ev.detail.response.routes[0];
+            router.selectRoute(route);
+        });
+    </script>
+</body>
+</html>

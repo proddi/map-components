@@ -1,8 +1,6 @@
-import {html, render, repeat} from '../../map/lit-html.js';
-import {BaseRouter} from '../../generics.js';
-import {RouteObserver} from '../../map/mixins.js';
-
-import {formatDuration, formatTime, formatDistance} from '../../map/tools.js';
+import { html, render, repeat } from '../../map/lit-html.js';
+import { RouteObserver } from '../mixins.js';
+import { formatDuration, formatTime, formatDistance } from '../../map/tools.js';
 
 import './mc-icon.js';
 
@@ -24,6 +22,19 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         super();
 
         this.attachShadow({mode: 'open'});
+
+        this.legRenderer = {
+            default:    leg => this.defaultLegRenderer(leg),
+            walk:       leg => this.walkLegRenderer(leg),
+            car:        leg => this.carLegRenderer(leg),
+            train:      leg => this.transitLegRenderer(leg),
+            bus:        leg => this.transitLegRenderer(leg),
+            tram:       leg => this.transitLegRenderer(leg),
+            metro:      leg => this.transitLegRenderer(leg),
+            subway:     leg => this.transitLegRenderer(leg),
+            monorail:   leg => this.transitLegRenderer(leg),
+        }
+
     }
 
     selectLeg(leg) {
@@ -62,7 +73,8 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     margin-bottom: 0;
                 }
                 .list-item {
-                    font-size: .80em;
+                    f_ont-size: .80em;
+                    line-height: 1.5;
                     color: #495057;
                     box-sizing: border-box;
 
@@ -86,8 +98,14 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     display: block;
                     margin: 6px 0;
                 }
+                /* remove margin for the first elements .... ???
+                .list-item:first-child > :first-child {
+                    margin-top: 0;
+                }
+                */
                 .list-item > ul {
                     padding: 0;
+                    list-style: none;
 
                 }
                 .list-item > header,
@@ -110,26 +128,14 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 /* HEADER STYLES */
 
                 /* CONTENT STYLES */
-                .list-item content > div {
+                .list-item content.info {
                     font-size: .9em;
                     opacity: .7;
-                }
-
-                .list-item content .distance {
-                    color: rgb(44, 72, 161);
                 }
 
                 .list-item content ul {
                     margin: 0;
                     list-style: none;
-                    p_adding: 10px 0;
-                }
-                .l_ist-item content ul {
-                    margin: 2px -12px 2px -50px;
-                }
-
-                .l_ist-item content ul > li {
-                    padding: 6px 0;
                 }
 
                 .list-item > ul.stops > li {
@@ -169,11 +175,6 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
 
                 /* GENERIC STYLES */
-                time {
-                    float: right;
-                    padding-left: 7px;
-                }
-
                 .no-wrap {
                     white-space: nowrap;
                 }
@@ -183,42 +184,60 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     overflow-x: hidden;
                 }
 
+                time {
+                    float: right;
+                    padding-left: 7px;
+                }
+
+                .distance {
+                    color: rgb(44, 72, 161);
+                }
+
                 /* HEADER STYLES */
+
+
+                /* LEG TYPE SPECIFIC STYLES */
+                .list-item.walk-item > ul.steps > li {
+                    margin-left: 30px;
+                }
+
 
 
                 /* GFX STYLES */
                 .leg-icon {
                     position: absolute;
                     left: 12px;
-                    top: 0;
+                    top: 6px;
                     width: 24px;
                     height: 24px;
                     fill: var(--line-color);
+                    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
 
                 .maneuver-icon {
                     position: absolute;
-                    left: 12px;
+                    left: 22px;
                     top: 5px;
                     width: 16px;
                     height: 16px;
                     fill: #2c48a1;
-
+                    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
 
-                .list-item .line {
+                .line {
                     position: absolute;
-                    top: 27px;
+                    top: 33px;
                     left: 22px;
-                    bottom: -4px;
+                    bottom: -10px;
                     border-left: 4px solid var(--line-color, rgb(75, 81, 89));
                     z-index: 2;
                 }
-                .list-item .line.line-walk {
+                .line.walk-line {
                     border-left-style: dotted;
                 }
-                .list-item .line.line-car {
+                .line.car-line {
                     border-left-style: dotted;
+                    border-left-style: dashed;
                 }
 
 
@@ -241,8 +260,11 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     }
 
     renderLeg(leg) {
-        const renderer = this[`${leg.transport.type}LegRenderer`] || this.defaultLegRenderer;
-        return renderer.call(this, leg);
+        const [basetype] = `${leg.transport.type}/`.split("/", 1);
+        const renderer = this.legRenderer[leg.transport.type] || this.legRenderer[basetype] || this.legRenderer.default;
+        return renderer(leg);
+//        const renderer = this[`${leg.transport.type}LegRenderer`] || this.defaultLegRenderer;
+//        return renderer.call(this, leg);
     }
 
     defaultLegRenderer(leg) {
@@ -262,15 +284,21 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
     walkLegRenderer(leg) {
         return html`
-            <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
+            <div class="list-item walk-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
                 <mc-icon class="leg-icon" icon="mc:walk"></mc-icon>
-                <div class="line line-walk"></div>
+                <div class="line walk-line"></div>
                 <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
-                <content>
-                    <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-                    <div>Steps: ${leg.steps.length}</div>
-                </content>
+                <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>See ${leg.steps.length} directions for this ${formatDistance(leg.distance)} walk</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
+                <ul class="steps">
+                ${repeat(leg.steps || [], (step, index) => html`
+                    <li>
+                        <mc-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}"></mc-icon>
+                        <div class="ellipsis"><time>${formatTime(step.time)}</time>${step.name}</div>
+                        <div><span class="distance">${formatDistance(leg.distance)}</span></div>
+                    </li>
+                `)}
+                </ul>
             </div>
         `;
     }
@@ -308,17 +336,13 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item steps-hidden" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
-                <div class="line line-transit" style="border-color: ${leg.transport.color}"></div>
-                <mc-icon class="leg-icon" icon="${foo(leg)}" st_yle="fill:${leg.transport.color}"></mc-icon>
-                <header class="no-wrap">
+                <div class="line transit-line"></div>
+                <mc-icon class="leg-icon" icon="${foo(leg)}"></mc-icon>
+                <header class="no-wrap ellipsis">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
-                <content class="steps-hidden">
-                    <header class="no-wrap" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</header>
-                    <div>
-                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})
-                    </div>
-                </content>
+                <content class="no-wrap ellipsis" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</content>
+                <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
                 <ul class="steps stops">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li class="no-wrap ellipsis"><time>${formatTime(step.time)}</time>${step.name}</li>
@@ -330,19 +354,15 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
     carLegRenderer(leg) {
         return html`
-            <div class="list-item" data-leg="${leg.id}" style="--line-color: #2c48a1"
+            <div class="list-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <div class="l_ine line-car"></div>
+                <div class="line car-line"></div>
                 <mc-icon class="leg-icon" icon="mc:car"></mc-icon>
-                <header>
-                    <time>${leg.departure.timeString}</time>Start at ${leg.departure.name}
-                </header>
+                <header><time>${leg.departure.timeString}</time>Start at ${leg.departure.name}</header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
-                    <div>
-                        <span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Manuevers: ${leg.steps.length}</span>
-                    </div>
                 </content>
+                <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Manuevers: ${leg.steps.length}</span></content>
                 <ul class="steps maneuvers">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
@@ -363,15 +383,18 @@ const _TYPE_MAP = {
     bike:       "mc:bike",
     car:        "mc:car",
     bus:        "mc:bus",
-    bus_rapid:  "mc:bus",
+//    bus_rapid:  "mc:bus",
     tram:       "mc:tram",
     subway:     "mc:subway",
     metro:      "mc:metro",
-    highspeed_train:    "mc:train",
+//    highspeed_train:    "mc:train",
     train:      "mc:train",
 }
 function foo(leg) {
-    return _TYPE_MAP[leg.transport.type] || "mc:transit";
+    const [basetype] = `${leg.transport.type}/`.split("/", 1);
+    const icon = _TYPE_MAP[basetype];
+    if (!icon) console.warn(`No icon for transport type "${leg.transport.type}" -`, leg);
+    return icon || "mc:transit";
 }
 
 customElements.define('route-details', RouteDetails);

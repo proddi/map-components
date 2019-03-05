@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>HERE transit routing - demo - maps web components</title>
+    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/dev/mockup-router.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
@@ -9,12 +12,11 @@
     <script type="module" src="../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../src/mapui/route-selector.js"></script>
-    <script type="module" src="../src/mapui/route-details.js"></script>
+    <script type="module" src="../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../src/mc/ui/route-details.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
-    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
 </head>
 <body>
     <h3>HERE transit routing</h3>
@@ -33,15 +35,14 @@
                     dest="13.56,52.41"></here-transit-router>
 
         <here-map center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-
             <here-map-routes></here-map-routes>
-        </here-map>
 
-        <route-selector toggle>
-            <route-spinner slot="top"></route-spinner>
-            <route-error slot="top"></route-error>
-        </route-selector>
-        <route-details></route-details>
+            <route-selector toggle>
+                <route-spinner slot="top"></route-spinner>
+                <route-error slot="top"></route-error>
+            </route-selector>
+            <route-details></route-details>
+        </here-map>
     </maps-example>
 
     <hr>

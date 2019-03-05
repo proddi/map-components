@@ -1,4 +1,4 @@
-import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, parseCoordString, parseTimeString} from '../generics.js';
+import {BaseRouter, RouteResponse, Route, Leg, Transport, Address, Stop, Maneuver, parseCoordString, parseTimeString} from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
 
 
@@ -109,8 +109,12 @@ class MockupRouter extends BaseRouter {
 }
 
 
+function builStep(data) {
+    return buildLocation(data);
+}
+
 function buildLocation(data) {
-    const TYPES = {address:Address,stop:Stop}
+    const TYPES = {address:Address,stop:Stop,maneuver:Maneuver}
     let Type = TYPES[data.type] || Location;
     data = Object.assign({}, data);
     delete data.type;

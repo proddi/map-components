@@ -1,4 +1,4 @@
-import {RouteSource} from './map/mixins.js';
+import { RouteSource } from './mc/mixins.js';
 
 /**
  * Base class element for building custom router elements (e.g. {@link HereTransitRouter}).
@@ -506,6 +506,43 @@ class Stop extends Address {
 
 
 /**
+ * generic Address object
+ */
+class Maneuver extends Location {
+    /**
+     * create instance.
+     * @param {{lat:float,lng:float,name:string,manuever:string,time:Date}} object
+     **/
+    constructor({lat, lng, lon, name, maneuver, distance, time}) {
+        super({lat:lat,lng:lng,lon:lon});
+
+        this.type = "maneuver";
+
+        this.name = name;
+
+        this.maneuver = maneuver;
+
+        this.distance = distance;
+
+        /** @type {Date} */
+        this.time = time;
+    }
+
+    /**
+     * Returns {name} or Address.
+     * @type {string}
+     */
+    get title() { return this.name || [this.lat, this.lon].map(val => Math.round(val, 2)).join(","); }
+
+    /**
+     * Returns the date as HH:MM
+     * @type {string}
+     */
+    get timeString() { return this.time.getHours() + ":" + ("0"+this.time.getMinutes()).slice(-2); }
+}
+
+
+/**
  * Transport object for {@link Leg}
  */
 class Transport {
@@ -831,7 +868,7 @@ export {
     RouteRequest, RouteResponse,
     BoardRequest, BoardResponse,
     MultiboardRequest, MultiboardResponse,
-    Route, Leg, Transport, Address, Stop, Departure, DepartureStop,
+    Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseCoordString, parseTimeString, findRootElement, buildURI, buildURIParams, deferredPromise, parseString, createUID,
     loadScript, loadStyle
 }

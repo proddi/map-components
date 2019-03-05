@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>HERE MAP - web components</title>
+    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
@@ -16,11 +19,8 @@
     <script type="module" src="../src/mapui/route-selector.js"></script>
     <script type="module" src="../src/mapui/route-details.js"></script>
     <script type="module" src="../src/union-router.js"></script>
-    <script type="module" src="../src/mc/ui/route-spinner.js"></script>
-    <script type="module" src="../src/mc/ui/route-error.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
-    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
 </head>
 <body>
     <h3>Combined routes from Google (walk, car, transit) and HERE transit</h3>
@@ -46,7 +46,7 @@
 
         <union-router id="union-router" routers="#here-router,#google-router,#walk-router,#google-transit-router"></union-router>
 
-        <here-map id="map1" center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 150 0 10">
+        <here-map id="map1" center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 10 0 150">
 
             <here-map-route-picker role="route-source" router="#union-router"
                 start="13.30,52.43"
@@ -55,13 +55,11 @@
             </here-map-route-picker>
 
             <here-map-routes></here-map-routes>
+
+            <route-selector toggle></route-selector>
+            <route-details></route-details>
         </here-map>
 
-        <route-selector toggle>
-            <route-spinner slot="top"></route-spinner>
-            <route-error slot="top"></route-error>
-        </route-selector>
-        <route-details></route-details>
     </maps-example>
 
     <hr>

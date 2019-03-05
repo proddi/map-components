@@ -1,6 +1,6 @@
 import {HereMap} from './map.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
-import {RouteObserver} from '../map/mixins.js'
+import {RouteObserver} from '../mc/mixins.js'
 
 /**
  * @extends {RouteObserver}

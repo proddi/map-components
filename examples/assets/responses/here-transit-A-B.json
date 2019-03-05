@@ -54,7 +54,33 @@
             "name":"walk"
           },
           "steps":[
-
+            {
+              "lat":52.5445988,
+              "lng":13.316990400000009,
+              "type":"maneuver",
+              "maneuver":"turn-right",
+              "distance":36,
+              "_name":"Turn <b>right</b> onto <b>Riedemannweg</b>",
+              "time":"2019-01-09T04:15:12.000Z"
+            },
+            {
+              "lat":52.544857,
+              "lng":13.317790500000001,
+              "type":"maneuver",
+              "maneuver":"turn-slightly-left",
+              "distance":147,
+              "_name":"<b>Riedemannweg</b> turns slightly <b>left</b> and becomes <b>Buchholzweg</b>",
+              "time":"2019-01-09T04:15:28.000Z"
+            },
+            {
+              "lat":52.5463825,
+              "lng":13.318691899999976,
+              "type":"maneuver",
+              "maneuver":"turn-left",
+              "distance":142,
+              "_name":"Turn <b>left</b> onto <b>Saatwinkler Damm</b>",
+              "time":"2019-01-09T04:15:53.000Z"
+            }
           ],
           "geometry":[
 

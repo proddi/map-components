@@ -23,8 +23,12 @@ Support:
 - MapBox: Map, Route picking, Route rendering
 
 
-Example
-=======
+Examples:
+---------
+
+You just need a webserver to browse the examples.
+
+You can use e.g. [dev-https](https://github.com/proddi/dev-httpd):
 
 A fully functional map with transit route and drag'n'drop markers to change the route.
 
@@ -53,7 +57,7 @@ A fully functional map with transit route and drag'n'drop markers to change the 
 
 
 Components:
-===========
+-----------
 
 - `Router` - The worker of search and routing. Other components can use them for routing as well. The lib contains routers
 for `HERE` and `Google`. (`Mapbox` planned).
@@ -64,8 +68,8 @@ for `HERE` and `Google`. (`Mapbox` planned).
 - Common and vendor specific `UI` elements.
 
 
-Data flow
-=========
+Data flow:
+----------
 
 - Simple:
 

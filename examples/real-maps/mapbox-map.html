@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>Mapbox Map - map-components</title>
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+    <link href="../assets/examples.css" rel="stylesheet">
     <script type="module" src="../../src/mapui/example.js"></script>
     <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-mapbox/platform.js"></script>
@@ -21,7 +24,9 @@
 <body>
     <h3>MapBox Map + here transit routes</h3>
     <maps-example>
-        <here-transit-router id="here-router" app-id="${localStorage.getItem('HERE_APP_ID')}" app-code="${localStorage.getItem('HERE_APP_CODE')}"
+        <here-platform app-id="${localStorage.getItem('HERE_APP_ID')}" app-code="${localStorage.getItem('HERE_APP_CODE')}"></here-platform>
+
+        <here-transit-router role="route-source" platform="here-platform"
             name="here/transit"
             start="13.40,52.53"
             dest="13.56,52.41"
@@ -31,13 +36,11 @@
         <mapbox-platform token="${localStorage.getItem('MAPBOX_TOKEN')}"></mapbox-platform>
 
         <mapbox-map center="13.5,52.5" zoom="11" style="height:700px" platform="mapbox-platform">
-            <mapbox-map-route-picker router="#here-router"></mapbox-map-route-picker>
-            <mapbox-map-routes selector="#route-selector"></mapbox-map-routes>
+            <mapbox-map-route-picker></mapbox-map-route-picker>
+            <mapbox-map-routes></mapbox-map-routes>
         </mapbox-map>
 
-        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-            <route-selector id="route-selector" router="#here-router"></route-selector>
-        </div>
+        <route-selector id="route-selector"></route-selector>
     </maps-example>
 
     <hr>

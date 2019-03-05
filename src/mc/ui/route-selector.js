@@ -1,6 +1,6 @@
-import {html, render, repeat} from '../../map/lit-html.js';
-import {RouteObserver} from '../../map/mixins.js';
-import {Leg, Transport} from '../../generics.js';
+import { html, render, repeat } from '../../map/lit-html.js';
+import { RouteObserver } from '../mixins.js';
+import { Leg, Transport } from '../../generics.js';
 
 import './mc-icon.js';
 
@@ -62,14 +62,20 @@ class RouteSelector extends RouteObserver(HTMLElement) {
 //        this.setAttribute("loading", "");
 //        this.removeAttribute("error");
 //        this.removeAttribute("routes");
-        this.classList.remove("active");
+//        this.classList.remove("active");
+        this.onRouteClear();
     }
 
     /**
      * @param {RouteResponse} response
      */
-    onRouteResponse(response) {
+    onRouteResponse(response, intermediate, source) {
         render(this.render(response), this._rootNode);
+        if (source.routeSelected) {
+            this.onRouteSelected(source.routeSelected);
+        } else {
+            this.setAttribute("selected", "");
+        }
         if (!response.error) this.classList.add("active");
 //        this.setAttribute(respone.error ? "error" : "routes", "");
 //        this.removeAttribute("loading");
@@ -79,6 +85,7 @@ class RouteSelector extends RouteObserver(HTMLElement) {
 //        render(this._baseRenderer(this, {}, this._routeRenderer), this._rootNode);
 //        this.removeAttribute("error");
 //        this.removeAttribute("routes");
+        this.removeAttribute("selected");
         this.classList.remove("active");
     }
 
@@ -87,7 +94,9 @@ class RouteSelector extends RouteObserver(HTMLElement) {
      */
     onRouteSelected(route) {
         this.setAttribute("selected", route.id);
-        this._rootNode.querySelector(`[data-route="${route.uid}"]`).classList.add('active');
+        let node = this._rootNode.querySelector(`[data-route="${route.uid}"]`);
+        if (node) node.classList.add('active');
+        else console.warn("Not existing route selected:", route.id);
     }
 
 
@@ -95,8 +104,9 @@ class RouteSelector extends RouteObserver(HTMLElement) {
      * @param {Route} route
      */
     onRouteDeselected(route) {
-        this.removeAttribute("selected");
-        this._rootNode.querySelector(`[data-route="${route.uid}"]`).classList.remove('active');
+        this.setAttribute("selected", "");
+        let node = this._rootNode.querySelector(`[data-route="${route.uid}"]`);
+        if (node) node.classList.remove('active');
     }
 
     /**
@@ -119,7 +129,8 @@ class RouteSelector extends RouteObserver(HTMLElement) {
                     margin-bottom: 0;
                 }
                 .list-item {
-                    font-size: .80em;
+                    f_ont-size: .80em;
+                    line-height: 1.5;
                     color: #495057;
                     box-sizing: border-box;
 
@@ -191,8 +202,10 @@ class RouteSelector extends RouteObserver(HTMLElement) {
                     top: calc(50% - 12px);
                     width: 24px;
                     height: 24px;
+                    fill: currentColor;
+                    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
-                .list-item svg.list-item-icon {
+                ___.list-item svg.list-item-icon {
                     fill: currentcolor;
                     filter: opacity(90%)
                     f_ilter: invert(100%);

@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>HERE transit routing - demo - maps web components</title>
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <link href="../assets/examples.css" rel="stylesheet">
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/vendor-here/platform.js"></script>
@@ -10,7 +12,7 @@
     <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-here/map-routes.js"></script>
     <script type="module" src="../../src/mapui/route-selector.js"></script>
-    <script type="module" src="/node_modules/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
+    <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
     <script type="module" src="./comps/route-details-pane.js"></script>
     <script>
         function getClosest(el, selector) {
@@ -20,40 +22,11 @@
             }
         };
     </script>
-    <style>
-        here-map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-        here-map > route-selector {
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            width: 300px;
-            max-height: calc(100% - 20px);
-            z-index: 10;
-            background: white;
-            border: 0.1rem solid #f1f1f2;
-        }
-        here-map > demo-router {
-            position: absolute;
-            bottom: 10px;
-            left: 330px;
-            right: 10px;
-            z-index: 10;
-            padding: 10px;
-            margin: 0;
-            background: rgba(255, 255, 255, .85);
-        }
-    </style>
 </head>
 <body>
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
     <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 20 20 300">
-        <demo-router id="router"
+        <demo-router id="router" role="route-source"
             name="demo"
             base="../assets/responses/here-transit-"
             start="A"
@@ -66,7 +39,7 @@
 
         <route-selector id="route-selector" router="#router" toggle></route-selector>
 
-        <route-details-pane selector="route-selector" role="fade-right">
+        <route-details-pane role="fade-right">
             <template role="header" args-as="route">
                 <paper-icon-item>
                     <iron-icon icon="maps:directions-transit" slot="item-icon"></iron-icon>

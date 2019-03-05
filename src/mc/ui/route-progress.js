@@ -1,5 +1,5 @@
 import {html, render} from '../../map/lit-html.js';
-import {RouteObserver} from '../../map/mixins.js';
+import {RouteObserver} from '../../mc/mixins.js';
 
 import '/node_modules/@polymer/paper-progress/paper-progress.js';
 

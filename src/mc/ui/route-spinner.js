@@ -1,7 +1,7 @@
 import {html, render} from '../../map/lit-html.js';
-import {RouteObserver} from '../../map/mixins.js';
+import {RouteObserver} from '../../mc/mixins.js';
 
-import '/node_modules/@polymer/paper-spinner/paper-spinner.js';
+import 'https://unpkg.com/@polymer/paper-spinner/paper-spinner.js';
 
 
 /**

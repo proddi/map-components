@@ -1,4 +1,4 @@
-import {RouteSource} from '../map/mixins.js';
+import {RouteSource} from '../mc/mixins.js';
 import {deferredPromise} from '../generics.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';
 import {HereMap} from './map.js';
@@ -74,8 +74,6 @@ class HereMapRoutePicker extends RouteSource(HTMLElement) {
     }
 
     setMap(hereMap) {
-        console.assert(hereMap instanceof HereMap);
-
         hereMap.whenReady.then(({map, behavior}) => {
             let startMarker = new H.map.Marker({lat:0,lng:0}, {icon:new H.map.Icon(TRIP_START_SVG, {anchor: new H.math.Point(21, 50)})});
             startMarker.draggable = true;

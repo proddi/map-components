@@ -20,6 +20,9 @@
         "server": "./node_modules/.bin/polymer serve"
     },
     "dependencies": {
+        "lit-html": "^1.0.0-rc.2"
+    },
+    "devDependencies": {
         "@cwmr/paper-autocomplete": "^4.0.0",
         "@google-web-components/google-youtube": "^3.0.1",
         "@polymer/iron-icons": "^3.0.1",
@@ -29,13 +32,10 @@
         "@polymer/paper-material": "^3.0.1",
         "@polymer/paper-progress": "^3.0.1",
         "@polymer/paper-spinner": "^3.0.1",
-        "lit-html": "^1.0.0-rc.2"
-    },
-    "devDependencies": {
         "@proddi/esdoc": "^1.2.0",
         "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
-        "polymer-cli": "^1.9.5",
+        "polymer-cli": ">=1.9.5",
         "webpack": "^4.28.3",
         "webpack-cli": "^3.2.0"
     }

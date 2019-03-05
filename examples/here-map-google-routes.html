@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>HERE MAP - web components</title>
+    <link type="text/css" rel="stylesheet" href="assets/examples.css" />
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
@@ -13,16 +16,9 @@
     <script type="module" src="../src/vendor-google/router.js"></script>
 
     <script type="module" src="../src/mapui/route-selector.js"></script>
+    <script type="module" src="../src/mapui/route-details.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
-    <script type="module" src="../src/mc/ui/route-spinner.js"></script>
-    <style>
-        /* component base styles */
-        here-map {
-            height: 400px;
-            display: block;
-        }
-    </style>
 </head>
 <body>
     <maps-example>
@@ -45,13 +41,10 @@
                 time="2018-12-22T19:17:07">
             </here-map-route-picker>
             <here-map-routes></here-map-routes>
-        </here-map>
 
-        <div style="position:fixed;right:0;top:0;width:300px;background:rgba(255,255,255,.8)">
-            <route-selector>
-                <route-spinner slot="center"></route-spinner>
-            </route-selector>
-        </div>
+            <route-selector toggle></route-selector>
+            <route-details></route-details>
+        </here-map>
     </maps-example>
 
     <route-link router="#google-router" start="13.30,52.54" dest="13.45,52.42">route1</route-link>

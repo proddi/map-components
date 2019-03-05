@@ -1,5 +1,5 @@
 import {html, render} from 'https://unpkg.com/lit-html?module';
-import {RouteObserver} from './map/mixins.js';
+import {RouteObserver} from './mc/mixins.js';
 
 
 /**
