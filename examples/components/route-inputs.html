@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>route-selector - map components</title>
+    <link href="../assets/examples.css" rel="stylesheet">
+    <script type="text/javascript" src="../credentials.js"></script>
+    <script type="module" src="../../src/mc/ui/html-demo.js"></script>
+    <script type="module" src="../../src/dev/demo-router.js"></script>
+    <script type="module" src="../../src/vendor-here/transit-router.js"></script>
+    <script type="module" src="../../src/vendor-here/platform.js"></script>
+    <script type="module" src="../../src/vendor-here/map.js"></script>
+    <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
+    <script type="module" src="../../src/vendor-here/map-routes.js"></script>
+    <script type="module" src="../../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../../src/mc/ui/route-details.js"></script>
+    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
+    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+
+    <script type="module">
+import { html, render, repeat } from '../../src/map/lit-html.js';
+import { Address } from '../../src/generics.js';
+import { RouteObserver } from '../../src/mc/mixins.js';
+
+
+class RouteInputs extends RouteObserver(HTMLElement) {
+    constructor() {
+        super();
+
+        this.attachShadow({mode: 'open'});
+
+        render(this.render(), this.shadowRoot);
+        this._startInput = this.shadowRoot.querySelector('#start');
+        this._destInput = this.shadowRoot.querySelector('#dest');
+
+        this._startInput.addEventListener('change', ev => {
+//            this.getRouter().then(router => {
+            this.routeSource.requestStopsByName(this._startInput.value, this._destLoc || this._startLoc || {lat:52.5,lng:13.5})
+                    .then(response => {
+                            this._startLoc = response.stops[0];
+                            this._startInput.value = this._startLoc.title;
+                            this.routeSource.setRoute(this._startLoc, this._destLoc)
+                        })
+                    ;
+                })
+//            });
+        this._destInput.addEventListener('change', ev => {
+//            this.getRouter().then(router => {
+            this.routeSource.requestStopsByName(this._destInput.value, this._startLoc || this._destLoc || {lat:52.5,lng:13.5})
+                    .then(response => {
+                            this._destLoc = response.stops[0];
+                            this._destInput.value = this._destLoc.title;
+                            this.routeSource.setRoute(this._startLoc, this._destLoc)
+                        })
+                    ;
+                });
+//            });
+    }
+
+    onRouteRequest(request) {
+        console.log("req", request.start, "->", request.dest);
+
+        this._startLoc = Address.enforce(request.start);
+        this._destLoc = Address.enforce(request.dest);
+        this._startInput.value = this._startLoc.title;
+        this._destInput.value = this._destLoc.title;
+//        render(this.render(), this.shadowRoot);
+    }
+
+    onRouteResponse(response) {
+        console.log("> res", response);
+        let route = response.routes[0];
+        this._startLoc = route.departure;
+        this._destLoc = route.arrival;
+        console.log("route", this._startLoc, "->", this._destLoc);
+        this._startInput.value = this._startLoc.title;
+        this._destInput.value = this._destLoc.title;
+    }
+
+    render() {
+        return html`
+            <style>
+                :host {
+                    display: block;
+                }
+            </style>
+
+            <div>
+                <div><input id="start"></div>
+                <div><input id="dest"></div>
+            </div>
+        `;
+    }
+
+}
+
+customElements.define('route-inputs', RouteInputs);
+
+    </script>
+
+    <style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .row > * {
+            flex-basis: 0;
+            -ms-flex-positive: 1;
+            flex-grow: 1;
+            max-width: 100%;
+            margin: 0 1em;
+        }
+        .row > *:first-child {
+            margin-left: 2em;
+        }
+        .row > *:last-child {
+            margin-right: 2em;
+        }
+    </style>
+</head>
+<body>
+    <h3>RouteInput - map-components</h3>
+
+    <demo-router show-routes
+        base="../assets/responses/here-transit-"
+        start="A"
+        dest="B">
+    </demo-router>
+
+    <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+
+    <here-transit-router role="route-source"
+                    start="13.31709,52.54441"
+                    dest="13.56,52.41"></here-transit-router>
+
+    <html-demo>
+        <route-inputs></route-inputs>
+        <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
+            <here-map-route-picker router="here-transit-router"></here-map-route-picker>
+            <here-map-routes route-source="here-transit-router"></here-map-routes>
+        </here-map>
+    </html-demo>
+
+</body>
+</html>

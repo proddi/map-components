@@ -1,4 +1,5 @@
 import {qs, qp, whenElementReady} from './utils.js';
+import {RouteResponse} from '../generics.js';
 
 
 /**
@@ -140,6 +141,10 @@ let RouteSourceImpl = Base => class extends Base {
         }
     }
 
+    /**
+     * API to request a route
+     * @async
+     */
     requestRoute(...args) {
         return this._emitRouteRequest(...args);
 //        this.routeRequest = request;

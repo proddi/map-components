@@ -409,6 +409,27 @@ class MultiboardResponse extends Response {
 }
 
 
+class StopResponse extends Response {
+    get type() { return "stop"; }
+
+    /** @private */
+    constructor(request) {
+        super(request)
+        /** @type {Array<DepartureStop>} */
+        this.stops = [];
+    }
+
+    /**
+     * Resolve the request.
+     * @param {DepartureStop[]} stops - The stops with departures.
+     * @returns {MultiboardRequest} - This instance.
+     */
+    resolve(stops) {
+        return super.resolve({stops:stops});
+    }
+}
+
+
 /**
  * generic Location object
  */
@@ -868,6 +889,7 @@ export {
     RouteRequest, RouteResponse,
     BoardRequest, BoardResponse,
     MultiboardRequest, MultiboardResponse,
+    StopResponse,
     Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseCoordString, parseTimeString, findRootElement, buildURI, buildURIParams, deferredPromise, parseString, createUID,
     loadScript, loadStyle

@@ -1,5 +1,6 @@
 import {
-    BaseRouter, RouteResponse, MultiboardResponse,
+    BaseRouter,
+    RouteResponse, MultiboardResponse, StopResponse,
     Route, Leg, Transport, Address, Stop, Maneuver, Departure, DepartureStop,
     parseString, buildURI, createUID,
 } from '../generics.js';
@@ -44,6 +45,55 @@ class HereTransitRouter extends BaseRouter {
             ;
 
     }
+
+
+    /**
+     * Requests Stops by name
+     * @experimental - Not official
+     * @private
+     * @todo Structure this according to API
+     * @async
+     */
+    async requestStopsByName(name, center) {
+
+        let platform = this.platform;
+
+        let url = buildURI(`${this.server}/v3/stations/by_name.json`, {
+                name:       name,
+                center:     `${center.lat},${center.lng}`,
+                client:     "map-components",
+//                max:        request.max,
+                app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
+                app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
+            });
+
+        let response = new StopResponse(null);
+        return fetch(url).then(res => res.json()).then(res => {
+                console.log(`by_name(${name})`, res);
+                if (res.Res.Message) {
+                    throw new Error(res.Res.Message.text);
+                }
+                // parse connections
+                let stops = res.Res.Stations.Stn.map(stn => new Stop({
+                        lat:  stn.y,
+                        lng:  stn.x,
+                        name: stn.name,
+                        type: "stop",
+                        time: 0,
+                        id:   stn.id,
+                    }));
+                return response.resolve(stops);
+            });
+    }
+
+
+
+
+
+
+
+
+
 
     buildRouteRequest(start, dest, time) {
         return super.buildRouteRequest(start, dest, time, {
@@ -226,7 +276,7 @@ function buildLocation(loc, {time="time"}={}) {
             lng:  stn.x,
             name: stn.name,
             type: "stop",
-            time: new Date(loc.time || loc.arr || loc.dep),
+            time: new Date(loc.time || loc.arr || loc.dep || 0),
             id:   stn.id,
         });
 
@@ -234,7 +284,7 @@ function buildLocation(loc, {time="time"}={}) {
             lat:  addr.y,
             lng:  addr.x,
             type: "address",
-            time: new Date(loc.time || loc.arr || loc.dep),
+            time: new Date(loc.time || loc.arr || loc.dep || 0),
         });
 }
 
