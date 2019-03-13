@@ -1,0 +1,12 @@
+/* generic base style */
+.mc-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+}
+
+.mc-icon.transit {
+    background: red;
+    background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" focusable="false" xmlns="http://www.w3.org/2000/svg"><use href="/route-icons------------new.svg#transit"/></svg>');
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><circle cx="15" cy="15" r="10"/><use href="#transit"/></svg>')  no-repeat;
+}

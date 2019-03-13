@@ -3,8 +3,13 @@
 <head>
     <title>HERE MAP - web components</title>
     <link type="text/css" rel="stylesheet" href="assets/examples.css" />
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../assets/icons/transit-icons.svg"></x-iconset-svg>
+
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
@@ -15,8 +20,8 @@
     <script type="module" src="../src/vendor-google/platform.js"></script>
     <script type="module" src="../src/vendor-google/router.js"></script>
 
-    <script type="module" src="../src/mapui/route-selector.js"></script>
-    <script type="module" src="../src/mapui/route-details.js"></script>
+    <script type="module" src="../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../src/mc/ui/route-details.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
 </head>
@@ -25,7 +30,7 @@
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
         <google-platform key="${GOOGLE_KEY}"></google-platform>
 
-        <google-router id="google-router"
+        <google-router role="route-source" id="google-router"
             platform="google-platform"
             name="google/car"
             mode="DRIVING"
@@ -35,7 +40,7 @@
         </google-router>
 
         <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <here-map-route-picker role="route-source" router="#google-router"
+            <here-map-route-picker
                 start="13.30,52.43"
                 dest="13.76,52.51"
                 time="2018-12-22T19:17:07">

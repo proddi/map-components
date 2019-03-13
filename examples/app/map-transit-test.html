@@ -20,9 +20,11 @@
     <script type="module" src="../../src/mc/ui/route-error.js"></script>
 
     <!-- mc-icons -->
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">
-    <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
+    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -80,14 +82,19 @@
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
     <google-platform key="${GOOGLE_KEY}"></google-platform>
 
-    <union-router id="router" routers="#transit-router,#car-router,#bike-router">
+    <union-router
+            role="route-source"
+            routers="#transit-router,#car-router,#bike-router"
+            start="13.31709,52.54441"
+            dest="13.56,52.41"
+            time="2019-01-22T19:17:07">
         <here-transit-router id="transit-router"></here-transit-router>
         <google-router id="car-router" mode="DRIVING" name="google/car"></google-router>
         <google-router id="bike-router" mode="BICYCLING" name="google/bike"></google-router>
     </union-router>
 
     <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
-        <here-map-route-picker role="route-source" router="#router"
+        <here-map-route-picker
                 start="13.31709,52.54441"
                 dest="13.56,52.41"
                 time="2019-01-22T19:17:07">

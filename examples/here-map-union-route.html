@@ -3,8 +3,14 @@
 <head>
     <title>HERE MAP - web components</title>
     <link type="text/css" rel="stylesheet" href="assets/examples.css" />
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
+    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
+
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
@@ -16,8 +22,8 @@
     <script type="module" src="../src/vendor-google/platform.js"></script>
     <script type="module" src="../src/vendor-google/router.js"></script>
 
-    <script type="module" src="../src/mapui/route-selector.js"></script>
-    <script type="module" src="../src/mapui/route-details.js"></script>
+    <script type="module" src="../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../src/mc/ui/route-details.js"></script>
     <script type="module" src="../src/union-router.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
@@ -44,14 +50,16 @@
         <google-router id="walk-router" platform="google-platform" mode="WALKING" name="google/walk"></google-router>
         <google-router id="google-transit-router" platform="google-platform" mode="TRANSIT" name="google/transit"></google-router>
 
-        <union-router id="union-router" routers="#here-router,#google-router,#walk-router,#google-transit-router"></union-router>
+        <union-router role="route-source"
+            routers="#here-router,#google-router,#walk-router,#google-transit-router"
+            start="13.30,52.43"
+            dest="13.4687,52.52864"
+            time="2019-02-22T19:17:07">
+        </union-router>
 
         <here-map id="map1" center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 10 0 150">
 
-            <here-map-route-picker role="route-source" router="#union-router"
-                start="13.30,52.43"
-                dest="13.4687,52.52864"
-                time="2019-02-22T19:17:07">
+            <here-map-route-picker>
             </here-map-route-picker>
 
             <here-map-routes></here-map-routes>

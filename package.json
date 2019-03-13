@@ -20,15 +20,13 @@
         "server": "./node_modules/.bin/polymer serve"
     },
     "dependencies": {
+        "@proddi/x-icons": ">=0.0.3",
         "lit-html": "^1.0.0-rc.2"
     },
     "devDependencies": {
+        "@polymer/iron-demo-helpers": "^3.0.1",
         "@cwmr/paper-autocomplete": "^4.0.0",
-        "@google-web-components/google-youtube": "^3.0.1",
-        "@polymer/iron-icons": "^3.0.1",
-        "@polymer/paper-icon-button": "^3.0.2",
         "@polymer/paper-input": "^3.0.1",
-        "@polymer/paper-item": "^3.0.1",
         "@polymer/paper-material": "^3.0.1",
         "@polymer/paper-progress": "^3.0.1",
         "@polymer/paper-spinner": "^3.0.1",

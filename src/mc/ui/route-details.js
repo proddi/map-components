@@ -2,7 +2,7 @@ import { html, render, repeat } from '../../map/lit-html.js';
 import { RouteObserver } from '../mixins.js';
 import { formatDuration, formatTime, formatDistance } from '../../map/tools.js';
 
-import './mc-icon.js';
+import '@proddi/x-icons/x-icon.js';
 
 
 /**
@@ -203,7 +203,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     top: 6px;
                     width: 24px;
                     height: 24px;
-                    fill: var(--line-color);
+                    color: var(--line-color);
                     filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
 
@@ -213,7 +213,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     top: 5px;
                     width: 16px;
                     height: 16px;
-                    fill: #2c48a1;
+                    color: #2c48a1;
                     filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
 
@@ -251,7 +251,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     arrivalRenderer(route) {
         return html`
             <div class="list-item">
-                <mc-icon class="leg-icon" icon="mc:place"></mc-icon>
+                <x-icon class="leg-icon" icon="mc:place"></x-icon>
                 <header><time>${formatTime(route.arrival.time)}</time>Arrive at ${route.arrival.name}</header>
             </div>
         `;
@@ -268,7 +268,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
-                <mc-icon class="leg-icon" icon="${foo(leg)}"></mc-icon>
+                <x-icon class="leg-icon" icon="${foo(leg)}"></x-icon>
                 <div class="line"></div>
                 <header><time datetime="PT2H30M">${leg.departure.timeString}</time>${leg.summary}</header>
                 <content>
@@ -282,14 +282,14 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         return html`
             <div class="list-item walk-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <mc-icon class="leg-icon" icon="mc:walk"></mc-icon>
+                <x-icon class="leg-icon" icon="mc:walk"></x-icon>
                 <div class="line walk-line"></div>
                 <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
                 <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>See ${leg.steps.length} directions for this ${formatDistance(leg.distance)} walk</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
                 <ul class="steps">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
-                        <mc-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}" title="manuever: ${step.maneuver}"></mc-icon>
+                        <x-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}" title="manuever: ${step.maneuver}"></x-icon>
                         <div class="ellipsis"><time>${formatTime(step.time)}</time>${step.name}</div>
                         <div><span class="distance">${formatDistance(leg.distance)}</span></div>
                     </li>
@@ -305,7 +305,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line transit-line"></div>
-                <mc-icon class="leg-icon" icon="${foo(leg)}"></mc-icon>
+                <x-icon class="leg-icon" icon="${foo(leg)}"></x-icon>
                 <header class="no-wrap ellipsis">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
@@ -325,7 +325,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item car-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line car-line"></div>
-                <mc-icon class="leg-icon" icon="mc:car"></mc-icon>
+                <x-icon class="leg-icon" icon="mc:car"></x-icon>
                 <header><time>${leg.departure.timeString}</time>Start at ${leg.departure.name}</header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
@@ -334,7 +334,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 <ul class="steps maneuvers">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
-                        <mc-icon class="maneuver-icon" icon="maneuvers:turn-left"></mc-icon>
+                        <x-icon class="maneuver-icon" icon="maneuvers:turn-left"></x-icon>
                         <div class="ellipsis"><time>${formatTime(leg.departure.time)}</time>${step.name}</div>
                     </li>
                 `)}

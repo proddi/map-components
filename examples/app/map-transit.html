@@ -2,16 +2,22 @@
 <html>
 <head>
     <title>HERE transit routing - demo - maps web components</title>
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <link href="../assets/examples.css" rel="stylesheet">
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
+    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
+
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/vendor-here/platform.js"></script>
     <script type="module" src="../../src/vendor-here/map.js"></script>
     <script type="module" src="../../src/dev/demo-router.js"></script>
     <script type="module" src="../../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../../src/mapui/route-selector.js"></script>
+    <script type="module" src="../../src/mc/ui/route-selector.js"></script>
     <script type="module" src="https://unpkg.com/@polymer/paper-icon-button/paper-icon-button.js?module"></script>
     <script type="module" src="./comps/route-details-pane.js"></script>
     <script>
@@ -25,19 +31,20 @@
 </head>
 <body>
     <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
+
+    <demo-router role="route-source"
+        name="demo"
+        base="../assets/responses/here-transit-"
+        start="A"
+        dest="B"
+        time="2018-12-22T19:17:07">
+    </demo-router>
+
     <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 20 20 300">
-        <demo-router id="router" role="route-source"
-            name="demo"
-            base="../assets/responses/here-transit-"
-            start="A"
-            dest="B"
-            time="2018-12-22T19:17:07">
-        </demo-router>
+        <here-map-route-picker></here-map-route-picker>
+        <here-map-routes></here-map-routes>
 
-        <here-map-route-picker id="picker" router="#router"></here-map-route-picker>
-        <here-map-routes selector="#route-selector" styler="#route-selector"></here-map-routes>
-
-        <route-selector id="route-selector" router="#router" toggle></route-selector>
+        <route-selector id="route-selector" toggle></route-selector>
 
         <route-details-pane role="fade-right">
             <template role="header" args-as="route">

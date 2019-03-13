@@ -2,7 +2,7 @@ import { html, render, repeat } from '../../map/lit-html.js';
 import { RouteObserver } from '../mixins.js';
 import { Leg, Transport } from '../../generics.js';
 
-import './mc-icon.js';
+import '@proddi/x-icons/x-icon.js';
 
 
 /**
@@ -39,9 +39,18 @@ class RouteSelector extends RouteObserver(HTMLElement) {
      * @experimental
      * @returns {DOMNode} The elements root node
      */
-    getRootNode() {
+    createRenderRoot() {
         this.attachShadow({mode: 'open'});
         return this.shadowRoot;
+    }
+
+    /**
+     * @deprecated
+     * @returns {DOMNode} The elements root node
+     */
+    getRootNode() {
+        console.warn(`RouteSelector.getRootNode() is deprecated - use .createRenderRoot() instead!`)
+        return this.createRenderRoot();
     }
 
     /**
@@ -74,7 +83,7 @@ class RouteSelector extends RouteObserver(HTMLElement) {
         if (source.routeSelected) {
             this.onRouteSelected(source.routeSelected);
         } else {
-            this.setAttribute("selected", "");
+//            this.removeAttribute("selected");
         }
         if (!response.error) this.classList.add("active");
 //        this.setAttribute(respone.error ? "error" : "routes", "");
@@ -104,7 +113,7 @@ class RouteSelector extends RouteObserver(HTMLElement) {
      * @param {Route} route
      */
     onRouteDeselected(route) {
-        this.setAttribute("selected", "");
+        this.removeAttribute("selected");
         let node = this._rootNode.querySelector(`[data-route="${route.uid}"]`);
         if (node) node.classList.remove('active');
     }
@@ -230,7 +239,7 @@ class RouteSelector extends RouteObserver(HTMLElement) {
                     @click=${_ => this.selectRoute(route)}
                     @mouseenter=${_ => this.routeSource.emphasizeRoute(route, "highlighted")}
                     @mouseleave=${_ => this.routeSource.emphasizeRoute(route)}>
-                <mc-icon class="list-item-icon" icon="mc:${route.router.type || 'transit'}"></mc-icon>
+                <x-icon class="list-item-icon" icon="mc:${route.router.type || 'transit'}"></x-icon>
                 <header><small style="float:right">${route.router.type}</small>${route.duration}</header>
                 <content class="route-modes">
                     ${route.legs.filter(leg => leg.transport.type !== "walk").map(leg => html`<span class="leg leg-${leg.transport.type}" title="${leg.summary || ''}" style="color: ${leg.transport.color};">${leg.transport.name}</span>  &rsaquo; `)}

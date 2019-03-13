@@ -3,8 +3,14 @@
 <head>
     <title>HERE transit routing - demo - maps web components</title>
     <link type="text/css" rel="stylesheet" href="assets/examples.css" />
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
+    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
+
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/dev/mockup-router.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
@@ -32,7 +38,8 @@
 
         <here-transit-router role="route-source"
                     start="13.31709,52.54441"
-                    dest="13.56,52.41"></here-transit-router>
+                    dest="13.56,52.41">
+        </here-transit-router>
 
         <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="10 10 10 310">
             <here-map-route-picker></here-map-route-picker>

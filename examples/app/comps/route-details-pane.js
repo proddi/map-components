@@ -1,7 +1,7 @@
-import {RouteDetails} from '../../../src/mapui/route-details.js';
+import {RouteDetails} from '../../../src/mc/ui/route-details.js';
 import {elementTemplate} from '../../../src/map/tools.js';
-import {RouteObserver} from '../../../src/map/mixins.js';
-import {html, render} from '../../../src/map/lit-html.js';
+import {RouteObserver} from '../../../src/mc/mixins.js';
+import {html, render} from '../../../src/mc/lit-html.js';
 
 class RouteDetailsPane extends RouteObserver(HTMLElement) {
     baseRenderer() {

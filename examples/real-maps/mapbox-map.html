@@ -2,16 +2,22 @@
 <html>
 <head>
     <title>Mapbox Map - map-components</title>
-    <link rel="mc-icons" name="mc" href="../../assets/icons/route-icons.svg">  <!-- mc-icons -->
-    <link rel="mc-icons" name="maneuvers" href="../../assets/icons/route-nav-icons.svg">  <!-- mc-icons -->
     <link href="../assets/examples.css" rel="stylesheet">
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '@proddi/x-icons/x-iconset-svg.js';
+    </script>
+    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
+    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
+
     <script type="module" src="../../src/mapui/example.js"></script>
     <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-mapbox/platform.js"></script>
     <script type="module" src="../../src/vendor-mapbox/map.js"></script>
     <script type="module" src="../../src/vendor-mapbox/map-route-picker.js"></script>
     <script type="module" src="../../src/vendor-mapbox/map-routes.js"></script>
-    <script type="module" src="../../src/mapui/route-selector.js"></script>
+    <script type="module" src="../../src/mc/ui/route-selector.js"></script>
     <script type="module" src="../../src/route-debug.js"></script>
     <style>
         /* component base styles */
@@ -40,7 +46,7 @@
             <mapbox-map-routes></mapbox-map-routes>
         </mapbox-map>
 
-        <route-selector id="route-selector"></route-selector>
+        <route-selector></route-selector>
     </maps-example>
 
     <hr>
