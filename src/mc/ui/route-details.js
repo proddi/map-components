@@ -29,7 +29,9 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             bike:       leg => this.carLegRenderer(leg, "bike"),
             car:        leg => this.carLegRenderer(leg, "car"),
             train:      leg => this.transitLegRenderer(leg),
+            highspeed_train:    leg => this.transitLegRenderer(leg),
             bus:        leg => this.transitLegRenderer(leg),
+            bus_rapid:  leg => this.transitLegRenderer(leg),
             tram:       leg => this.transitLegRenderer(leg),
             metro:      leg => this.transitLegRenderer(leg),
             subway:     leg => this.transitLegRenderer(leg),
@@ -252,7 +254,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     arrivalRenderer(route) {
         return html`
             <div class="list-item">
-                <x-icon class="leg-icon" icon="transit:place"></x-icon>
+                <x-icon class="leg-icon" icon="transit:arrive"></x-icon>
                 <header><time>${formatTime(route.arrival.time)}</time>Arrive at ${route.arrival.name}</header>
             </div>
         `;
@@ -306,7 +308,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line transit-line"></div>
-                <x-icon class="leg-icon" icon="${foo(leg)}"></x-icon>
+                <x-icon class="leg-icon" icon="${foo(leg)}" title="type='${leg.transport.type}'"></x-icon>
                 <header class="no-wrap ellipsis">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
@@ -352,11 +354,11 @@ const _TYPE_MAP = {
     bike:       "transit:bike",
     car:        "transit:car",
     bus:        "transit:bus",
-//    bus_rapid:  "transit:bus",
+    bus_rapid:  "transit:bus",
     tram:       "transit:tram",
     subway:     "transit:subway",
     metro:      "transit:metro",
-//    highspeed_train:    "transit:train",
+    highspeed_train:    "transit:train/highspeed",
     train:      "transit:train",
 }
 function foo(leg) {
