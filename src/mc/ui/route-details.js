@@ -29,12 +29,14 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             bike:       leg => this.carLegRenderer(leg, "bike"),
             car:        leg => this.carLegRenderer(leg, "car"),
             train:      leg => this.transitLegRenderer(leg),
-            highspeed_train:    leg => this.transitLegRenderer(leg),
+//            highspeed_train:    leg => this.transitLegRenderer(leg),
             bus:        leg => this.transitLegRenderer(leg),
-            bus_rapid:  leg => this.transitLegRenderer(leg),
+//            bus_rapid:  leg => this.transitLegRenderer(leg),
             tram:       leg => this.transitLegRenderer(leg),
             metro:      leg => this.transitLegRenderer(leg),
             subway:     leg => this.transitLegRenderer(leg),
+            ferry:      leg => this.transitLegRenderer(leg),
+            aerial:     leg => this.transitLegRenderer(leg),
             monorail:   leg => this.transitLegRenderer(leg),
         }
 
@@ -140,7 +142,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     margin: 0;
                     list-style: none;
                 }
-
+ferry
                 .list-item > ul.stops > li {
                     padding-top: 2px;
                     padding-bottom: 2px;
@@ -209,6 +211,9 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     color: var(--line-color);
                     filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
+                .leg-icon:hover {
+                    box-shadow: 0 0 3px red;
+                }
 
                 .maneuver-icon {
                     position: absolute;
@@ -271,7 +276,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
-                <x-icon class="leg-icon" icon="${foo(leg)}"></x-icon>
+                <x-icon class="leg-icon" icon="${foo(leg)}" title="type='${leg.transport.type}'"></x-icon>
                 <div class="line"></div>
                 <header><time datetime="PT2H30M">${leg.departure.timeString}</time>${leg.summary}</header>
                 <content>
@@ -285,7 +290,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         return html`
             <div class="list-item walk-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <x-icon class="leg-icon" icon="transit:walk"></x-icon>
+                <x-icon class="leg-icon" icon="transit:walk" title="type='${leg.transport.type}'"></x-icon>
                 <div class="line walk-line"></div>
                 <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
                 <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>See ${leg.steps.length} directions for this ${formatDistance(leg.distance)} walk</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
@@ -308,10 +313,10 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line transit-line"></div>
-                <x-icon class="leg-icon" icon="${foo(leg)}" title="type='${leg.transport.type}'"></x-icon>
                 <header class="no-wrap ellipsis">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
+                <x-icon class="leg-icon" icon="transit:${leg.transport.type}" title="type='${leg.transport.type}'"></x-icon>
                 <content class="no-wrap ellipsis" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</content>
                 <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
                 <ul class="steps stops">
@@ -328,7 +333,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item ${type}-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line ${type}-line"></div>
-                <x-icon class="leg-icon" icon="transit:${type}"></x-icon>
+                <x-icon class="leg-icon" icon="transit:${type}" title="type='${leg.transport.type}'"></x-icon>
                 <header><time>${leg.departure.timeString}</time>Start at ${leg.departure.name}</header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>

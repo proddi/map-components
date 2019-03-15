@@ -10,7 +10,7 @@
     "main": "src/index.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/proddi/map-components.git"
+        "url": "git+https://github.com/proddi/map-components.git"
     },
     "scripts": {
         "build": "./node_modules/.bin/webpack --config webpack.config.js",
@@ -20,16 +20,11 @@
         "serve": "./node_modules/.bin/polymer serve"
     },
     "dependencies": {
-        "@proddi/x-icons": ">=0.0.7",
+        "@proddi/x-icons": ">=0.0.8",
         "lit-html": "^1.0.0-rc.2"
     },
     "devDependencies": {
         "@polymer/iron-demo-helpers": "^3.0.1",
-        "@cwmr/paper-autocomplete": "^4.0.0",
-        "@polymer/paper-input": "^3.0.1",
-        "@polymer/paper-material": "^3.0.1",
-        "@polymer/paper-progress": "^3.0.1",
-        "@polymer/paper-spinner": "^3.0.1",
         "@proddi/esdoc": "^1.2.0",
         "esdoc-publish-html-templates-plugin": "file:esdoc-publish-html-templates-plugin",
         "esdoc-standard-plugin": "^1.0.0",
