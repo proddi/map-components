@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>HERE MAP - web components</title>
-    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2.0.0/webcomponents-loader.js"></script>
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
     <script type="module" src="../src/vendor-here/platform.js"></script>
@@ -10,8 +9,8 @@
     <script type="module" src="../src/vendor-here/router.js"></script>
     <script type="module" src="../src/vendor-here/map-route-picker.js"></script>
     <script type="module" src="../src/vendor-here/map-routes.js"></script>
-    <script type="module" src="../src/mapui/route-selector.js"></script>
-    <script type="module" src="../src/mapui/route-details.js"></script>
+    <script type="module" src="../src/mc/ui/route-selector.js"></script>
+    <script type="module" src="../src/mc/ui/route-details.js"></script>
     <script type="module" src="../src/route-debug.js"></script>
     <script type="module" src="../src/route-link.js"></script>
     <link type="text/css" rel="stylesheet" href="assets/examples.css" />
@@ -27,17 +26,15 @@
 
     <maps-example>
         <here-platform app-id="${HERE_APP_ID}" app-code="${HERE_APP_CODE}"></here-platform>
-        <here-router></here-router>
-
-        <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 150 0 10">
-
-            <here-map-route-picker role="route-source" router="here-router"
+        <here-router role="route-source"
                 start="13.387234135880135,52.516663186138175"
                 dest="13.422018470882904,52.51460610994581"
                 time="2019-02-22T19:17:07">
-            </here-map-route-picker>
+        </here-router>
 
-            <here-map-routes selector="#route-selector"></here-map-routes>
+        <here-map center="13.5,52.5" zoom="11" platform="here-platform" view-padding="20 150 0 10">
+            <here-map-route-picker></here-map-route-picker>
+            <here-map-routes></here-map-routes>
         </here-map>
 
         <route-selector toggle>

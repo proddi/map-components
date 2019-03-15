@@ -2,6 +2,13 @@
 <html>
 <head>
     <title>HERE transit routing - demo - maps web components</title>
+
+    <!-- mc-icons -->
+    <script type="module">
+        import '../../src/mc/ui/assets/transit-icons.js';
+        import '../../src/mc/ui/assets/maneuver-icons.js';
+    </script>
+
     <script type="text/javascript" src="../credentials.js"></script>
     <script type="module" src="../../src/vendor-here/transit-router.js"></script>
     <script type="module" src="../../src/vendor-here/platform.js"></script>
@@ -18,13 +25,6 @@
     <script type="module" src="../../src/mc/ui/route-details.js"></script>
     <script type="module" src="../../src/mc/ui/route-progress.js"></script>
     <script type="module" src="../../src/mc/ui/route-error.js"></script>
-
-    <!-- mc-icons -->
-    <script type="module">
-        import '@proddi/x-icons/x-iconset-svg.js';
-    </script>
-    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
-    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -84,21 +84,16 @@
 
     <union-router
             role="route-source"
-            routers="#transit-router,#car-router,#bike-router"
             start="13.31709,52.54441"
             dest="13.56,52.41"
             time="2019-01-22T19:17:07">
-        <here-transit-router id="transit-router"></here-transit-router>
-        <google-router id="car-router" mode="DRIVING" name="google/car"></google-router>
-        <google-router id="bike-router" mode="BICYCLING" name="google/bike"></google-router>
+        <here-transit-router name="here/transit"></here-transit-router>
+        <google-router mode="DRIVING" name="google/car"></google-router>
+        <google-router mode="BICYCLING" name="google/bike"></google-router>
     </union-router>
 
     <here-map center="13.5,52.5" zoom="11" view-padding="10 210 10 10">
-        <here-map-route-picker
-                start="13.31709,52.54441"
-                dest="13.56,52.41"
-                time="2019-01-22T19:17:07">
-        </here-map-route-picker>
+        <here-map-route-picker></here-map-route-picker>
         <here-map-routes></here-map-routes>
         <route-selector toggle>
             <route-progress slot="top"></route-progress>

@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>route-selector - map components</title>
+    <title>route-selector+details - map components</title>
+
+    <!-- mc-icons -->
     <script type="module">
-        import '@proddi/x-icons/x-iconset-svg.js';
+        import '../../src/mc/ui/assets/transit-icons.js';
+        import '../../src/mc/ui/assets/maneuver-icons.js';
     </script>
 
     <link href="../assets/examples.css" rel="stylesheet">
@@ -13,10 +16,6 @@
     <script type="module" src="../../src/mc/ui/route-selector.js"></script>
     <script type="module" src="../../src/mc/ui/route-details.js"></script>
 
-    <x-iconset-svg name="mc" icon-size="24" href="../../assets/icons/transit-icons.svg"></x-iconset-svg>
-    <x-iconset-svg name="maneuvers" icon-size="24" href="../../assets/icons/route-nav-icons.svg"></x-iconset-svg>
-    <x-iconset-svg name="mc1" icon-size="48" href="../../assets/icons/transit-icons-colored.svg"></x-iconset-svg>
-    <x-iconset-svg name="mc1" href="../../assets/icons/transit-icons-color-asset.svg"></x-iconset-svg>
     <style>
         .row {
             display: flex;
@@ -38,7 +37,7 @@
     </style>
 </head>
 <body>
-    <h3>RouteSelector - map-components</h3>
+    <h3>RouteSelector + Details - map-components</h3>
 
     <demo-router role="route-source" show-routes
         base="../assets/responses/here-transit-"

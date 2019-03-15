@@ -6,9 +6,9 @@
 
     <!-- mc-icons -->
     <script type="module">
-        import '@proddi/x-icons/x-iconset-svg.js';
+        import '../src/mc/ui/assets/transit-icons.js';
+        import '../src/mc/ui/assets/maneuver-icons.js';
     </script>
-    <x-iconset-svg name="mc" icon-size="24" href="../assets/icons/transit-icons.svg"></x-iconset-svg>
 
     <script type="text/javascript" src="credentials.js"></script>
     <script type="module" src="../src/mapui/example.js"></script>
@@ -35,16 +35,11 @@
             name="google/car"
             mode="DRIVING"
             start="13.30,52.43"
-            dest="13.76,52.51"
-            time="2018-12-22T19:17:07">
+            dest="13.76,52.51">
         </google-router>
 
         <here-map id="map1" center="13.5,52.5" zoom="11" style="height:500px" platform="here-platform">
-            <here-map-route-picker
-                start="13.30,52.43"
-                dest="13.76,52.51"
-                time="2018-12-22T19:17:07">
-            </here-map-route-picker>
+            <here-map-route-picker></here-map-route-picker>
             <here-map-routes></here-map-routes>
 
             <route-selector toggle></route-selector>
