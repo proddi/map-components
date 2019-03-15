@@ -1,5 +1,5 @@
 import {Address} from '../generics.js';
-import {html, render, repeat} from '../map/lit-html.js';
+import {html, render, repeat} from '../mc/lit-html.js';
 import {MockupRouter} from './mockup-router.js';
 import {elementTemplate} from '../map/tools.js';
 import {qs, qp, whenElementReady} from '../mc/utils.js';

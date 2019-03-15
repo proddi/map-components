@@ -1,4 +1,4 @@
-import { html, render, repeat } from '../../map/lit-html.js';
+import { html, render, repeat } from '../../mc/lit-html.js';
 import { RouteObserver } from '../mixins.js';
 import { Leg, Transport } from '../../generics.js';
 
@@ -242,8 +242,8 @@ class RouteSelector extends RouteObserver(HTMLElement) {
                     @click=${_ => this.selectRoute(route)}
                     @mouseenter=${_ => this.routeSource.emphasizeRoute(route, "highlighted")}
                     @mouseleave=${_ => this.routeSource.emphasizeRoute(route)}>
-                <x-icon class="list-item-icon" icon="transit:${route.router.type || 'transit'}"></x-icon>
-                <header><small style="float:right">${route.router.type}</small>${route.duration}</header>
+                <x-icon class="list-item-icon" icon="transit:${route.router.type || 'transit'}" title="type='${route.router.type}'"></x-icon>
+                <header>${route.duration}</header>
                 <content class="route-modes">
                     ${route.legs.filter(leg => leg.transport.type !== "walk").map(leg => html`<span class="leg leg-${leg.transport.type}" title="${leg.summary || ''}" style="color: ${leg.transport.color};">${leg.transport.name}</span>  &rsaquo; `)}
                 </content>

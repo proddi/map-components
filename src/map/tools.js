@@ -1,4 +1,4 @@
-import {html, render} from './lit-html.js';
+import {html, render} from '../mc/lit-html.js';
 
 
 /**

@@ -37,7 +37,8 @@ class HereTransitRouter extends BaseRouter {
      * @const
      * @type {string}
      */
-    get vendor() { return "here/" + this.type; }
+    get name() { return "here/" + this.type; }
+    set name(name) { this._name = name; }
 
     constructor() {
         super();
@@ -140,7 +141,6 @@ class HereTransitRouter extends BaseRouter {
                 app_id:     platform ? platform.app_id : parseString(this.getAttribute("app-id"), window),
                 app_code:   platform ? platform.app_code : parseString(this.getAttribute("app-code"), window),
             });
-
 
         let response = new RouteResponse(request);
         return fetch(url).then(res => res.json()).then(res => {

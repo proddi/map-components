@@ -23,7 +23,7 @@ import '/node_modules/@polymer/paper-material/paper-material.js';
 */
 
 // import {Polymer} from '@polymer/polymer/lib/legacy/polymer-fn.js';
-import {html, render, repeat} from '../../map/lit-html.js';
+import {html, render, repeat} from '../lit-html.js';
 
 
 class LocationInputSuggestions extends HTMLElement {

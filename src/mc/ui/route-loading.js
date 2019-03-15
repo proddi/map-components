@@ -1,4 +1,4 @@
-import {html, render} from '../../map/lit-html.js';
+import {html, render} from '../../mc/lit-html.js';
 import {RouteObserver} from '../../mc/mixins.js';
 
 

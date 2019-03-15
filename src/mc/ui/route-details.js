@@ -1,4 +1,4 @@
-import { html, render, repeat } from '../../map/lit-html.js';
+import { html, render, repeat } from '../../mc/lit-html.js';
 import { RouteObserver } from '../mixins.js';
 import { formatDuration, formatTime, formatDistance } from '../../map/tools.js';
 
@@ -26,7 +26,8 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         this.legRenderer = {
             default:    leg => this.defaultLegRenderer(leg),
             walk:       leg => this.walkLegRenderer(leg),
-            car:        leg => this.carLegRenderer(leg),
+            bike:       leg => this.carLegRenderer(leg, "bike"),
+            car:        leg => this.carLegRenderer(leg, "car"),
             train:      leg => this.transitLegRenderer(leg),
             bus:        leg => this.transitLegRenderer(leg),
             tram:       leg => this.transitLegRenderer(leg),
@@ -320,12 +321,12 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         `;
     }
 
-    carLegRenderer(leg) {
+    carLegRenderer(leg, type="car") {
         return html`
-            <div class="list-item car-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
+            <div class="list-item ${type}-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <div class="line car-line"></div>
-                <x-icon class="leg-icon" icon="transit:car"></x-icon>
+                <div class="line ${type}-line"></div>
+                <x-icon class="leg-icon" icon="transit:${type}"></x-icon>
                 <header><time>${leg.departure.timeString}</time>Start at ${leg.departure.name}</header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>

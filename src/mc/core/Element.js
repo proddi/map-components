@@ -1,4 +1,4 @@
-import {html, render, repeat} from '../../map/lit-html.js';
+import {html, render, repeat} from '../lit-html.js';
 
 
 const converters = {
