@@ -1,3 +1,4 @@
+import { html, render } from './mc/lit-html.js';
 import {BaseRouter, RouteResponse} from './generics.js';
 import {qs, qp, whenElementReady} from './mc/utils.js';
 
@@ -5,7 +6,6 @@ import {qs, qp, whenElementReady} from './mc/utils.js';
 /**
  * Element for combining multiple routers {BaseRouter}s into one.
  *
- * @todo Autodiscover node.children routers (qci(this, BaseRouter) - queryChildInstance)
  * @todo Find the right place.
  *
  * @example
@@ -14,6 +14,13 @@ import {qs, qp, whenElementReady} from './mc/utils.js';
  *
  * <union-router routers="#router1,#router2" start="lat,lon" dest="lat,lon">
  * </union-router>
+ *
+ * @example
+ * <union-router start="lat,lon" dest="lat,lon">
+ *   <router1></router1>
+ *   <router2></router2>
+ * </union-router>
+ *
  */
 class UnionRouter extends BaseRouter {
     /**
@@ -34,14 +41,29 @@ class UnionRouter extends BaseRouter {
 
         this.routers = [];
 
-        this._whenReady = Promise.all(
-            this.getAttribute("routers")
-                .split(",")
+        // render
+        this.attachShadow({mode: 'open'});
+        render(this.render(), this.shadowRoot);
+
+        let routers = this.getAttribute("routers");
+        const attrRouters = (routers ? routers.split(",") : [])
                 .filter(id => id)
                 .map(id => whenElementReady(qs(id)))
-            )
-//            .then(routers => { console.log(".all:", routers); return routers; })
-            .then(routers => this.routers = routers);
+                ;
+        const slotRouters = this.shadowRoot.querySelector('slot')
+                .assignedElements()
+                .map(el => customElements.whenDefined(el.tagName.toLowerCase()).then(_ => el))
+                ;
+
+        this._whenReady = Promise.all(attrRouters.concat(slotRouters))
+            .then(routers => this.routers = routers)
+            ;
+    }
+
+    render() {
+        return html`
+            <slot></slot>
+        `
     }
 
     getRouter() {
