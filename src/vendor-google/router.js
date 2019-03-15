@@ -3,6 +3,14 @@ import {qs, qp, whenElementReady} from '../mc/utils.js';
 import {GooglePlatform} from './platform.js';
 
 
+const MODES_TO_TYPE = {
+    DRIVING: 'car',
+    WALKING: 'walk',
+    BICYCLING: 'bike',
+    TRANSIT: 'transit',
+    default: 'car',
+}
+
 /**
  * Provides an router element for google directions. It can be referenced in map components.
  *
@@ -18,11 +26,16 @@ import {GooglePlatform} from './platform.js';
  **/
 class GoogleDirectionsRouter extends BaseRouter {
     /**
-     * Type of the router - _"google"_ for this router.
-     * @const
+     * Type of the router - _"car"_, _"transit"_, _"bike"_ or _"walk"_ for this router.
      * @type {string}
      */
-    get type() { return "google"; }
+    get type() { return MODES_TO_TYPE[this.mode] || MODES_TO_TYPE.default }
+
+    /**
+     * Type of the router - _"here/transit"_ for this router.
+     * @type {string}
+     */
+    get vendor() { return "google/" + this.type; }
 
     constructor() {
         super();

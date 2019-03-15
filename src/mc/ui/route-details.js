@@ -251,7 +251,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
     arrivalRenderer(route) {
         return html`
             <div class="list-item">
-                <x-icon class="leg-icon" icon="mc:place"></x-icon>
+                <x-icon class="leg-icon" icon="transit:place"></x-icon>
                 <header><time>${formatTime(route.arrival.time)}</time>Arrive at ${route.arrival.name}</header>
             </div>
         `;
@@ -282,14 +282,14 @@ class RouteDetails extends RouteObserver(HTMLElement) {
         return html`
             <div class="list-item walk-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
-                <x-icon class="leg-icon" icon="mc:walk"></x-icon>
+                <x-icon class="leg-icon" icon="transit:walk"></x-icon>
                 <div class="line walk-line"></div>
                 <header><time>${leg.departure.timeString}</time>${leg.summary}</header>
                 <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>See ${leg.steps.length} directions for this ${formatDistance(leg.distance)} walk</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
                 <ul class="steps">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
-                        <x-icon class="maneuver-icon" icon="maneuvers:${step.maneuver}" title="manuever: ${step.maneuver}"></x-icon>
+                        <x-icon class="maneuver-icon" icon="maneuver:${step.maneuver}" title="manuever: ${step.maneuver}"></x-icon>
                         <div class="ellipsis"><time>${formatTime(step.time)}</time>${step.name}</div>
                         <div><span class="distance">${formatDistance(leg.distance)}</span></div>
                     </li>
@@ -325,7 +325,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
             <div class="list-item car-item steps-hidden" data-leg="${leg.id}" style="--line-color: #2c48a1"
                     @click=${_ => this.selectLeg(leg)}>
                 <div class="line car-line"></div>
-                <x-icon class="leg-icon" icon="mc:car"></x-icon>
+                <x-icon class="leg-icon" icon="transit:car"></x-icon>
                 <header><time>${leg.departure.timeString}</time>Start at ${leg.departure.name}</header>
                 <content>
                     <div><span class="distance">${formatDistance(leg.distance)}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</div>
@@ -334,7 +334,7 @@ class RouteDetails extends RouteObserver(HTMLElement) {
                 <ul class="steps maneuvers">
                 ${repeat(leg.steps || [], (step, index) => html`
                     <li>
-                        <x-icon class="maneuver-icon" icon="maneuvers:turn-left"></x-icon>
+                        <x-icon class="maneuver-icon" icon="maneuver:turn-left"></x-icon>
                         <div class="ellipsis"><time>${formatTime(leg.departure.time)}</time>${step.name}</div>
                     </li>
                 `)}
@@ -347,22 +347,22 @@ class RouteDetails extends RouteObserver(HTMLElement) {
 
 
 const _TYPE_MAP = {
-    walk:       "mc:walk",
-    bike:       "mc:bike",
-    car:        "mc:car",
-    bus:        "mc:bus",
-//    bus_rapid:  "mc:bus",
-    tram:       "mc:tram",
-    subway:     "mc:subway",
-    metro:      "mc:metro",
-//    highspeed_train:    "mc:train",
-    train:      "mc:train",
+    walk:       "transit:walk",
+    bike:       "transit:bike",
+    car:        "transit:car",
+    bus:        "transit:bus",
+//    bus_rapid:  "transit:bus",
+    tram:       "transit:tram",
+    subway:     "transit:subway",
+    metro:      "transit:metro",
+//    highspeed_train:    "transit:train",
+    train:      "transit:train",
 }
 function foo(leg) {
     const [basetype] = `${leg.transport.type}/`.split("/", 1);
     const icon = _TYPE_MAP[basetype];
     if (!icon) console.warn(`No icon for transport type "${leg.transport.type}" -`, leg);
-    return icon || "mc:transit";
+    return icon || "transit:transit";
 }
 
 customElements.define('route-details', RouteDetails);

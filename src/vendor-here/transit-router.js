@@ -26,11 +26,18 @@ import {HerePlatform} from './platform.js';
  */
 class HereTransitRouter extends BaseRouter {
     /**
+     * Type of the router - _"transit"_ for this router.
+     * @const
+     * @type {string}
+     */
+    get type() { return "transit"; }
+
+    /**
      * Type of the router - _"here/transit"_ for this router.
      * @const
      * @type {string}
      */
-    get type() { return "here/transit"; }
+    get vendor() { return "here/" + this.type; }
 
     constructor() {
         super();

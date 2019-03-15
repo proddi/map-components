@@ -17,10 +17,10 @@
         "build:prod": "NODE_ENV=production npm run build",
         "build:docs": "rm -rf docs; ./node_modules/.bin/esdoc -c esdoc.json",
         "push:docs": "./node_modules/.bin/gh-pages -d build/docs/ -m \"Auto-generated commit for documentation\"",
-        "server": "./node_modules/.bin/polymer serve"
+        "serve": "./node_modules/.bin/polymer serve"
     },
     "dependencies": {
-        "@proddi/x-icons": ">=0.0.3",
+        "@proddi/x-icons": ">=0.0.7",
         "lit-html": "^1.0.0-rc.2"
     },
     "devDependencies": {
