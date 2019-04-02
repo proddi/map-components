@@ -288,7 +288,14 @@ const ROUTER_MODES = {
     12: "bus/rapid",
     13: "monorail",
     14: "flight",
+    17: "bike",
+    18: "bike/share",
+    19: "pnr",
     20: "walk",
+    21: "car",
+    22: "car/share",
+    23: "car/taxi",
+
 }
 
 

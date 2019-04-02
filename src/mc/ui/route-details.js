@@ -211,9 +211,6 @@ ferry
                     color: var(--line-color);
                     filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, .2));
                 }
-                .leg-icon:hover {
-                    box-shadow: 0 0 3px red;
-                }
 
                 .maneuver-icon {
                     position: absolute;
@@ -308,6 +305,7 @@ ferry
     }
 
     transitLegRenderer(leg) {
+        console.log(leg);
         return html`
             <div class="list-item transit-item steps-hidden" data-leg="${leg.id}"
                     style="--line-color: ${leg.transport.color || 'rgb(75, 81, 89)'}"
@@ -316,7 +314,7 @@ ferry
                 <header class="no-wrap ellipsis">
                     <time>${leg.departure.timeString}</time>${leg.departure.name}
                 </header>
-                <x-icon class="leg-icon" icon="transit:${leg.transport.type}" title="type='${leg.transport.type}'"></x-icon>
+                <x-icon class="leg-icon" icon="transit:${resolveMimeSeq(leg.transport.type)} || transit" title="type='${leg.transport.type}'"></x-icon>
                 <content class="no-wrap ellipsis" title="${leg.transport.name} towards ${leg.transport.headsign}" style="color: var(--line-color)">${leg.transport.name} → ${leg.transport.headsign}</content>
                 <content class="info"><span class="steps-toggle" @click=${_ => this._toggleLegElement(leg, "", "steps-hidden")}>Stops: ${leg.steps.length}</span> &nbsp; (${formatDuration(leg.departure.time, leg.arrival.time)})</content>
                 <ul class="steps stops">
@@ -351,6 +349,11 @@ ferry
         `;
     }
 
+}
+
+
+function resolveMimeSeq(mime) {
+    return mime.split('/').map((_, i, list) => list.slice(0, i+1).join("/")).reverse().join(' || ');
 }
 
 

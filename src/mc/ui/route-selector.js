@@ -32,7 +32,7 @@ class RouteSelector extends RouteObserver(HTMLElement) {
          */
         this.toggleSelection = this.hasAttribute("toggle");
 
-        this._rootNode = this.getRootNode();
+        this._rootNode = this.createRenderRoot();
 
         // initial rendering
         this.onRouteClear();
@@ -45,15 +45,6 @@ class RouteSelector extends RouteObserver(HTMLElement) {
     createRenderRoot() {
         this.attachShadow({mode: 'open'});
         return this.shadowRoot;
-    }
-
-    /**
-     * @deprecated
-     * @returns {DOMNode} The elements root node
-     */
-    getRootNode() {
-        console.warn(`RouteSelector.getRootNode() is deprecated - use .createRenderRoot() instead!`)
-        return this.createRenderRoot();
     }
 
     /**
